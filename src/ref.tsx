@@ -20,20 +20,11 @@ export type RefProps = {
 export const Ref: Component<RefProps> = (props) => {
   const { id, refId } = props;
 
-  const [scenegraph, { createRef, createNode, getCurrentBBox, setBBox }] =
-    useContext(BBoxContext)!;
+  const [scenegraph, { createRef }] = useContext(BBoxContext)!;
 
   const parentId = useContext(ParentIDContext);
 
   createRef(id, refId, parentId);
-
-  // useEffect(() => {
-  //   // first we convert the refBBox to our frame
-  //   // const refBBox = getCurrentBBox(scenegraph, refId);
-  //   // const refTransform = scenegraph[refId]?.worldTransform;
-  //   // setBBox(id, refBBox, id, refTransform);
-  //   // TODO: probably have to cleanup ownership here...
-  // }, [createRef, getCurrentBBox, id, refId, scenegraph, setBBox]);
 
   return <></>;
 };

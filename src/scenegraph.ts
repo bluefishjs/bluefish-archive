@@ -256,45 +256,6 @@ export const createScenegraph = (): BBoxStore => {
     }
   };
 
-  const getCurrentBBox = (
-    scenegraph: { [key: string]: ScenegraphNode },
-    id: string
-  ) => {
-    return {
-      get left() {
-        const node = getNode(scenegraph, id);
-        if (
-          node.bbox.left === undefined ||
-          node.transform.translate.x === undefined
-        ) {
-          return undefined;
-        }
-
-        return node.bbox.left + node.transform.translate.x;
-      },
-      get top() {
-        const node = getNode(scenegraph, id);
-
-        if (
-          node.bbox.top === undefined ||
-          node.transform.translate.y === undefined
-        ) {
-          return undefined;
-        }
-
-        return node.bbox.top + node.transform.translate.y;
-      },
-      get width() {
-        const node = getNode(scenegraph, id);
-        return node.bbox.width;
-      },
-      get height() {
-        const node = getNode(scenegraph, id);
-        return node.bbox.height;
-      },
-    };
-  };
-
   const getBBox = (id: string) => {
     const node = getNode(scenegraph, id, setScenegraph);
     // console.log("getBBox id", id);
@@ -686,7 +647,6 @@ export const createScenegraph = (): BBoxStore => {
       setBBox,
       createNode,
       createRef,
-      getCurrentBBox,
       getNode,
     },
   ];
@@ -697,10 +657,6 @@ export type BBoxStore = [
   set: {
     // TODO: move this out of set...
     getBBox: (id: string) => BBox;
-    getCurrentBBox: (
-      scenegraph: { [key: string]: ScenegraphNode },
-      id: string
-    ) => BBox;
     getNode: (
       scenegraph: { [key: string]: ScenegraphNode },
       id: string
