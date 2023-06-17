@@ -1,4 +1,4 @@
-import { createContext, useContext } from "solid-js";
+import { createContext, untrack, useContext } from "solid-js";
 import { SetStoreFunction, createStore, produce } from "solid-js/store";
 import { getLCAChainSuffixes, getTransformDiff } from "./lcaUtil";
 import _ from "lodash";
@@ -8,6 +8,10 @@ export type Id = string;
 export type BBox = {
   left?: number;
   top?: number;
+  right?: number;
+  bottom?: number;
+  centerX?: number;
+  centerY?: number;
   width?: number;
   height?: number;
 };
@@ -329,6 +333,36 @@ export const createScenegraph = (): BBoxStore => {
         // const node = getNode(scenegraph, id, setScenegraph);
 
         return node.bbox.height;
+      },
+      get right() {
+        // calculated using left and width
+        if (this.left === undefined || this.width === undefined) {
+          return undefined;
+        }
+
+        return this.left + this.width;
+      },
+      get bottom() {
+        // calculated using top and height
+        if (this.top === undefined || this.height === undefined) {
+          return undefined;
+        }
+
+        return this.top + this.height;
+      },
+      get centerX() {
+        if (this.left === undefined || this.width === undefined) {
+          return undefined;
+        }
+
+        return this.left + this.width / 2;
+      },
+      get centerY() {
+        if (this.top === undefined || this.height === undefined) {
+          return undefined;
+        }
+
+        return this.top + this.height / 2;
       },
     };
   };

@@ -19,8 +19,8 @@ export type Alignment2DObjs = {
   [K in Alignment2D]: { [k in K]: boolean };
 }[Alignment2D];
 
-export type VerticalAlignment = "top" | "center" | "bottom";
-export type HorizontalAlignment = "left" | "center" | "right";
+export type VerticalAlignment = "top" | "centerY" | "bottom";
+export type HorizontalAlignment = "left" | "centerX" | "right";
 
 export type Alignment1DHorizontal = "left" | "centerHorizontally" | "right";
 export type Alignment1DVertical = "top" | "centerVertically" | "bottom";
@@ -57,7 +57,7 @@ export const splitAlignment = (
     case "centerLeft":
     case "center":
     case "centerRight":
-      verticalAlignment = "center";
+      verticalAlignment = "centerY";
       break;
     case "bottom":
     case "bottomLeft":
@@ -78,7 +78,7 @@ export const splitAlignment = (
     case "topCenter":
     case "center":
     case "bottomCenter":
-      horizontalAlignment = "center";
+      horizontalAlignment = "centerX";
       break;
     case "right":
     case "topRight":
@@ -114,6 +114,10 @@ export function Align(props: AlignProps) {
         top: bbox.top,
         width: bbox.width,
         height: bbox.height,
+        right: bbox.right,
+        bottom: bbox.bottom,
+        centerX: bbox.centerX,
+        centerY: bbox.centerY,
       };
     });
   const getNode = (scenegraph: Scenegraph, id: string) =>
@@ -179,26 +183,10 @@ export function Align(props: AlignProps) {
       )
       .map(([placeable, alignment]) => {
         const [verticalAlignment, horizontalAlignment] = alignment!;
-        if (verticalAlignment === "top") {
-          return [placeable, reactiveGetBBox(placeable!).top];
-        } else if (verticalAlignment === "center") {
-          const top = reactiveGetBBox(placeable!).top;
-          const height = reactiveGetBBox(placeable!).height;
-          if (top === undefined || height === undefined) {
-            return [placeable, undefined];
-          }
-          return [placeable, top + height / 2];
-        } else if (verticalAlignment === "bottom") {
-          // return reactiveGetBBox(placeable!).bottom;
-          const top = reactiveGetBBox(placeable!).top;
-          const height = reactiveGetBBox(placeable!).height;
-          if (top === undefined || height === undefined) {
-            return [placeable, undefined];
-          }
-          return [placeable, top + height];
-        } else {
+        if (verticalAlignment === undefined) {
           return [placeable, undefined];
         }
+        return [placeable, reactiveGetBBox(placeable!)[verticalAlignment]];
       })
       .filter(
         ([placeable, value]) =>
@@ -229,25 +217,10 @@ export function Align(props: AlignProps) {
       )
       .map(([placeable, alignment]) => {
         const [verticalAlignment, horizontalAlignment] = alignment!;
-        if (horizontalAlignment === "left") {
-          return [placeable, reactiveGetBBox(placeable!).left];
-        } else if (horizontalAlignment === "center") {
-          const left = reactiveGetBBox(placeable!).left;
-          const width = reactiveGetBBox(placeable!).width;
-          if (left === undefined || width === undefined) {
-            return [placeable, undefined];
-          }
-          return [placeable, left + width / 2];
-        } else if (horizontalAlignment === "right") {
-          const left = reactiveGetBBox(placeable!).left;
-          const width = reactiveGetBBox(placeable!).width;
-          if (left === undefined || width === undefined) {
-            return [placeable, undefined];
-          }
-          return [placeable, left + width];
-        } else {
+        if (horizontalAlignment === undefined) {
           return [placeable, undefined];
         }
+        return [placeable, reactiveGetBBox(placeable!)[horizontalAlignment]];
       })
       .filter(
         ([placeable, value]) =>
@@ -259,8 +232,6 @@ export function Align(props: AlignProps) {
       horizontalValueArr.length === 0
         ? 0
         : (horizontalValueArr[0][1] as number);
-
-    console.log("horizontalValue", horizontalValue);
 
     for (const [placeable, alignment] of verticalPlaceables) {
       if (
@@ -275,7 +246,7 @@ export function Align(props: AlignProps) {
       const [verticalAlignment, horizontalAlignment] = alignment!;
       if (verticalAlignment === "top") {
         setSmartBBox(placeable!, { top: verticalValue }, props.id);
-      } else if (verticalAlignment === "center") {
+      } else if (verticalAlignment === "centerY") {
         const height = getBBox(placeable!).height;
         if (height === undefined) {
           continue;
@@ -303,9 +274,8 @@ export function Align(props: AlignProps) {
         continue;
       const [verticalAlignment, horizontalAlignment] = alignment!;
       if (horizontalAlignment === "left") {
-        console.log("setting left", placeable, horizontalValue);
         setSmartBBox(placeable!, { left: horizontalValue }, props.id);
-      } else if (horizontalAlignment === "center") {
+      } else if (horizontalAlignment === "centerX") {
         const width = getBBox(placeable!).width;
         if (width === undefined) {
           continue;
@@ -317,17 +287,11 @@ export function Align(props: AlignProps) {
         );
       } else if (horizontalAlignment === "right") {
         // placeable!.right = horizontalValue;
-        console.log(
-          "setting right",
-          placeable,
-          horizontalValue,
-          getBBox(placeable!).width
-        );
-        setSmartBBox(
-          placeable!,
-          { left: horizontalValue - getBBox(placeable!).width! },
-          props.id
-        );
+        const width = getBBox(placeable!).width;
+        if (width === undefined) {
+          continue;
+        }
+        setSmartBBox(placeable!, { left: horizontalValue - width }, props.id);
       }
     }
 
@@ -337,7 +301,6 @@ export function Align(props: AlignProps) {
       width: childIds.map((childId) => getBBox(childId).width),
       height: childIds.map((childId) => getBBox(childId).height),
     };
-    console.log("bbboxes", props.id, bboxes);
 
     const left = bboxes.left.includes(undefined)
       ? undefined
@@ -369,15 +332,6 @@ export function Align(props: AlignProps) {
       left !== undefined && right !== undefined ? right - left : undefined;
     const height =
       top !== undefined && bottom !== undefined ? bottom - top : undefined;
-
-    console.log("align bbox", props.id, {
-      left,
-      top,
-      right,
-      bottom,
-      width,
-      height,
-    });
 
     return {
       transform: {
