@@ -28,14 +28,15 @@ export function Rect(props: RectProps) {
     };
   };
 
-  const paint = ({ bbox, transform }: { bbox: BBox; transform: Transform }) => {
-    console.log("paint rect", props.id, bbox, transform);
+  const paint = (paintProps: { bbox: BBox; transform: Transform }) => {
     return (
       <rect
-        x={(bbox.left ?? 0) + (transform.translate.x ?? 0)}
-        y={(bbox.top ?? 0) + (transform.translate.y ?? 0)}
-        width={bbox.width}
-        height={bbox.height}
+        x={
+          (paintProps.bbox.left ?? 0) + (paintProps.transform.translate.x ?? 0)
+        }
+        y={(paintProps.bbox.top ?? 0) + (paintProps.transform.translate.y ?? 0)}
+        width={paintProps.bbox.width}
+        height={paintProps.bbox.height}
         fill={props.fill}
       />
     );

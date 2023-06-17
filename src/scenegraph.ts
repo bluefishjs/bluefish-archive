@@ -293,9 +293,9 @@ export const createScenegraph = (): BBoxStore => {
 
   const getBBox = (id: string) => {
     const node = getNode(scenegraph, id, setScenegraph);
-    console.log("getBBox id", id);
-    console.log("node", JSON.parse(JSON.stringify(node)));
-    console.log("scenegraph", JSON.parse(JSON.stringify(scenegraph)));
+    // console.log("getBBox id", id);
+    // console.log("node", JSON.parse(JSON.stringify(node)));
+    // console.log("scenegraph", JSON.parse(JSON.stringify(scenegraph)));
     return {
       get left() {
         // const node = getNode(scenegraph, id, setScenegraph);

@@ -4,6 +4,7 @@ import logo from "./logo.svg";
 import styles from "./App.module.css";
 import Bluefish from "./bluefish";
 import Rect from "./rect";
+import Align from "./align";
 
 const App: Component = () => {
   return (
@@ -17,6 +18,12 @@ const App: Component = () => {
           height={150}
           fill="steelblue"
         />
+      </Bluefish>
+      <Bluefish id="bluefish2" width={500} height={500}>
+        <Align id="align" alignment="center" x={0} y={0}>
+          <Rect id="rect1" width={100} height={150} fill="steelblue" />
+          <Rect id="rect2" width={50} height={50} fill="lightgreen" />
+        </Align>
       </Bluefish>
     </div>
   );
