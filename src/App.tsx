@@ -40,7 +40,7 @@ const App: Component = () => {
           </Align>
         </Bluefish>
         <Bluefish id={"ref-test"} width={1000} height={200}>
-          <Align id="align1" alignment={"right"} x={0} y={0}>
+          <Align id="align1" alignment={"centerHorizontally"} x={0} y={0}>
             <Rect
               id="innerRect11"
               x={32}
@@ -51,10 +51,10 @@ const App: Component = () => {
             />
             <Rect id="innerRect21" width={50} height={50} fill="lightgreen" />
           </Align>
-          {/* <Align id="align2" alignment="top"> */}
-          {/* <Ref id="ref1" refId="innerRect11" />
-            <Ref id="ref2" refId="innerRect21" /> */}
-          {/* </Align> */}
+          <Align id="align2" alignment="centerVertically">
+            <Ref id="ref1" refId="innerRect11" />
+            <Ref id="ref2" refId="innerRect21" />
+          </Align>
           {/* <Align id="align3" alignment="center">
             <Ref id="ref3" refId="innerRect21" />
             <Rect id="innerRect31" width={20} height={30} fill="magenta" />

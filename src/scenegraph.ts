@@ -92,100 +92,103 @@ export const getNode = (
     let transform: { translate: { x?: number; y?: number } } = {
       translate: { x: 0, y: 0 },
     };
-    let currNode: ScenegraphNode = node;
-    while (currNode.type === "ref") {
-      // console.log('looking up', currNode.refId);
-      // console.log('currNode', JSON.parse(JSON.stringify(currNode)));
-      let transformDiff = getTransformDiff(scenegraph, id, currNode.refId);
+    const currNode = untrack(() => {
+      let currNode: ScenegraphNode = node;
+      while (currNode.type === "ref") {
+        // console.log('looking up', currNode.refId);
+        // console.log('currNode', JSON.parse(JSON.stringify(currNode)));
+        let transformDiff = getTransformDiff(scenegraph, id, currNode.refId);
 
-      if (setScenegraph !== undefined) {
-        if (scenegraph[node.refId].type === "node") {
-          // if the refId's translates are fully defined, then define all undefined id translates
-          const [idSuffix, refIdSuffix] = getLCAChainSuffixes(
-            scenegraph,
-            id,
-            node.refId
-          );
-          if (
-            _.every(
-              [currNode.refId, ...refIdSuffix],
-              (id) => scenegraph[id].transform.translate.x !== undefined
-            )
-          ) {
-            for (const id of idSuffix) {
-              if (scenegraph[id].transform.translate.x === undefined) {
-                setScenegraph(
-                  id,
-                  produce((node: ScenegraphNode) => {
-                    node.transform.translate.x = 0;
-                  })
-                );
+        if (setScenegraph !== undefined) {
+          if (scenegraph[node.refId].type === "node") {
+            // if the refId's translates are fully defined, then define all undefined id translates
+            const [idSuffix, refIdSuffix] = getLCAChainSuffixes(
+              scenegraph,
+              id,
+              node.refId
+            );
+            if (
+              _.every(
+                [currNode.refId, ...refIdSuffix],
+                (id) => scenegraph[id].transform.translate.x !== undefined
+              )
+            ) {
+              for (const id of idSuffix) {
+                if (scenegraph[id].transform.translate.x === undefined) {
+                  setScenegraph(
+                    id,
+                    produce((node: ScenegraphNode) => {
+                      node.transform.translate.x = 0;
+                    })
+                  );
+                }
+              }
+            }
+          }
+
+          if (scenegraph[node.refId].type === "node") {
+            // if the refId's translates are fully defined, then define all undefined id translates
+            const [idSuffix, refIdSuffix] = getLCAChainSuffixes(
+              scenegraph,
+              id,
+              node.refId
+            );
+            if (
+              _.every(
+                [currNode.refId, ...refIdSuffix],
+                (id) => scenegraph[id].transform.translate.y !== undefined
+              )
+            ) {
+              for (const id of idSuffix) {
+                if (scenegraph[id].transform.translate.y === undefined) {
+                  setScenegraph(
+                    id,
+                    produce((node: ScenegraphNode) => {
+                      node.transform.translate.y = 0;
+                    })
+                  );
+                }
               }
             }
           }
         }
 
-        if (scenegraph[node.refId].type === "node") {
-          // if the refId's translates are fully defined, then define all undefined id translates
-          const [idSuffix, refIdSuffix] = getLCAChainSuffixes(
-            scenegraph,
-            id,
-            node.refId
-          );
-          if (
-            _.every(
-              [currNode.refId, ...refIdSuffix],
-              (id) => scenegraph[id].transform.translate.y !== undefined
-            )
-          ) {
-            for (const id of idSuffix) {
-              if (scenegraph[id].transform.translate.y === undefined) {
-                setScenegraph(
-                  id,
-                  produce((node: ScenegraphNode) => {
-                    node.transform.translate.y = 0;
-                  })
-                );
-              }
-            }
-          }
-        }
+        // add currNode.refId's transform to transformDiff
+        const refIdTransform = scenegraph[currNode.refId].transform;
+        transformDiff = {
+          translate: {
+            x:
+              transformDiff.translate.x !== undefined &&
+              refIdTransform.translate.x !== undefined
+                ? transformDiff.translate.x + refIdTransform.translate.x
+                : undefined,
+            y:
+              transformDiff.translate.y !== undefined &&
+              refIdTransform.translate.y !== undefined
+                ? transformDiff.translate.y + refIdTransform.translate.y
+                : undefined,
+          },
+        };
+        const xUndefined =
+          transform.translate.x === undefined ||
+          transformDiff.translate.x === undefined;
+        const yUndefined =
+          transform.translate.y === undefined ||
+          transformDiff.translate.y === undefined;
+        transform = {
+          translate: {
+            x: !xUndefined
+              ? transform.translate.x! + transformDiff.translate.x!
+              : undefined,
+            y: !yUndefined
+              ? transform.translate.y! + transformDiff.translate.y!
+              : undefined,
+          },
+        };
+        currNode = scenegraph[currNode.refId];
       }
-
-      // add currNode.refId's transform to transformDiff
-      const refIdTransform = scenegraph[currNode.refId].transform;
-      transformDiff = {
-        translate: {
-          x:
-            transformDiff.translate.x !== undefined &&
-            refIdTransform.translate.x !== undefined
-              ? transformDiff.translate.x + refIdTransform.translate.x
-              : undefined,
-          y:
-            transformDiff.translate.y !== undefined &&
-            refIdTransform.translate.y !== undefined
-              ? transformDiff.translate.y + refIdTransform.translate.y
-              : undefined,
-        },
-      };
-      const xUndefined =
-        transform.translate.x === undefined ||
-        transformDiff.translate.x === undefined;
-      const yUndefined =
-        transform.translate.y === undefined ||
-        transformDiff.translate.y === undefined;
-      transform = {
-        translate: {
-          x: !xUndefined
-            ? transform.translate.x! + transformDiff.translate.x!
-            : undefined,
-          y: !yUndefined
-            ? transform.translate.y! + transformDiff.translate.y!
-            : undefined,
-        },
-      };
-      currNode = scenegraph[currNode.refId];
-    }
+      return currNode;
+    });
 
     return {
       ...currNode,
@@ -258,12 +261,25 @@ export const createScenegraph = (): BBoxStore => {
 
   const getBBox = (id: string) => {
     const node = getNode(scenegraph, id, setScenegraph);
-    // console.log("getBBox id", id);
-    // console.log("node", JSON.parse(JSON.stringify(node)));
-    // console.log("scenegraph", JSON.parse(JSON.stringify(scenegraph)));
+    // const node = untrack(() => {
+    //   const node = getNode(scenegraph, id, setScenegraph);
+    //   return {
+    //     bbox: {
+    //       left: node.bbox.left,
+    //       top: node.bbox.top,
+    //       width: node.bbox.width,
+    //       height: node.bbox.height,
+    //     },
+    //     transform: {
+    //       translate: {
+    //         x: node.transform.translate.x,
+    //         y: node.transform.translate.y,
+    //       },
+    //     },
+    //   };
+    // });
     return {
       get left() {
-        // const node = getNode(scenegraph, id, setScenegraph);
         if (
           node.bbox.left === undefined ||
           node.transform.translate.x === undefined
@@ -274,8 +290,6 @@ export const createScenegraph = (): BBoxStore => {
         return node.bbox.left + node.transform.translate.x;
       },
       get top() {
-        // const node = getNode(scenegraph, id, setScenegraph);
-
         if (
           node.bbox.top === undefined ||
           node.transform.translate.y === undefined
@@ -286,13 +300,9 @@ export const createScenegraph = (): BBoxStore => {
         return node.bbox.top + node.transform.translate.y;
       },
       get width() {
-        // const node = getNode(scenegraph, id, setScenegraph);
-
         return node.bbox.width;
       },
       get height() {
-        // const node = getNode(scenegraph, id, setScenegraph);
-
         return node.bbox.height;
       },
       get right() {
@@ -347,60 +357,52 @@ export const createScenegraph = (): BBoxStore => {
 
     setScenegraph(id, (node: ScenegraphNode) => {
       if (node.type === "ref") {
-        const transform = getTransformDiff(scenegraph, id, node.refId);
+        untrack(() => {
+          const transform = getTransformDiff(scenegraph, id, node.refId);
 
-        if (
-          transform.translate.x === undefined &&
-          scenegraph[node.refId].type === "node"
-        ) {
-          // set all the x translates in the chains to 0 if they are not yet defined
-          const [idSuffix, refIdSuffix] = getLCAChainSuffixes(
-            scenegraph,
-            id,
-            node.refId
-          );
-          for (const id of idSuffix) {
-            if (scenegraph[id].transform.translate.x === undefined) {
-              setScenegraph(
-                id,
-                produce((node: ScenegraphNode) => {
-                  node.transform.translate.x = 0;
-                })
-              );
-            }
-          }
-          for (const id of refIdSuffix) {
-            if (scenegraph[id].transform.translate.x === undefined) {
-              setScenegraph(
-                id,
-                produce((node: ScenegraphNode) => {
-                  node.transform.translate.x = 0;
-                })
-              );
-            }
-          }
-        }
-
-        if (
-          transform.translate.y === undefined &&
-          scenegraph[node.refId].type === "node"
-        ) {
-          // set all the y translates in the chains to 0 if they are not yet defined
-          const [idSuffix, refIdSuffix] = getLCAChainSuffixes(
-            scenegraph,
-            id,
-            node.refId
-          );
-          for (const id of idSuffix) {
-            if (scenegraph[id].transform.translate.y === undefined) {
-              setScenegraph(
-                id,
-                produce((node: ScenegraphNode) => {
-                  node.transform.translate.y = 0;
-                })
-              );
+          if (
+            transform.translate.x === undefined &&
+            scenegraph[node.refId].type === "node"
+          ) {
+            // set all the x translates in the chains to 0 if they are not yet defined
+            const [idSuffix, refIdSuffix] = getLCAChainSuffixes(
+              scenegraph,
+              id,
+              node.refId
+            );
+            for (const id of idSuffix) {
+              if (scenegraph[id].transform.translate.x === undefined) {
+                setScenegraph(
+                  id,
+                  produce((node: ScenegraphNode) => {
+                    node.transform.translate.x = 0;
+                  })
+                );
+              }
             }
             for (const id of refIdSuffix) {
+              if (scenegraph[id].transform.translate.x === undefined) {
+                setScenegraph(
+                  id,
+                  produce((node: ScenegraphNode) => {
+                    node.transform.translate.x = 0;
+                  })
+                );
+              }
+            }
+          }
+
+          if (
+            transform.translate.y === undefined &&
+            scenegraph[node.refId].type === "node"
+          ) {
+            // set all the y translates in the chains to 0 if they are not yet defined
+            const [idSuffix, refIdSuffix] = getLCAChainSuffixes(
+              scenegraph,
+              id,
+              node.refId
+            );
+            for (const id of idSuffix) {
               if (scenegraph[id].transform.translate.y === undefined) {
                 setScenegraph(
                   id,
@@ -409,24 +411,34 @@ export const createScenegraph = (): BBoxStore => {
                   })
                 );
               }
+              for (const id of refIdSuffix) {
+                if (scenegraph[id].transform.translate.y === undefined) {
+                  setScenegraph(
+                    id,
+                    produce((node: ScenegraphNode) => {
+                      node.transform.translate.y = 0;
+                    })
+                  );
+                }
+              }
             }
           }
-        }
 
-        const newBBox = {
-          left:
-            bbox.left !== undefined
-              ? bbox.left - (transform.translate.x ?? 0)
-              : undefined,
-          top:
-            bbox.top !== undefined
-              ? bbox.top - (transform.translate.y ?? 0)
-              : undefined,
-          width: bbox.width,
-          height: bbox.height,
-        };
+          const newBBox = {
+            left:
+              bbox.left !== undefined
+                ? bbox.left - (transform.translate.x ?? 0)
+                : undefined,
+            top:
+              bbox.top !== undefined
+                ? bbox.top - (transform.translate.y ?? 0)
+                : undefined,
+            width: bbox.width,
+            height: bbox.height,
+          };
 
-        setSmartBBox(node.refId, newBBox, owner);
+          setSmartBBox(node.refId, newBBox, owner);
+        });
         return node;
       }
 
