@@ -21,5 +21,5 @@ export const maybeMax = (xs: (number | undefined)[]) =>
 export const maybeMin = (xs: (number | undefined)[]) =>
   xs.every((x) => x !== undefined) ? Math.min(...(xs as number[])) : undefined;
 
-export const maybe = <T, U>(f: (x: T) => U, x: T | undefined): U | undefined =>
+export const maybe = <T, U>(x: T | undefined, f: (x: T) => U): U | undefined =>
   x !== undefined ? f(x) : undefined;

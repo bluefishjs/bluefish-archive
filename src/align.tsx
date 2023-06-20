@@ -1,8 +1,17 @@
 import { JSX, ParentProps, untrack } from "solid-js";
 import { Layout } from "./layout";
-import { Id, BBox, Transform, useScenegraph, Scenegraph } from "./scenegraph";
+import {
+  Id,
+  BBox,
+  Transform,
+  useScenegraph,
+  Scenegraph,
+  ownedByOther,
+  ScenegraphNode,
+  owned,
+} from "./scenegraph";
 import _, { get } from "lodash";
-import { maybeAdd, maybeMax, maybeMin, maybeSub } from "./maybeUtil";
+import { maybe, maybeAdd, maybeMax, maybeMin, maybeSub } from "./maybeUtil";
 
 export type Alignment2D =
   | "topLeft"
@@ -129,7 +138,10 @@ export function Align(props: AlignProps) {
         centerY: bbox.centerY,
       };
     });
-  const getNode = (scenegraph: Scenegraph, id: string) =>
+  const getNode = (
+    scenegraph: Scenegraph,
+    id: string
+  ): ScenegraphNode & { type: "node" } =>
     untrack(() => {
       const node = reactiveGetNode(scenegraph, id);
       return {
@@ -139,7 +151,7 @@ export function Align(props: AlignProps) {
             y: node.transformOwners.translate.y,
           },
         },
-      };
+      } as ScenegraphNode & { type: "node" };
     });
 
   const layout = (childIds: Id[] /* , getBBox: (id: string) => BBox */) => {
@@ -163,24 +175,34 @@ export function Align(props: AlignProps) {
           : [undefined, undefined]
       );
 
-    const verticalPlaceables = _.zip(childIds, alignments).filter(
-      ([placeable, alignment]) => {
-        if (alignment === undefined) {
-          return false;
-        }
-        const [verticalAlignment, horizontalAlignment] = alignment;
-        return verticalAlignment !== undefined;
+    const verticalAlignments = childIds
+      .map((m) => /* m.guidePrimary ?? */ props.alignment)
+      .map((alignment) => maybe(alignment, verticalAlignment));
+
+    const horizontalAlignments = childIds
+      .map((m) => /* m.guidePrimary ?? */ props.alignment)
+      .map((alignment) => maybe(alignment, horizontalAlignment));
+
+    // assert alignments and verticalAlignments/horizontalAlignments agree
+    alignments.forEach(([verticalAlignment, horizontalAlignment], i) => {
+      if (verticalAlignment !== verticalAlignments[i]) {
+        throw new Error(
+          `vertical alignment mismatch: ${verticalAlignment} !== ${verticalAlignments[i]}`
+        );
       }
+      if (horizontalAlignment !== horizontalAlignments[i]) {
+        throw new Error(
+          `horizontal alignment mismatch: ${horizontalAlignment} !== ${horizontalAlignments[i]}`
+        );
+      }
+    });
+
+    const verticalPlaceables = _.zip(childIds, verticalAlignments).filter(
+      ([placeable, alignment]) => alignment !== undefined
     );
 
-    const horizontalPlaceables = _.zip(childIds, alignments).filter(
-      ([placeable, alignment]) => {
-        if (alignment === undefined) {
-          return false;
-        }
-        const [verticalAlignment, horizontalAlignment] = alignment;
-        return horizontalAlignment !== undefined;
-      }
+    const horizontalPlaceables = _.zip(childIds, horizontalAlignments).filter(
+      ([placeable, alignment]) => alignment !== undefined
     );
 
     console.log(
@@ -200,15 +222,15 @@ export function Align(props: AlignProps) {
     const verticalValueArr = verticalPlaceables
       .filter(
         ([placeable, _]) =>
-          getNode(scenegraph, placeable! as any).transformOwners.translate.y !==
-          props.id
+          !owned(props.id, getNode(scenegraph, placeable! as any), "y")
       )
       .map(([placeable, alignment]) => {
-        const [verticalAlignment, horizontalAlignment] = alignment!;
-        if (verticalAlignment === undefined) {
-          return [placeable, undefined];
-        }
-        return [placeable, reactiveGetBBox(placeable!)[verticalAlignment]];
+        return [
+          placeable,
+          alignment !== undefined
+            ? reactiveGetBBox(placeable!)[alignment]
+            : undefined,
+        ];
       })
       .filter(
         ([placeable, value]) =>
@@ -234,15 +256,15 @@ export function Align(props: AlignProps) {
     const horizontalValueArr = horizontalPlaceables
       .filter(
         ([placeable, _]) =>
-          getNode(scenegraph, placeable! as any).transformOwners.translate.x !==
-          props.id
+          !owned(props.id, getNode(scenegraph, placeable! as any), "x")
       )
       .map(([placeable, alignment]) => {
-        const [verticalAlignment, horizontalAlignment] = alignment!;
-        if (horizontalAlignment === undefined) {
-          return [placeable, undefined];
-        }
-        return [placeable, reactiveGetBBox(placeable!)[horizontalAlignment]];
+        return [
+          placeable,
+          alignment !== undefined
+            ? reactiveGetBBox(placeable!)[alignment]
+            : undefined,
+        ];
       })
       .filter(
         ([placeable, value]) =>
@@ -256,30 +278,23 @@ export function Align(props: AlignProps) {
         : (horizontalValueArr[0][1] as number);
 
     for (const [placeable, alignment] of verticalPlaceables) {
-      if (
-        // scenegraph[placeable!].transformOwners.translate.y !== undefined &&
-        // scenegraph[placeable!].transformOwners.translate.y !== id
-        getNode(scenegraph, placeable! as any).transformOwners.translate.y !==
-          undefined &&
-        getNode(scenegraph, placeable! as any).transformOwners.translate.y !==
-          props.id
-      )
+      if (ownedByOther(props.id, getNode(scenegraph, placeable! as any), "y"))
         continue;
       console.log(
         "vertical owner",
         getNode(scenegraph, placeable! as any).transformOwners.translate.y
       );
-      const [verticalAlignment, horizontalAlignment] = alignment!;
-      if (verticalAlignment === "top") {
+      // const [verticalAlignment, horizontalAlignment] = alignment!;
+      if (alignment === "top") {
         console.log("setting smart bbox", props.id, placeable!, verticalValue);
         setSmartBBox(placeable!, { top: verticalValue }, props.id);
-      } else if (verticalAlignment === "centerY") {
+      } else if (alignment === "centerY") {
         const height = getBBox(placeable!).height;
         if (height === undefined) {
           continue;
         }
         setSmartBBox(placeable!, { top: verticalValue - height / 2 }, props.id);
-      } else if (verticalAlignment === "bottom") {
+      } else if (alignment === "bottom") {
         // placeable!.bottom = verticalValue;
         setSmartBBox(
           placeable!,
@@ -290,23 +305,15 @@ export function Align(props: AlignProps) {
     }
 
     for (const [placeable, alignment] of horizontalPlaceables) {
-      if (
-        // scenegraph[placeable!].transformOwners.translate.x !== undefined &&
-        // scenegraph[placeable!].transformOwners.translate.x !== id
-        getNode(scenegraph, placeable! as any).transformOwners.translate.x !==
-          undefined &&
-        getNode(scenegraph, placeable! as any).transformOwners.translate.x !==
-          props.id
-      )
+      if (ownedByOther(props.id, getNode(scenegraph, placeable! as any), "x"))
         continue;
       console.log(
         "horizontal owner",
         getNode(scenegraph, placeable! as any).transformOwners.translate.x
       );
-      const [verticalAlignment, horizontalAlignment] = alignment!;
-      if (horizontalAlignment === "left") {
+      if (alignment === "left") {
         setSmartBBox(placeable!, { left: horizontalValue }, props.id);
-      } else if (horizontalAlignment === "centerX") {
+      } else if (alignment === "centerX") {
         const width = getBBox(placeable!).width;
         if (width === undefined) {
           continue;
@@ -316,7 +323,7 @@ export function Align(props: AlignProps) {
           { left: horizontalValue - width / 2 },
           props.id
         );
-      } else if (horizontalAlignment === "right") {
+      } else if (alignment === "right") {
         // placeable!.right = horizontalValue;
         const width = getBBox(placeable!).width;
         if (width === undefined) {

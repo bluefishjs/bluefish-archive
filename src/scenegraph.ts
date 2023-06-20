@@ -82,6 +82,40 @@ export type Scenegraph = {
   [key: string]: ScenegraphNode;
 };
 
+export const owned = (
+  id: string, // with respect to this node
+  node: ScenegraphNode & { type: "node" }, // do we own this node
+  axis: "x" | "y" // along this axis
+): boolean => {
+  if (axis === "x") {
+    return node.transformOwners.translate.x === id;
+  } else if (axis === "y") {
+    return node.transformOwners.translate.y === id;
+  } else {
+    throw new Error("owned: axis is neither x nor y");
+  }
+};
+
+export const ownedByOther = (
+  id: string, // with respect to this node
+  node: ScenegraphNode & { type: "node" }, // is this node already owned
+  axis: "x" | "y" // along this axis
+): boolean => {
+  if (axis === "x") {
+    return (
+      node.transformOwners.translate.x !== undefined &&
+      node.transformOwners.translate.x !== id
+    );
+  } else if (axis === "y") {
+    return (
+      node.transformOwners.translate.y !== undefined &&
+      node.transformOwners.translate.y !== id
+    );
+  } else {
+    throw new Error("ownedByOther: axis is neither x nor y");
+  }
+};
+
 export const getNode = (
   scenegraph: { [key: string]: ScenegraphNode },
   id: string,
