@@ -3,6 +3,7 @@ import {
   BBox,
   BBoxContext,
   Id,
+  LayoutFn,
   ParentIDContext,
   Transform,
 } from "./scenegraph";
@@ -12,6 +13,7 @@ import {
   ParentProps,
   createEffect,
   createMemo,
+  createRenderEffect,
   createSignal,
   mergeProps,
   on,
@@ -22,13 +24,7 @@ import {
 export type LayoutProps = ParentProps<{
   id: Id;
   bbox?: Partial<BBox>;
-  layout: (
-    childIds: Id[],
-    getBBox?: (id: string) => BBox
-  ) => {
-    bbox: Partial<BBox>;
-    transform: Transform;
-  };
+  layout: LayoutFn;
   paint: (props: {
     bbox: BBox;
     transform: Transform;
@@ -43,7 +39,7 @@ export const Layout: Component<LayoutProps> = (props) => {
   const [scenegraph, { getBBox, setBBox, createNode, getNode }] =
     useContext(BBoxContext)!;
 
-  createNode(props.id, parentId);
+  createNode(props.id, parentId, props.layout);
 
   // const childIds = createMemo(
   //   () =>
@@ -59,13 +55,26 @@ export const Layout: Component<LayoutProps> = (props) => {
   // TODO: should only change when an unowned child property changes. the code works properly for
   // alignment, though it blows up the stack b/c too many re-renders.
 
+  // createMemo(() => {
+  //   const id = props.id;
+  //   console.log("layout", props.id);
+  //   debugger;
+  //   const { bbox, transform } = props.layout(
+  //     scenegraph[props.id]?.children /* , getBBox */
+  //   );
+  //   setBBox(props.id, bbox, props.id, transform);
+  //   untrack(() => console.log(JSON.parse(JSON.stringify(scenegraph))));
+  // });
+
   createEffect(() => {
+    const id = props.id;
     console.log("layout", props.id);
+    // debugger;
     const { bbox, transform } = props.layout(
       scenegraph[props.id]?.children /* , getBBox */
     );
     setBBox(props.id, bbox, props.id, transform);
-    // console.log(JSON.parse(JSON.stringify(scenegraph)));
+    untrack(() => console.log(JSON.parse(JSON.stringify(scenegraph))));
   });
 
   // createEffect(() => {

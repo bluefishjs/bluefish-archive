@@ -2,6 +2,7 @@ import { createContext, untrack, useContext } from "solid-js";
 import { SetStoreFunction, createStore, produce } from "solid-js/store";
 import { getLCAChainSuffixes, getTransformDiff } from "./lcaUtil";
 import _ from "lodash";
+import { maybeAdd, maybeDiv, maybeSub } from "./maybeUtil";
 
 export type Id = string;
 
@@ -16,12 +17,7 @@ export type BBox = {
   height?: number;
 };
 
-export type BBoxOwners = {
-  left?: string;
-  top?: string;
-  width?: string;
-  height?: string;
-};
+export type BBoxOwners = { [key in keyof BBox]?: Id };
 
 export type TransformOwners = {
   translate: {
@@ -54,6 +50,14 @@ export type Transform = {
   };
 };
 
+export type LayoutFn = (
+  childIds: Id[],
+  getBBox?: (id: string) => BBox
+) => {
+  bbox: Partial<BBox>;
+  transform: Transform;
+};
+
 export type ScenegraphNode =
   | {
       type: "node";
@@ -64,7 +68,7 @@ export type ScenegraphNode =
       children: Set<string>;
       parent: string | null;
       // parents?: string[];
-      // layout?
+      layout: LayoutFn;
       // paint?
     }
   | {
@@ -157,37 +161,28 @@ export const getNode = (
         const refIdTransform = scenegraph[currNode.refId].transform;
         transformDiff = {
           translate: {
-            x:
-              transformDiff.translate.x !== undefined &&
-              refIdTransform.translate.x !== undefined
-                ? transformDiff.translate.x + refIdTransform.translate.x
-                : undefined,
-            y:
-              transformDiff.translate.y !== undefined &&
-              refIdTransform.translate.y !== undefined
-                ? transformDiff.translate.y + refIdTransform.translate.y
-                : undefined,
+            x: maybeAdd(transformDiff.translate.x, refIdTransform.translate.x),
+            y: maybeAdd(transformDiff.translate.y, refIdTransform.translate.y),
           },
         };
-        const xUndefined =
-          transform.translate.x === undefined ||
-          transformDiff.translate.x === undefined;
-        const yUndefined =
-          transform.translate.y === undefined ||
-          transformDiff.translate.y === undefined;
         transform = {
           translate: {
-            x: !xUndefined
-              ? transform.translate.x! + transformDiff.translate.x!
-              : undefined,
-            y: !yUndefined
-              ? transform.translate.y! + transformDiff.translate.y!
-              : undefined,
+            x: maybeAdd(transform.translate.x, transformDiff.translate.x),
+            y: maybeAdd(transform.translate.y, transformDiff.translate.y),
           },
         };
         currNode = scenegraph[currNode.refId];
       }
       return currNode;
+    });
+
+    untrack(() => {
+      if (currNode.transformOwners.translate.x === undefined)
+        console.log(
+          "debug getNode",
+          id,
+          JSON.parse(JSON.stringify(currNode.transformOwners))
+        );
     });
 
     return {
@@ -206,7 +201,11 @@ export const createScenegraph = (): BBoxStore => {
   // TODO: use a Proxy for each object to make objects appear as simply left, right, top, bottom, etc. even though
   // they are composed of internal dimensions and transform.
 
-  const createNode = (id: string, parentId: string | null) => {
+  const createNode = (
+    id: string,
+    parentId: string | null,
+    layout: LayoutFn
+  ) => {
     setScenegraph(id, {
       type: "node",
       bbox: {},
@@ -219,6 +218,7 @@ export const createScenegraph = (): BBoxStore => {
       },
       children: new Set(),
       parent: parentId,
+      layout,
     });
 
     if (parentId !== null) {
@@ -280,24 +280,10 @@ export const createScenegraph = (): BBoxStore => {
     // });
     return {
       get left() {
-        if (
-          node.bbox.left === undefined ||
-          node.transform.translate.x === undefined
-        ) {
-          return undefined;
-        }
-
-        return node.bbox.left + node.transform.translate.x;
+        return maybeAdd(node.bbox.left, node.transform.translate.x);
       },
       get top() {
-        if (
-          node.bbox.top === undefined ||
-          node.transform.translate.y === undefined
-        ) {
-          return undefined;
-        }
-
-        return node.bbox.top + node.transform.translate.y;
+        return maybeAdd(node.bbox.top, node.transform.translate.y);
       },
       get width() {
         return node.bbox.width;
@@ -307,33 +293,17 @@ export const createScenegraph = (): BBoxStore => {
       },
       get right() {
         // calculated using left and width
-        if (this.left === undefined || this.width === undefined) {
-          return undefined;
-        }
-
-        return this.left + this.width;
+        return maybeAdd(this.left, this.width);
       },
       get bottom() {
         // calculated using top and height
-        if (this.top === undefined || this.height === undefined) {
-          return undefined;
-        }
-
-        return this.top + this.height;
+        return maybeAdd(this.top, this.height);
       },
       get centerX() {
-        if (this.left === undefined || this.width === undefined) {
-          return undefined;
-        }
-
-        return this.left + this.width / 2;
+        return maybeAdd(this.left, maybeDiv(this.width, 2));
       },
       get centerY() {
-        if (this.top === undefined || this.height === undefined) {
-          return undefined;
-        }
-
-        return this.top + this.height / 2;
+        return maybeAdd(this.top, maybeDiv(this.height, 2));
       },
     };
   };
@@ -425,17 +395,18 @@ export const createScenegraph = (): BBoxStore => {
           }
 
           const newBBox = {
-            left:
-              bbox.left !== undefined
-                ? bbox.left - (transform.translate.x ?? 0)
-                : undefined,
-            top:
-              bbox.top !== undefined
-                ? bbox.top - (transform.translate.y ?? 0)
-                : undefined,
+            left: maybeSub(bbox.left, transform.translate.x ?? 0),
+            top: maybeSub(bbox.top, transform.translate.y ?? 0),
             width: bbox.width,
             height: bbox.height,
           };
+
+          console.log(
+            "newBBox",
+            JSON.parse(JSON.stringify(newBBox)),
+            bbox.left,
+            transform.translate.x
+          );
 
           setSmartBBox(node.refId, newBBox, owner);
         });
@@ -484,6 +455,10 @@ export const createScenegraph = (): BBoxStore => {
           proposedBBox.left = bbox.left;
           proposedTransform.translate.x = 0;
         } else if (node.transformOwners.translate.x === owner) {
+          console.log("bbox.left", bbox.left);
+          console.log("node.bbox.left", node.bbox.left);
+          console.log("node.transform.translate.x", node.transform.translate.x);
+          // proposedTransform.translate.x = bbox.left - node.bbox.left!;
           proposedTransform.translate.x = bbox.left - node.bbox.left!;
         }
       }
@@ -495,6 +470,13 @@ export const createScenegraph = (): BBoxStore => {
         } else if (node.transformOwners.translate.y === owner) {
           proposedTransform.translate.y = bbox.top - node.bbox.top!;
         }
+      }
+
+      if (proposedBBox.left !== undefined)
+        console.log("proposedBBox", proposedBBox);
+
+      if (proposedTransform.translate.x !== undefined) {
+        console.log("proposedTransform", JSON.stringify(proposedTransform));
       }
 
       const newBBoxOwners = {
@@ -554,60 +536,33 @@ export const createScenegraph = (): BBoxStore => {
         setBBox(node.refId, bbox, owner, transform);
         return node;
       }
-      if (
-        bbox.left !== undefined &&
-        node.bboxOwners.left !== undefined &&
-        node.bboxOwners.left !== owner
-      ) {
-        console.error(
-          `${owner} tried to set ${id}'s left to ${bbox.left} but it was already set by ${node.bboxOwners.left}. Only one component can set a bbox property. We skipped this update.`
-        );
-        return node;
-      } else if (
-        bbox.top !== undefined &&
-        node.bboxOwners.top !== undefined &&
-        node.bboxOwners.top !== owner
-      ) {
-        console.error(
-          `${owner} tried to set ${id}'s top to ${bbox.top} but it was already set by ${node.bboxOwners.top}. Only one component can set a bbox property. We skipped this update.`
-        );
-        return node;
-      } else if (
-        bbox.width !== undefined &&
-        node.bboxOwners.width !== undefined &&
-        node.bboxOwners.width !== owner
-      ) {
-        console.error(
-          `${owner} tried to set ${id}'s width to ${bbox.width} but it was already set by ${node.bboxOwners.width}. Only one component can set a bbox property. We skipped this update.`
-        );
-        return node;
-      } else if (
-        bbox.height !== undefined &&
-        node.bboxOwners.height !== undefined &&
-        node.bboxOwners.height !== owner
-      ) {
-        console.error(
-          `${owner} tried to set ${id}'s height to ${bbox.height} but it was already set by ${node.bboxOwners.height}. Only one component can set a bbox property. We skipped this update.`
-        );
-        return node;
-      } else if (
-        transform?.translate.x !== undefined &&
-        node.transformOwners.translate.x !== undefined &&
-        node.transformOwners.translate.x !== owner
-      ) {
-        console.error(
-          `${owner} tried to set ${id}'s translate.x to ${transform.translate.x} but it was already set by ${node.transformOwners.translate.x}. Only one component can set a transform property. We skipped this update.`
-        );
-        return node;
-      } else if (
-        transform?.translate.y !== undefined &&
-        node.transformOwners.translate.y !== undefined &&
-        node.transformOwners.translate.y !== owner
-      ) {
-        console.error(
-          `${owner} tried to set ${id}'s translate.y to ${transform.translate.y} but it was already set by ${node.transformOwners.translate.y}. Only one component can set a transform property. We skipped this update.`
-        );
-        return node;
+
+      // check bbox ownership
+      for (const key of Object.keys(bbox) as Array<keyof BBox>) {
+        if (
+          node.bboxOwners[key] !== undefined &&
+          node.bboxOwners[key] !== owner
+        ) {
+          console.error(
+            `${owner} tried to set ${id}'s ${key} to ${bbox[key]} but it was already set by ${node.bboxOwners[key]}. Only one component can set a bbox property. We skipped this update.`
+          );
+          return node;
+        }
+      }
+
+      // check transform ownership
+      for (const key of Object.keys(transform?.translate ?? {}) as Array<
+        keyof Transform["translate"]
+      >) {
+        if (
+          node.transformOwners.translate[key] !== undefined &&
+          node.transformOwners.translate[key] !== owner
+        ) {
+          console.error(
+            `${owner} tried to set ${id}'s translate.${key} to ${transform?.translate[key]} but it was already set by ${node.transformOwners.translate[key]}. Only one component can set a transform property. We skipped this update.`
+          );
+          return node;
+        }
       }
 
       const newBBoxOwners = {
@@ -680,7 +635,17 @@ export type BBoxStore = [
       owner: string,
       transform?: Transform
     ) => void;
-    createNode: (id: string, parentId: string | null) => void;
+    createNode: (
+      id: string,
+      parentId: string | null,
+      layout: (
+        childIds: Id[],
+        getBBox?: (id: string) => BBox
+      ) => {
+        bbox: Partial<BBox>;
+        transform: Transform;
+      }
+    ) => void;
     createRef: (id: string, refId: string, parentId: string | null) => void;
   }
 ];

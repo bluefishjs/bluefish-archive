@@ -2,6 +2,7 @@ import { JSX, ParentProps, untrack } from "solid-js";
 import { Layout } from "./layout";
 import { Id, BBox, Transform, useScenegraph, Scenegraph } from "./scenegraph";
 import _, { get } from "lodash";
+import { maybeAdd, maybeMax, maybeMin, maybeSub } from "./maybeUtil";
 
 export type Alignment2D =
   | "topLeft"
@@ -19,13 +20,13 @@ export type Alignment2DObjs = {
   [K in Alignment2D]: { [k in K]: boolean };
 }[Alignment2D];
 
-export type VerticalAlignment = "top" | "centerY" | "bottom";
-export type HorizontalAlignment = "left" | "centerX" | "right";
+export type AlignmentVertical = "top" | "centerY" | "bottom";
+export type AlignmentHorizontal = "left" | "centerX" | "right";
 
-export type Alignment1DHorizontal = "left" | "centerHorizontally" | "right";
-export type Alignment1DVertical = "top" | "centerVertically" | "bottom";
+// export type Alignment1DHorizontal = "left" | "centerHorizontally" | "right";
+// export type Alignment1DVertical = "top" | "centerVertically" | "bottom";
 
-export type Alignment1D = Alignment1DHorizontal | Alignment1DVertical;
+export type Alignment1D = AlignmentVertical | AlignmentHorizontal;
 
 export type Alignment1DObjs = {
   [K in Alignment1D]: { [k in K]: boolean };
@@ -33,62 +34,70 @@ export type Alignment1DObjs = {
 
 export type AlignAuxProps = {
   alignments: [
-    VerticalAlignment | undefined,
-    HorizontalAlignment | undefined
+    AlignmentVertical | undefined,
+    AlignmentHorizontal | undefined
   ][];
 } & {
   x?: number;
   y?: number;
 };
 
+const verticalAlignmentMap: {
+  [K in Alignment2D | Alignment1D]: AlignmentVertical | undefined;
+} = {
+  topLeft: "top",
+  topCenter: "top",
+  topRight: "top",
+  centerLeft: "centerY",
+  center: "centerY",
+  centerRight: "centerY",
+  bottomLeft: "bottom",
+  bottomCenter: "bottom",
+  bottomRight: "bottom",
+  top: "top",
+  centerY: "centerY",
+  bottom: "bottom",
+  left: undefined,
+  centerX: undefined,
+  right: undefined,
+};
+
+export const verticalAlignment = (
+  alignment: Alignment2D | Alignment1D
+): AlignmentVertical | undefined => {
+  return verticalAlignmentMap[alignment];
+};
+
+const horizontalAlignmentMap: {
+  [K in Alignment2D | Alignment1D]: AlignmentHorizontal | undefined;
+} = {
+  topLeft: "left",
+  topCenter: "centerX",
+  topRight: "right",
+  centerLeft: "left",
+  center: "centerX",
+  centerRight: "right",
+  bottomLeft: "left",
+  bottomCenter: "centerX",
+  bottomRight: "right",
+  top: undefined,
+  centerY: undefined,
+  bottom: undefined,
+  left: "left",
+  centerX: "centerX",
+  right: "right",
+};
+
+export const horizontalAlignment = (
+  alignment: Alignment2D | Alignment1D
+): AlignmentHorizontal | undefined => {
+  return horizontalAlignmentMap[alignment];
+};
+
 export const splitAlignment = (
   alignment: Alignment2D | Alignment1D
-): [VerticalAlignment | undefined, HorizontalAlignment | undefined] => {
-  let verticalAlignment: VerticalAlignment | undefined;
-  let horizontalAlignment: HorizontalAlignment | undefined;
-  switch (alignment) {
-    case "top":
-    case "topLeft":
-    case "topCenter":
-    case "topRight":
-      verticalAlignment = "top";
-      break;
-    case "centerVertically":
-    case "centerLeft":
-    case "center":
-    case "centerRight":
-      verticalAlignment = "centerY";
-      break;
-    case "bottom":
-    case "bottomLeft":
-    case "bottomCenter":
-    case "bottomRight":
-      verticalAlignment = "bottom";
-      break;
-  }
-
-  switch (alignment) {
-    case "left":
-    case "topLeft":
-    case "centerLeft":
-    case "bottomLeft":
-      horizontalAlignment = "left";
-      break;
-    case "centerHorizontally":
-    case "topCenter":
-    case "center":
-    case "bottomCenter":
-      horizontalAlignment = "centerX";
-      break;
-    case "right":
-    case "topRight":
-    case "centerRight":
-    case "bottomRight":
-      horizontalAlignment = "right";
-      break;
-  }
-
-  return [verticalAlignment, horizontalAlignment];
+): [AlignmentVertical | undefined, AlignmentHorizontal | undefined] => {
+  return [verticalAlignment(alignment), horizontalAlignment(alignment)];
 };
 
 export type AlignProps = ParentProps<{
@@ -144,8 +153,8 @@ export function Align(props: AlignProps) {
     // childIds.forEach(getBBox);
 
     const alignments: [
-      VerticalAlignment | undefined,
-      HorizontalAlignment | undefined
+      AlignmentVertical | undefined,
+      AlignmentHorizontal | undefined
     ][] = childIds
       .map((m) => /* m.guidePrimary ?? */ props.alignment)
       .map((alignment) =>
@@ -172,6 +181,19 @@ export function Align(props: AlignProps) {
         const [verticalAlignment, horizontalAlignment] = alignment;
         return horizontalAlignment !== undefined;
       }
+    );
+
+    console.log(
+      "align child owners",
+      props.id,
+      childIds.map(
+        (placeable) =>
+          `${placeable}: ${
+            getNode(scenegraph, placeable! as any).transformOwners.translate.x
+          }, ${
+            getNode(scenegraph, placeable! as any).transformOwners.translate.y
+          }`
+      )
     );
 
     // TODO: should be able to filter by ownership instead
@@ -243,8 +265,13 @@ export function Align(props: AlignProps) {
           props.id
       )
         continue;
+      console.log(
+        "vertical owner",
+        getNode(scenegraph, placeable! as any).transformOwners.translate.y
+      );
       const [verticalAlignment, horizontalAlignment] = alignment!;
       if (verticalAlignment === "top") {
+        console.log("setting smart bbox", props.id, placeable!, verticalValue);
         setSmartBBox(placeable!, { top: verticalValue }, props.id);
       } else if (verticalAlignment === "centerY") {
         const height = getBBox(placeable!).height;
@@ -272,6 +299,10 @@ export function Align(props: AlignProps) {
           props.id
       )
         continue;
+      console.log(
+        "horizontal owner",
+        getNode(scenegraph, placeable! as any).transformOwners.translate.x
+      );
       const [verticalAlignment, horizontalAlignment] = alignment!;
       if (horizontalAlignment === "left") {
         setSmartBBox(placeable!, { left: horizontalValue }, props.id);
@@ -291,6 +322,12 @@ export function Align(props: AlignProps) {
         if (width === undefined) {
           continue;
         }
+        console.log(
+          "setting smart bbox",
+          props.id,
+          placeable!,
+          horizontalValue - width
+        );
         setSmartBBox(placeable!, { left: horizontalValue - width }, props.id);
       }
     }
@@ -302,48 +339,26 @@ export function Align(props: AlignProps) {
       height: childIds.map((childId) => getBBox(childId).height),
     };
 
-    const left = bboxes.left.includes(undefined)
-      ? undefined
-      : Math.min(...(bboxes.left as number[]));
+    const left = maybeMin(bboxes.left);
 
-    const right =
-      bboxes.left.includes(undefined) || bboxes.width.includes(undefined)
-        ? undefined
-        : Math.max(
-            ...(bboxes.left as number[]).map(
-              (left, i) => left + (bboxes.width as number[])[i]
-            )
-          );
+    const right = maybeMax(
+      bboxes.left.map((left, i) => maybeAdd(left, bboxes.width[i]))
+    );
 
-    const top = bboxes.top.includes(undefined)
-      ? undefined
-      : Math.min(...(bboxes.top as number[]));
+    const top = maybeMin(bboxes.top);
 
-    const bottom =
-      bboxes.top.includes(undefined) || bboxes.height.includes(undefined)
-        ? undefined
-        : Math.max(
-            ...(bboxes.top as number[]).map(
-              (top, i) => top + (bboxes.height as number[])[i]
-            )
-          );
+    const bottom = maybeMax(
+      bboxes.top.map((top, i) => maybeAdd(top, bboxes.height[i]))
+    );
 
-    const width =
-      left !== undefined && right !== undefined ? right - left : undefined;
-    const height =
-      top !== undefined && bottom !== undefined ? bottom - top : undefined;
+    const width = maybeSub(right, left);
+    const height = maybeSub(bottom, top);
 
     return {
       transform: {
         translate: {
-          x:
-            props.x !== undefined && left !== undefined
-              ? props.x - left
-              : undefined,
-          y:
-            props.y !== undefined && top !== undefined
-              ? props.y - top
-              : undefined,
+          x: maybeSub(props.x, left),
+          y: maybeSub(props.y, top),
         },
       },
       bbox: { left, top, right, bottom, width, height },
