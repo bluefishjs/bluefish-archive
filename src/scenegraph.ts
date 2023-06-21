@@ -69,6 +69,7 @@ export type ScenegraphNode =
       parent: string | null;
       // parents?: string[];
       layout: LayoutFn;
+      runLayout: () => void;
       // paint?
     }
   | {
@@ -76,6 +77,7 @@ export type ScenegraphNode =
       refId: string;
       transform: Transform;
       parent: string | null;
+      runLayout: () => void;
     };
 
 export type Scenegraph = {
@@ -253,6 +255,14 @@ export const createScenegraph = (): BBoxStore => {
       children: new Set(),
       parent: parentId,
       layout,
+      runLayout: () => {
+        const _id = id;
+        debugger;
+        const { bbox, transform } = layout(
+          scenegraph[id]?.children /* , getBBox */
+        );
+        setBBox(id, bbox, id, transform);
+      },
     });
 
     if (parentId !== null) {
@@ -277,6 +287,7 @@ export const createScenegraph = (): BBoxStore => {
         translate: {},
       },
       parent: parentId,
+      runLayout: () => {},
     });
 
     if (parentId !== null) {
@@ -447,11 +458,7 @@ export const createScenegraph = (): BBoxStore => {
         return node;
       }
 
-      if (
-        bbox.left !== undefined &&
-        node.transformOwners.translate.x !== undefined &&
-        node.transformOwners.translate.x !== owner
-      ) {
+      if (bbox.left !== undefined && ownedByOther(owner, node, "x")) {
         console.error(
           `${owner} tried to set ${id}'s left to ${
             bbox.left
@@ -462,11 +469,7 @@ export const createScenegraph = (): BBoxStore => {
           }. Only one component can set a bbox property. We skipped this update.`
         );
         return node;
-      } else if (
-        bbox.top !== undefined &&
-        node.transformOwners.translate.y !== undefined &&
-        node.transformOwners.translate.y !== owner
-      ) {
+      } else if (bbox.top !== undefined && ownedByOther(owner, node, "y")) {
         console.error(
           `${owner} tried to set ${id}'s top to ${
             bbox.top
@@ -574,6 +577,7 @@ export const createScenegraph = (): BBoxStore => {
       // check bbox ownership
       for (const key of Object.keys(bbox) as Array<keyof BBox>) {
         if (
+          bbox[key] !== undefined &&
           node.bboxOwners[key] !== undefined &&
           node.bboxOwners[key] !== owner
         ) {
@@ -589,6 +593,7 @@ export const createScenegraph = (): BBoxStore => {
         keyof Transform["translate"]
       >) {
         if (
+          transform?.translate[key] !== undefined &&
           node.transformOwners.translate[key] !== undefined &&
           node.transformOwners.translate[key] !== owner
         ) {

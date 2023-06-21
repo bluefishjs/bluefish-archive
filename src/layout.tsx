@@ -69,7 +69,12 @@ export const Layout: Component<LayoutProps> = (props) => {
   createEffect(() => {
     const id = props.id;
     console.log("layout", props.id);
-    // debugger;
+    // for (const childId of scenegraph[props.id]?.children) {
+    //   // runLayout
+    //   const node = untrack(() => getNode(scenegraph, childId));
+    //   untrack(() => node.runLayout());
+    // }
+    debugger;
     const { bbox, transform } = props.layout(
       scenegraph[props.id]?.children /* , getBBox */
     );

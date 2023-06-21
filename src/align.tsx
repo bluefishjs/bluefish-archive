@@ -151,6 +151,7 @@ export function Align(props: AlignProps) {
             y: node.transformOwners.translate.y,
           },
         },
+        runLayout: node.runLayout,
       } as ScenegraphNode & { type: "node" };
     });
 
@@ -164,16 +165,13 @@ export function Align(props: AlignProps) {
     // before invoking layout
     // childIds.forEach(getBBox);
 
-    const alignments: [
-      AlignmentVertical | undefined,
-      AlignmentHorizontal | undefined
-    ][] = childIds
-      .map((m) => /* m.guidePrimary ?? */ props.alignment)
-      .map((alignment) =>
-        alignment !== undefined
-          ? splitAlignment(alignment)
-          : [undefined, undefined]
-      );
+    // for (const childId of childIds) {
+    //   // runLayout
+    //   const node = getNode(scenegraph, childId);
+    //   if (node.runLayout) {
+    //     untrack(() => node.runLayout());
+    //   }
+    // }
 
     const verticalAlignments = childIds
       .map((m) => /* m.guidePrimary ?? */ props.alignment)
@@ -182,20 +180,6 @@ export function Align(props: AlignProps) {
     const horizontalAlignments = childIds
       .map((m) => /* m.guidePrimary ?? */ props.alignment)
       .map((alignment) => maybe(alignment, horizontalAlignment));
-
-    // assert alignments and verticalAlignments/horizontalAlignments agree
-    alignments.forEach(([verticalAlignment, horizontalAlignment], i) => {
-      if (verticalAlignment !== verticalAlignments[i]) {
-        throw new Error(
-          `vertical alignment mismatch: ${verticalAlignment} !== ${verticalAlignments[i]}`
-        );
-      }
-      if (horizontalAlignment !== horizontalAlignments[i]) {
-        throw new Error(
-          `horizontal alignment mismatch: ${horizontalAlignment} !== ${horizontalAlignments[i]}`
-        );
-      }
-    });
 
     const verticalPlaceables = _.zip(childIds, verticalAlignments).filter(
       ([placeable, alignment]) => alignment !== undefined

@@ -1,9 +1,8 @@
 import { Scenegraph } from "./scenegraph";
 
-export const getAncestorChain = (
-  scenegraph: Scenegraph,
-  id: string
-): string[] => {
+export type Tree = { [key: string]: { parent: string | null } };
+
+export const getAncestorChain = (scenegraph: Tree, id: string): string[] => {
   const chain = [];
   let node = scenegraph[id];
   if (node === undefined) {
@@ -17,7 +16,7 @@ export const getAncestorChain = (
 };
 
 export const getLCAChain = (
-  scenegraph: Scenegraph,
+  scenegraph: Tree,
   id1: string,
   id2: string
 ): string[] => {
@@ -38,7 +37,7 @@ export const getLCAChain = (
 
 // like getLCAChain, but returns the suffixes of the chains instead
 export const getLCAChainSuffixes = (
-  scenegraph: Scenegraph,
+  scenegraph: Tree,
   id1: string,
   id2: string
 ): [string[], string[]] => {

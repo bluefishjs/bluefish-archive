@@ -56,7 +56,22 @@ export function Bluefish(props: BluefishProps) {
   // });
 
   if (scenegraph[id] === undefined) {
-    createNode(id, null);
+    createNode(id, null, () => {
+      return {
+        bbox: {
+          left: 0,
+          top: 0,
+          width: props.width,
+          height: props.height,
+        },
+        transform: {
+          translate: {
+            x: 0,
+            y: 0,
+          },
+        },
+      };
+    });
   }
 
   // const layout = useCallback(
@@ -103,20 +118,23 @@ export function Bluefish(props: BluefishProps) {
   // );
 
   return (
-    <BBoxContext.Provider value={bboxStore}>
-      <ParentIDContext.Provider value={id}>
-        <svg
-          width={props.width}
-          height={props.height}
-          viewBox={`0 0 ${props.width} ${props.height}`}
-        >
-          {props.children}
-        </svg>
-        {/* <Layout id={id} layout={layout} paint={paint}>
+    <>
+      <BBoxContext.Provider value={bboxStore}>
+        <ParentIDContext.Provider value={id}>
+          <svg
+            width={props.width}
+            height={props.height}
+            viewBox={`0 0 ${props.width} ${props.height}`}
+          >
+            {props.children}
+          </svg>
+          {/* <Layout id={id} layout={layout} paint={paint}>
           {props.children}
         </Layout> */}
-      </ParentIDContext.Provider>
-    </BBoxContext.Provider>
+        </ParentIDContext.Provider>
+      </BBoxContext.Provider>
+      <pre>{JSON.stringify(scenegraph, null, 2)}</pre>
+    </>
   );
 }
 

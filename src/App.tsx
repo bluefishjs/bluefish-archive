@@ -42,7 +42,7 @@ const App: Component = () => {
         <option value="right">right</option>
       </select>
       <div>
-        <Bluefish id="bluefish" width={1000} height={200}>
+        {/* <Bluefish id="bluefish" width={1000} height={200}>
           <Rect
             id="rect"
             x={32}
@@ -57,29 +57,31 @@ const App: Component = () => {
             <Rect id="rect1" width={100} height={150} fill="steelblue" />
             <Rect id="rect2" width={50} height={50} fill="lightgreen" />
           </Align>
-        </Bluefish>
-        <Bluefish id={"ref-test"} width={1000} height={200}>
+        </Bluefish> */}
+        {/* <Bluefish id={"ref-test"} width={1000} height={200}>
+          <Rect
+            id="innerRect11"
+            x={32}
+            y={45}
+            width={100}
+            height={150}
+            fill="steelblue"
+          />
+          <Rect
+            id="innerRect21"
+            x={20}
+            width={50}
+            height={50}
+            fill="lightgreen"
+          />
           <Align
             id="align1"
             alignment={horizontalAlignment() as AlignmentHorizontal}
             x={0}
             y={0}
           >
-            <Rect
-              id="innerRect11"
-              x={32}
-              y={45}
-              width={100}
-              height={150}
-              fill="steelblue"
-            />
-            <Rect
-              id="innerRect21"
-              x={20}
-              width={50}
-              height={50}
-              fill="lightgreen"
-            />
+            <Ref id="ref11" refId="innerRect11" />
+            <Ref id="ref21" refId="innerRect21" />
           </Align>
           <Align
             id="align2"
@@ -88,11 +90,49 @@ const App: Component = () => {
             <Ref id="ref1" refId="innerRect11" />
             <Ref id="ref2" refId="innerRect21" />
           </Align>
+        </Bluefish> */}
+        <Bluefish id={"ref-test"} width={1000} height={200}>
+          <Rect
+            id="innerRect11"
+            x={32}
+            y={45}
+            width={100}
+            height={150}
+            fill="steelblue"
+          />
+          <Rect
+            id="innerRect21"
+            x={20}
+            width={50}
+            height={50}
+            fill="lightgreen"
+          />
+          {/* <Align
+            id="align1"
+            alignment={horizontalAlignment() as AlignmentHorizontal}
+            x={0}
+            y={0}
+          >
+            <Ref id="ref11" refId="innerRect11" />
+            <Ref id="ref21" refId="innerRect21" />
+          </Align>
+          <Align
+            id="align2"
+            alignment={verticalAlignment() as AlignmentVertical}
+          >
+            <Ref id="ref1" refId="innerRect11" />
+            <Ref id="ref2" refId="innerRect21" />
+          </Align> */}
+          <Align x={0} y={0} id="align1" alignment="center">
+            <Ref id="ref11" refId="innerRect11" />
+            <Ref id="ref21" refId="innerRect21" />
+          </Align>
           {/* TODO: uncommenting this causes another infinite loop. this time the translate seems to accumulate forever... */}
-          {/* <Align id="align3" alignment="topRight">
+          {/* TODO: now it seems like the scenegraph doesn't change but it updates anyway. in any case, innerRect31's bbox is not getting set fully. only one axis shows up. */}
+          <Align id="align3" alignment="topRight">
             <Ref id="ref3" refId="innerRect21" />
             <Rect id="innerRect31" width={20} height={30} fill="magenta" />
-          </Align> */}
+          </Align>
         </Bluefish>
       </div>
     </>
