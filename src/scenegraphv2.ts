@@ -1,7 +1,7 @@
 import { SetStoreFunction, createStore, produce } from "solid-js/store";
 import { getLCAChainSuffixes } from "./lcaUtil";
 import _ from "lodash";
-import { maybeAdd, maybeAddAll, maybeSub } from "./maybeUtil";
+import { maybeAdd, maybeAddAll, maybeDiv, maybeSub } from "./maybeUtil";
 import { createContext, untrack, useContext } from "solid-js";
 
 export type Id = string;
@@ -268,36 +268,23 @@ the align node.
   };
 
   const getBBox = (id: string): BBox => {
-    const { id: resolvedId, transform } = resolveRef(id);
+    // const { id: resolvedId, transform } = resolveRef(id);
+    const resolvedId = id;
     const node = scenegraph[resolvedId] as ScenegraphNode & { type: "node" }; // guaranteed by resolveRef
 
     return {
       get left() {
         return maybeAddAll(
           node.bbox.left,
-          node.transform.translate.x,
-          transform?.translate.x
-        );
-      },
-      get right() {
-        return maybeAddAll(
-          node.bbox.right,
-          node.transform.translate.x,
-          transform?.translate.x
+          node.transform.translate.x
+          // transform?.translate.x
         );
       },
       get top() {
         return maybeAddAll(
           node.bbox.top,
-          node.transform.translate.y,
-          transform?.translate.y
-        );
-      },
-      get bottom() {
-        return maybeAddAll(
-          node.bbox.bottom,
-          node.transform.translate.y,
-          transform?.translate.y
+          node.transform.translate.y
+          // transform?.translate.y
         );
       },
       get width() {
@@ -306,19 +293,17 @@ the align node.
       get height() {
         return node.bbox.height;
       },
+      get right() {
+        return maybeAdd(this.top, this.width);
+      },
+      get bottom() {
+        return maybeAdd(this.left, this.height);
+      },
       get centerX() {
-        return maybeAddAll(
-          node.bbox.centerX,
-          node.transform.translate.x,
-          transform?.translate.x
-        );
+        return maybeAdd(this.left, maybeDiv(this.width, 2));
       },
       get centerY() {
-        return maybeAddAll(
-          node.bbox.centerY,
-          node.transform.translate.y,
-          transform?.translate.y
-        );
+        return maybeAdd(this.top, maybeDiv(this.height, 2));
       },
     };
   };
@@ -333,96 +318,92 @@ the align node.
     // TODO: should I untrack this?
     // const { id: resolvedId, transform: accumulatedTransform } = resolveRef(id);
 
-    setScenegraph(id, (n: ScenegraphNode) => {
-      const node = n as ScenegraphNode & { type: "node" }; // guaranteed by resolveRef
+    setScenegraph(
+      id,
+      produce((n: ScenegraphNode) => {
+        const node = n as ScenegraphNode & { type: "node" }; // guaranteed by resolveRef
 
-      // check bbox ownership
-      for (const key of Object.keys(bbox) as Array<keyof BBox>) {
-        if (
-          bbox[key] !== undefined &&
-          node.bboxOwners[key] !== undefined &&
-          node.bboxOwners[key] !== owner
-        ) {
-          console.error(
-            `${owner} tried to set ${id}'s ${key} to ${bbox[key]} but it was already set by ${node.bboxOwners[key]}. Only one component can set a bbox property. We skipped this update.`
-          );
-          return node;
+        // check bbox ownership
+        for (const key of Object.keys(bbox) as Array<keyof BBox>) {
+          if (
+            bbox[key] !== undefined &&
+            node.bboxOwners[key] !== undefined &&
+            node.bboxOwners[key] !== owner
+          ) {
+            console.error(
+              `${owner} tried to set ${id}'s ${key} to ${bbox[key]} but it was already set by ${node.bboxOwners[key]}. Only one component can set a bbox property. We skipped this update.`
+            );
+            return node;
+          }
         }
-      }
 
-      // check transform ownership
-      for (const key of Object.keys(transform?.translate ?? {}) as Array<
-        keyof Transform["translate"]
-      >) {
-        if (
-          transform?.translate[key] !== undefined &&
-          node.transformOwners.translate[key] !== undefined &&
-          node.transformOwners.translate[key] !== owner
-        ) {
-          console.error(
-            `${owner} tried to set ${id}'s translate.${key} to ${transform?.translate[key]} but it was already set by ${node.transformOwners.translate[key]}. Only one component can set a transform property. We skipped this update.`
-          );
-          return node;
+        // check transform ownership
+        for (const key of Object.keys(transform?.translate ?? {}) as Array<
+          keyof Transform["translate"]
+        >) {
+          if (
+            transform?.translate[key] !== undefined &&
+            node.transformOwners.translate[key] !== undefined &&
+            node.transformOwners.translate[key] !== owner
+          ) {
+            console.error(
+              `${owner} tried to set ${id}'s translate.${key} to ${transform?.translate[key]} but it was already set by ${node.transformOwners.translate[key]}. Only one component can set a transform property. We skipped this update.`
+            );
+            return node;
+          }
         }
-      }
 
-      const newBBoxOwners = {
-        ...node.bboxOwners,
-        ...(bbox.left !== undefined ? { left: owner } : {}),
-        ...(bbox.top !== undefined ? { top: owner } : {}),
-        ...(bbox.width !== undefined ? { width: owner } : {}),
-        ...(bbox.height !== undefined ? { height: owner } : {}),
-      };
+        const newBBoxOwners: BBoxOwners = {
+          ...(bbox.left !== undefined ? { left: owner } : {}),
+          ...(bbox.top !== undefined ? { top: owner } : {}),
+          ...(bbox.width !== undefined ? { width: owner } : {}),
+          ...(bbox.height !== undefined ? { height: owner } : {}),
+        };
 
-      const newTransformOwners: TransformOwners = {
-        translate: {
-          x:
-            node.transformOwners.translate.x ??
-            (transform?.translate.x !== undefined ? owner : undefined),
-          y:
-            node.transformOwners.translate.y ??
-            (transform?.translate.y !== undefined ? owner : undefined),
-        },
-      };
+        const newTransformOwners: TransformOwners = {
+          translate: {
+            x: transform?.translate.x !== undefined ? owner : undefined,
+            y: transform?.translate.y !== undefined ? owner : undefined,
+          },
+        };
 
-      // merge currentBbox and bbox, but don't overwrite currentBbox values with undefined
-      const newBBox = mergeObjects(node.bbox, bbox);
+        const newTransform = {
+          translate: transform?.translate ?? {},
+        };
 
-      // const convertedTransform = {
-      //   translate: {
-      //     x: maybeAdd(
-      //       transform?.translate.x,
-      //       accumulatedTransform?.translate.x
-      //     ),
-      //     y: maybeAdd(
-      //       transform?.translate.y,
-      //       accumulatedTransform?.translate.y
-      //     ),
-      //   },
-      // };
+        for (const key of Object.keys(bbox) as Array<keyof BBox>) {
+          if (bbox[key] !== undefined) {
+            node.bbox[key] = bbox[key];
+          }
+        }
 
-      const newTranslate = mergeObjects(
-        node.transform.translate,
-        transform?.translate ?? {}
-      );
+        for (const key of Object.keys(newBBoxOwners) as Array<keyof BBox>) {
+          if (newBBoxOwners[key] !== undefined) {
+            node.bboxOwners[key] = newBBoxOwners[key];
+          }
+        }
 
-      const newTransform = {
-        translate: newTranslate,
-      };
+        if (newTransform.translate.x !== undefined) {
+          node.transform.translate.x = newTransform.translate.x;
+        }
 
-      return {
-        type: "node",
-        bbox: newBBox,
-        bboxOwners: newBBoxOwners,
-        transform: newTransform,
-        transformOwners: newTransformOwners,
-        children: node.children,
-        parent: node.parent,
-      };
-    });
+        if (newTransform.translate.y !== undefined) {
+          node.transform.translate.y = newTransform.translate.y;
+        }
+
+        if (newTransformOwners.translate.x !== undefined) {
+          node.transformOwners.translate.x = newTransformOwners.translate.x;
+        }
+
+        if (newTransformOwners.translate.y !== undefined) {
+          node.transformOwners.translate.y = newTransformOwners.translate.y;
+        }
+      })
+    );
   };
 
   const setBBox = (owner: Id, id: Id, bbox: BBox) => {
+    // debugger;
     const { id: resolvedId, transform: accumulatedTransform } = untrack(() =>
       resolveRef(id)
     );
@@ -440,7 +421,8 @@ the align node.
       }
     }
 
-    untrack(() => {
+    const { proposedBBox, proposedTransform } = untrack(() => {
+      // debugger;
       const node = scenegraph[resolvedId] as ScenegraphNode & { type: "node" }; // guaranteed by resolveRef
 
       const proposedBBox: BBox = {};
@@ -454,10 +436,16 @@ the align node.
             `setBBox: ${owner} tried to update ${resolvedId}'s bbox.left with ${bbox.left}, but the accumulated transform.translate.x is undefined. Skipping...`
           );
         }
-        if (node.bboxOwners.left === owner) {
+        if (
+          node.bboxOwners.left === owner ||
+          node.bboxOwners.left === undefined
+        ) {
           proposedBBox.left = bbox.left;
           proposedTransform.translate.x = 0;
-        } else if (node.transformOwners.translate.x === owner) {
+        } else if (
+          node.transformOwners.translate.x === owner ||
+          node.transformOwners.translate.x === undefined
+        ) {
           proposedTransform.translate.x = bbox.left;
         }
       }
@@ -468,10 +456,16 @@ the align node.
             `setBBox: ${owner} tried to update ${resolvedId}'s bbox.top with ${bbox.top}, but the accumulated transform.translate.y is undefined. Skipping...`
           );
         }
-        if (node.bboxOwners.top === owner) {
+        if (
+          node.bboxOwners.top === owner ||
+          node.bboxOwners.top === undefined
+        ) {
           proposedBBox.top = bbox.top;
           proposedTransform.translate.y = 0;
-        } else if (node.transformOwners.translate.y === owner) {
+        } else if (
+          node.transformOwners.translate.y === owner ||
+          node.transformOwners.translate.y === undefined
+        ) {
           proposedTransform.translate.y = bbox.top;
         }
       }
@@ -486,8 +480,53 @@ the align node.
         accumulatedTransform.translate.y
       );
 
-      mergeBBoxAndTransform(owner, resolvedId, proposedBBox, proposedTransform);
+      return {
+        proposedBBox,
+        proposedTransform,
+      };
     });
+
+    mergeBBoxAndTransform(owner, resolvedId, proposedBBox, proposedTransform);
+  };
+
+  const ownedByUs = (
+    id: Id, // with respect to this node
+    check: Id, // do we own this node
+    axis: "x" | "y" // along this axis
+  ): boolean => {
+    const { id: resolvedId } = resolveRef(check);
+    const node = scenegraph[resolvedId] as ScenegraphNode & { type: "node" }; // guaranteed by resolveRef
+
+    if (axis === "x") {
+      return node.transformOwners.translate.x === id;
+    } else if (axis === "y") {
+      return node.transformOwners.translate.y === id;
+    } else {
+      throw new Error("ownedByUs: axis is neither x nor y");
+    }
+  };
+
+  const ownedByOther = (
+    id: Id, // with respect to this node
+    check: Id, // is this node already owned
+    axis: "x" | "y" // along this axis
+  ): boolean => {
+    const { id: resolvedId } = resolveRef(check);
+    const node = scenegraph[resolvedId] as ScenegraphNode & { type: "node" }; // guaranteed by resolveRef
+
+    if (axis === "x") {
+      return (
+        node.transformOwners.translate.x !== undefined &&
+        node.transformOwners.translate.x !== id
+      );
+    } else if (axis === "y") {
+      return (
+        node.transformOwners.translate.y !== undefined &&
+        node.transformOwners.translate.y !== id
+      );
+    } else {
+      throw new Error("ownedByOther: axis is neither x nor y");
+    }
   };
 
   return {
@@ -501,6 +540,8 @@ the align node.
     // API
     getBBox,
     setBBox,
+    ownedByUs,
+    ownedByOther,
   };
 };
 
@@ -517,6 +558,8 @@ export type ScenegraphContextType = {
   ) => void;
   getBBox: (id: Id) => BBox;
   setBBox: (owner: Id, id: Id, bbox: BBox) => void;
+  ownedByUs: (id: Id, check: Id, axis: "x" | "y") => boolean;
+  ownedByOther: (id: Id, check: Id, axis: "x" | "y") => boolean;
 };
 
 export const ScenegraphContext = createContext<ScenegraphContextType | null>(
@@ -530,8 +573,8 @@ export const useScenegraph = () => {
     throw new Error("useScenegraph must be used within a ScenegraphProvider");
   }
 
-  const { getBBox, setBBox } = context;
-  return { getBBox, setBBox };
+  const { getBBox, setBBox, ownedByUs, ownedByOther } = context;
+  return { getBBox, setBBox, ownedByUs, ownedByOther };
 };
 
 export const UNSAFE_useScenegraph = () => {
