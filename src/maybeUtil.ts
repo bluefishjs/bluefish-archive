@@ -3,8 +3,22 @@
   Saves us a lot of boilerplate with undefined checks that make the code
   harder to read.
 */
+
+// TODO: merge these two functions once I'm confident they're the same
 export const maybeAdd = (a: number | undefined, b: number | undefined) =>
   a !== undefined && b !== undefined ? a + b : undefined;
+
+export const maybeAddAll = (...xs: (number | undefined)[]) => {
+  if (xs.every((x) => x !== undefined)) {
+    let sum = 0;
+    for (const x of xs) {
+      sum += x!;
+    }
+    return sum;
+  } else {
+    return undefined;
+  }
+};
 
 export const maybeSub = (a: number | undefined, b: number | undefined) =>
   a !== undefined && b !== undefined ? a - b : undefined;
