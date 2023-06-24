@@ -268,23 +268,23 @@ the align node.
   };
 
   const getBBox = (id: string): BBox => {
-    // const { id: resolvedId, transform } = resolveRef(id);
-    const resolvedId = id;
+    const { id: resolvedId, transform } = resolveRef(id);
+    // const resolvedId = id;
     const node = scenegraph[resolvedId] as ScenegraphNode & { type: "node" }; // guaranteed by resolveRef
 
     return {
       get left() {
         return maybeAddAll(
           node.bbox.left,
-          node.transform.translate.x
-          // transform?.translate.x
+          node.transform.translate.x,
+          transform.translate.x
         );
       },
       get top() {
         return maybeAddAll(
           node.bbox.top,
-          node.transform.translate.y
-          // transform?.translate.y
+          node.transform.translate.y,
+          transform.translate.y
         );
       },
       get width() {
@@ -317,6 +317,18 @@ the align node.
   ) => {
     // TODO: should I untrack this?
     // const { id: resolvedId, transform: accumulatedTransform } = resolveRef(id);
+
+    // if any of the bbox values are NaN (undefined is ok), console.error and skip
+    for (const key of Object.keys(bbox) as Array<keyof BBox>) {
+      if (bbox[key] !== undefined && isNaN(bbox[key]!)) {
+        console.error(
+          `setBBox: ${owner} tried to update ${id}'s bbox with ${JSON.stringify(
+            bbox
+          )}, but the bbox contains NaN values. Skipping...`
+        );
+        return;
+      }
+    }
 
     setScenegraph(
       id,

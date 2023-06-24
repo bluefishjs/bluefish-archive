@@ -16,6 +16,7 @@ import BluefishV2 from "./bluefishv2";
 import RectV2 from "./rectv2";
 import AlignV2 from "./alignv2";
 import AlignV2Simple from "./alignv2simple";
+import RefV2 from "./refv2";
 
 const App: Component = () => {
   const [x, setX] = createSignal(0);
@@ -87,6 +88,42 @@ const App: Component = () => {
           >
             <RectV2 id="rect1" width={100} height={150} fill="steelblue" />
             <RectV2 id="rect2" width={50} height={50} fill="lightgreen" />
+          </AlignV2>
+        </BluefishV2>
+        <BluefishV2 id="bluefish3" width={500} height={500}>
+          <RectV2
+            id="rect1"
+            x={x()}
+            y={0}
+            width={100}
+            height={150}
+            fill="steelblue"
+          />
+          <RectV2 id="rect2" width={50} height={50} fill="lightgreen" />
+          {/* TODO: I should get an error when trying to set x or y values on this... */}
+          <AlignV2 id="align" alignment={alignment() as Alignment2D}>
+            <RefV2 id="ref1" refId="rect1" />
+            <RefV2 id="ref2" refId="rect2" />
+          </AlignV2>
+        </BluefishV2>
+        <BluefishV2 id="bluefish4" width={500} height={500}>
+          <RectV2
+            id="rect1"
+            x={x()}
+            y={0}
+            width={100}
+            height={150}
+            fill="steelblue"
+          />
+          <RectV2 id="rect2" width={50} height={50} fill="lightgreen" />
+          {/* TODO: I should get an error when trying to set x or y values on this... */}
+          <AlignV2 id="align" alignment={alignment() as Alignment2D}>
+            <RefV2 id="ref1" refId="rect1" />
+            <RefV2 id="ref2" refId="rect2" />
+          </AlignV2>
+          <AlignV2 id="align2" alignment={alignment() as Alignment2D}>
+            <RefV2 id="ref3" refId="rect2" />
+            <RectV2 id="rect3" width={20} height={30} fill="magenta" />
           </AlignV2>
         </BluefishV2>
         {/* <Bluefish id="bluefish" width={1000} height={200}>
