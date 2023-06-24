@@ -1,5 +1,5 @@
-import { LayoutV2 } from "./layoutv2";
-import { BBox, Transform } from "./scenegraphv2";
+import { Layout } from "./layout";
+import { BBox, Transform } from "./scenegraph";
 
 export type RectProps = {
   id: string;
@@ -10,7 +10,7 @@ export type RectProps = {
   fill: string;
 };
 
-export function RectV2(props: RectProps) {
+export function Rect(props: RectProps) {
   const layout = () => {
     return {
       bbox: {
@@ -42,7 +42,7 @@ export function RectV2(props: RectProps) {
     );
   };
 
-  return <LayoutV2 id={props.id} layout={layout} paint={paint} />;
+  return <Layout id={props.id} layout={layout} paint={paint} />;
 }
 
-export default RectV2;
+export default Rect;

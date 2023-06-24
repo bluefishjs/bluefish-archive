@@ -19,7 +19,7 @@ import {
   ParentIDContext,
   LayoutFn,
   Id,
-} from "./scenegraphv2";
+} from "./scenegraph";
 
 export type LayoutProps = ParentProps<{
   id: Id;
@@ -32,7 +32,7 @@ export type LayoutProps = ParentProps<{
   }) => JSX.Element;
 }>;
 
-export const LayoutV2: Component<LayoutProps> = (props) => {
+export const Layout: Component<LayoutProps> = (props) => {
   // const [isFirstRender, setIsFirstRender] = useState(true);
 
   const parentId = useContext(ParentIDContext);
@@ -130,4 +130,4 @@ export const LayoutV2: Component<LayoutProps> = (props) => {
   );
 };
 
-export default LayoutV2;
+export default Layout;

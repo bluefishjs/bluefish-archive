@@ -1,5 +1,5 @@
 import { Component, useContext } from "solid-js";
-import { Id, UNSAFE_useScenegraph, ParentIDContext } from "./scenegraphv2";
+import { Id, UNSAFE_useScenegraph, ParentIDContext } from "./scenegraph";
 
 // The properties we want:
 // every time the refId's bbox is updated, it should be propagated to the id
@@ -17,7 +17,7 @@ export type RefProps = {
   refId: Id;
 };
 
-export const RefV2: Component<RefProps> = (props) => {
+export const Ref: Component<RefProps> = (props) => {
   const { id, refId } = props;
 
   const parentId = useContext(ParentIDContext);
@@ -31,4 +31,4 @@ export const RefV2: Component<RefProps> = (props) => {
   return <></>;
 };
 
-export default RefV2;
+export default Ref;

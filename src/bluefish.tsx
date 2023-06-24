@@ -5,7 +5,7 @@ import {
   Transform,
   createScenegraph,
   ParentIDContext,
-} from "./scenegraphv2";
+} from "./scenegraph";
 import { ParentProps, createUniqueId } from "solid-js";
 
 export type BluefishProps = ParentProps<{
@@ -16,11 +16,11 @@ export type BluefishProps = ParentProps<{
 
 declare global {
   interface Window {
-    bluefishv2?: { [key: string]: { [key: string]: ScenegraphNode } };
+    bluefish?: { [key: string]: { [key: string]: ScenegraphNode } };
   }
 }
 
-export function BluefishV2(props: BluefishProps) {
+export function Bluefish(props: BluefishProps) {
   // const bboxStore = useMemo(() => observable.map(), []);
   // const bboxStore = useMemo(() => createScenegraph(), []);
   // const bboxStore = createScenegraph();
@@ -120,4 +120,4 @@ export function BluefishV2(props: BluefishProps) {
   );
 }
 
-export default BluefishV2;
+export default Bluefish;

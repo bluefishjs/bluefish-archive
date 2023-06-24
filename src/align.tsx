@@ -1,8 +1,8 @@
 import { JSX, ParentProps, untrack } from "solid-js";
-import { LayoutV2 } from "./layoutv2";
+import { Layout } from "./layout";
 import _, { get } from "lodash";
 import { maybe, maybeAdd, maybeMax, maybeMin, maybeSub } from "./maybeUtil";
-import { BBox, Id, Transform, useScenegraph } from "./scenegraphv2";
+import { BBox, Id, Transform, useScenegraph } from "./scenegraph";
 
 export type Alignment2D =
   | "topLeft"
@@ -107,7 +107,7 @@ export type AlignProps = ParentProps<{
   alignment?: Alignment2D | Alignment1D;
 }>;
 
-export function AlignV2(props: AlignProps) {
+export function Align(props: AlignProps) {
   // const { children, id } = props;
   const { getBBox, setBBox, ownedByUs, ownedByOther } = useScenegraph();
 
@@ -291,11 +291,11 @@ export function AlignV2(props: AlignProps) {
   };
 
   return (
-    <LayoutV2 id={props.id} layout={layout} paint={paint}>
+    <Layout id={props.id} layout={layout} paint={paint}>
       {props.children}
-    </LayoutV2>
+    </Layout>
   );
 }
-AlignV2.displayName = "Align";
+Align.displayName = "Align";
 
-export default AlignV2;
+export default Align;

@@ -4,10 +4,10 @@ import { createSignal, type Component } from "solid-js";
 
 import logo from "./logo.svg";
 import styles from "./App.module.css";
-import BluefishV2 from "./bluefishv2";
-import RectV2 from "./rectv2";
-import AlignV2, { Alignment2D } from "./alignv2";
-import RefV2 from "./refv2";
+import Bluefish from "./bluefish";
+import Rect from "./rect";
+import Align, { Alignment2D } from "./align";
+import Ref from "./ref";
 
 const App: Component = () => {
   const [x, setX] = createSignal(0);
@@ -60,8 +60,8 @@ const App: Component = () => {
         <option value="right">right</option>
       </select>
       <div>
-        <BluefishV2 id="bluefish" width={1000} height={200}>
-          <RectV2
+        <Bluefish id="bluefish" width={1000} height={200}>
+          <Rect
             id="rect"
             x={x()}
             y={45}
@@ -69,20 +69,20 @@ const App: Component = () => {
             height={150}
             fill="steelblue"
           />
-        </BluefishV2>
-        <BluefishV2 id="bluefish2" width={500} height={500}>
-          <AlignV2
+        </Bluefish>
+        <Bluefish id="bluefish2" width={500} height={500}>
+          <Align
             id="align"
             alignment={alignment() as Alignment2D}
             x={x()}
             y={0}
           >
-            <RectV2 id="rect1" width={100} height={150} fill="steelblue" />
-            <RectV2 id="rect2" width={50} height={50} fill="lightgreen" />
-          </AlignV2>
-        </BluefishV2>
-        <BluefishV2 id="bluefish3" width={500} height={200}>
-          <RectV2
+            <Rect id="rect1" width={100} height={150} fill="steelblue" />
+            <Rect id="rect2" width={50} height={50} fill="lightgreen" />
+          </Align>
+        </Bluefish>
+        <Bluefish id="bluefish3" width={500} height={200}>
+          <Rect
             id="rect1"
             x={x()}
             y={0}
@@ -90,18 +90,15 @@ const App: Component = () => {
             height={150}
             fill="steelblue"
           />
-          <RectV2 id="rect2" width={50} height={50} fill="lightgreen" />
-          {/* NOTE: this update to x is ignored b/c the ref resolution already sets the position of AlignV2 */}
-          <AlignV2
-            id="align"
-            /* x={0} */ alignment={alignment() as Alignment2D}
-          >
-            <RefV2 id="ref1" refId="rect1" />
-            <RefV2 id="ref2" refId="rect2" />
-          </AlignV2>
-        </BluefishV2>
-        <BluefishV2 id="bluefish4" width={500} height={500}>
-          <RectV2
+          <Rect id="rect2" width={50} height={50} fill="lightgreen" />
+          {/* NOTE: this update to x is ignored b/c the ref resolution already sets the position of Align */}
+          <Align id="align" /* x={0} */ alignment={alignment() as Alignment2D}>
+            <Ref id="ref1" refId="rect1" />
+            <Ref id="ref2" refId="rect2" />
+          </Align>
+        </Bluefish>
+        <Bluefish id="bluefish4" width={500} height={500}>
+          <Rect
             id="rect1"
             x={x()}
             y={0}
@@ -109,16 +106,16 @@ const App: Component = () => {
             height={150}
             fill="steelblue"
           />
-          <RectV2 id="rect2" width={50} height={50} fill="lightgreen" />
-          <AlignV2 id="align" alignment={alignment() as Alignment2D}>
-            <RefV2 id="ref1" refId="rect1" />
-            <RefV2 id="ref2" refId="rect2" />
-          </AlignV2>
-          <AlignV2 id="align2" alignment={alignment() as Alignment2D}>
-            <RefV2 id="ref3" refId="rect2" />
-            <RectV2 id="rect3" width={20} height={30} fill="magenta" />
-          </AlignV2>
-        </BluefishV2>
+          <Rect id="rect2" width={50} height={50} fill="lightgreen" />
+          <Align id="align" alignment={alignment() as Alignment2D}>
+            <Ref id="ref1" refId="rect1" />
+            <Ref id="ref2" refId="rect2" />
+          </Align>
+          <Align id="align2" alignment={alignment() as Alignment2D}>
+            <Ref id="ref3" refId="rect2" />
+            <Rect id="rect3" width={20} height={30} fill="magenta" />
+          </Align>
+        </Bluefish>
       </div>
     </>
   );
