@@ -4,18 +4,9 @@ import { createSignal, type Component } from "solid-js";
 
 import logo from "./logo.svg";
 import styles from "./App.module.css";
-import Bluefish from "./bluefish";
-import Rect from "./rect";
-import Align, {
-  AlignmentVertical,
-  AlignmentHorizontal,
-  Alignment2D,
-} from "./align";
-import Ref from "./ref";
 import BluefishV2 from "./bluefishv2";
 import RectV2 from "./rectv2";
-import AlignV2 from "./alignv2";
-import AlignV2Simple from "./alignv2simple";
+import AlignV2, { Alignment2D } from "./alignv2";
 import RefV2 from "./refv2";
 
 const App: Component = () => {
@@ -69,7 +60,7 @@ const App: Component = () => {
         <option value="right">right</option>
       </select>
       <div>
-        {/* <BluefishV2 id="bluefish" width={1000} height={200}>
+        <BluefishV2 id="bluefish" width={1000} height={200}>
           <RectV2
             id="rect"
             x={x()}
@@ -89,7 +80,7 @@ const App: Component = () => {
             <RectV2 id="rect1" width={100} height={150} fill="steelblue" />
             <RectV2 id="rect2" width={50} height={50} fill="lightgreen" />
           </AlignV2>
-        </BluefishV2> */}
+        </BluefishV2>
         <BluefishV2 id="bluefish3" width={500} height={200}>
           <RectV2
             id="rect1"
@@ -101,12 +92,15 @@ const App: Component = () => {
           />
           <RectV2 id="rect2" width={50} height={50} fill="lightgreen" />
           {/* NOTE: this update to x is ignored b/c the ref resolution already sets the position of AlignV2 */}
-          <AlignV2 id="align" x={0} alignment={alignment() as Alignment2D}>
+          <AlignV2
+            id="align"
+            /* x={0} */ alignment={alignment() as Alignment2D}
+          >
             <RefV2 id="ref1" refId="rect1" />
             <RefV2 id="ref2" refId="rect2" />
           </AlignV2>
         </BluefishV2>
-        {/* <BluefishV2 id="bluefish4" width={500} height={500}>
+        <BluefishV2 id="bluefish4" width={500} height={500}>
           <RectV2
             id="rect1"
             x={x()}
@@ -124,99 +118,7 @@ const App: Component = () => {
             <RefV2 id="ref3" refId="rect2" />
             <RectV2 id="rect3" width={20} height={30} fill="magenta" />
           </AlignV2>
-        </BluefishV2> */}
-        {/* <Bluefish id="bluefish" width={1000} height={200}>
-          <Rect
-            id="rect"
-            x={32}
-            y={45}
-            width={100}
-            height={150}
-            fill="steelblue"
-          />
-        </Bluefish>
-        <Bluefish id="bluefish2" width={500} height={500}>
-          <Align id="align" alignment="center" x={x()} y={0}>
-            <Rect id="rect1" width={100} height={150} fill="steelblue" />
-            <Rect id="rect2" width={50} height={50} fill="lightgreen" />
-          </Align>
-        </Bluefish> */}
-        {/* <Bluefish id={"ref-test"} width={1000} height={200}>
-          <Rect
-            id="innerRect11"
-            x={32}
-            y={45}
-            width={100}
-            height={150}
-            fill="steelblue"
-          />
-          <Rect
-            id="innerRect21"
-            x={20}
-            width={50}
-            height={50}
-            fill="lightgreen"
-          />
-          <Align
-            id="align1"
-            alignment={horizontalAlignment() as AlignmentHorizontal}
-            x={0}
-            y={0}
-          >
-            <Ref id="ref11" refId="innerRect11" />
-            <Ref id="ref21" refId="innerRect21" />
-          </Align>
-          <Align
-            id="align2"
-            alignment={verticalAlignment() as AlignmentVertical}
-          >
-            <Ref id="ref1" refId="innerRect11" />
-            <Ref id="ref2" refId="innerRect21" />
-          </Align>
-        </Bluefish> */}
-        {/* <Bluefish id={"ref-test"} width={1000} height={200}>
-          <Rect
-            id="innerRect11"
-            x={32}
-            y={45}
-            width={100}
-            height={150}
-            fill="steelblue"
-          />
-          <Rect
-            id="innerRect21"
-            x={20}
-            width={50}
-            height={50}
-            fill="lightgreen"
-          /> */}
-        {/* <Align
-            id="align1"
-            alignment={horizontalAlignment() as AlignmentHorizontal}
-            x={0}
-            y={0}
-          >
-            <Ref id="ref11" refId="innerRect11" />
-            <Ref id="ref21" refId="innerRect21" />
-          </Align>
-          <Align
-            id="align2"
-            alignment={verticalAlignment() as AlignmentVertical}
-          >
-            <Ref id="ref1" refId="innerRect11" />
-            <Ref id="ref2" refId="innerRect21" />
-          </Align> */}
-        {/* <Align x={0} y={0} id="align1" alignment="center">
-            <Ref id="ref11" refId="innerRect11" />
-            <Ref id="ref21" refId="innerRect21" />
-          </Align> */}
-        {/* TODO: uncommenting this causes another infinite loop. this time the translate seems to accumulate forever... */}
-        {/* TODO: now it seems like the scenegraph doesn't change but it updates anyway. in any case, innerRect31's bbox is not getting set fully. only one axis shows up. */}
-        {/* <Align id="align3" alignment="topRight">
-            <Ref id="ref3" refId="innerRect21" />
-            <Rect id="innerRect31" width={20} height={30} fill="magenta" />
-          </Align> */}
-        {/* </Bluefish> */}
+        </BluefishV2>
       </div>
     </>
   );

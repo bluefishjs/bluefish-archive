@@ -1,4 +1,4 @@
-import { Scenegraph } from "./scenegraph";
+import { Scenegraph } from "./scenegraphv2";
 
 export type Tree = { [key: string]: { parent: string | null } };
 
@@ -54,63 +54,4 @@ export const getLCAChainSuffixes = (
   }
 
   return [chain1.slice(lcaChain.length), chain2.slice(lcaChain.length)];
-};
-
-export const getTransformDiff = (
-  scenegraph: Scenegraph,
-  id1: string,
-  id2: string
-): { translate: { x?: number; y?: number } } => {
-  const [id1Suffix, id2Suffix] = getLCAChainSuffixes(scenegraph, id1, id2);
-  // accumulate transforms from id1 to id2
-  let transform: {
-    translate: { x?: number; y?: number };
-  } = {
-    translate: {
-      x: 0,
-      y: 0,
-    },
-  };
-
-  // first go up the id2 chain
-  for (const node of id2Suffix) {
-    const xUndefined =
-      scenegraph[node].transform.translate.x === undefined ||
-      transform.translate.x === undefined;
-    const yUndefined =
-      scenegraph[node].transform.translate.y === undefined ||
-      transform.translate.y === undefined;
-    transform = {
-      translate: {
-        x: !xUndefined
-          ? scenegraph[node].transform.translate.x! + transform.translate.x!
-          : undefined,
-        y: !yUndefined
-          ? scenegraph[node].transform.translate.y! + transform.translate.y!
-          : undefined,
-      },
-    };
-  }
-
-  // then go down the id1 chain
-  for (const node of id1Suffix) {
-    const xUndefined =
-      scenegraph[node].transform.translate.x === undefined ||
-      transform.translate.x === undefined;
-    const yUndefined =
-      scenegraph[node].transform.translate.y === undefined ||
-      transform.translate.y === undefined;
-    transform = {
-      translate: {
-        x: !xUndefined
-          ? transform.translate.x! - scenegraph[node].transform.translate.x!
-          : undefined,
-        y: !yUndefined
-          ? transform.translate.y! - scenegraph[node].transform.translate.y!
-          : undefined,
-      },
-    };
-  }
-
-  return transform;
 };

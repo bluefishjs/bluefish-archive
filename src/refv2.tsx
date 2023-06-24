@@ -1,6 +1,5 @@
 import { Component, useContext } from "solid-js";
-import { ParentIDContext } from "./scenegraph";
-import { Id, UNSAFE_useScenegraph } from "./scenegraphv2";
+import { Id, UNSAFE_useScenegraph, ParentIDContext } from "./scenegraphv2";
 
 // The properties we want:
 // every time the refId's bbox is updated, it should be propagated to the id

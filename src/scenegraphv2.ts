@@ -604,3 +604,13 @@ export const UNSAFE_useScenegraph = () => {
 
   return context;
 };
+
+export const ParentIDContext = createContext<Id | null>(null);
+
+export type LayoutFn = (
+  childIds: Id[],
+  getBBox?: (id: string) => BBox
+) => {
+  bbox: Partial<BBox>;
+  transform: Transform;
+};
