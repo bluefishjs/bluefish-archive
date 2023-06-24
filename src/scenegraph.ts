@@ -298,10 +298,10 @@ the align node.
         return node.bbox.height;
       },
       get right() {
-        return maybeAdd(this.top, this.width);
+        return maybeAdd(this.left, this.width);
       },
       get bottom() {
-        return maybeAdd(this.left, this.height);
+        return maybeAdd(this.top, this.height);
       },
       get centerX() {
         return maybeAdd(this.left, maybeDiv(this.width, 2));

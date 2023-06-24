@@ -92,11 +92,12 @@ const App: Component = () => {
           />
           <Rect id="rect2" width={50} height={50} fill="lightgreen" />
           {/* NOTE: this update to x is ignored b/c the ref resolution already sets the position of Align */}
-          <Align id="align" /* x={0} */ alignment={alignment() as Alignment2D}>
+          <Align id="align" x={0} alignment={alignment() as Alignment2D}>
             <Ref id="ref1" refId="rect1" />
             <Ref id="ref2" refId="rect2" />
           </Align>
         </Bluefish>
+        {/* TODO: there is a bug with bottom and right alignment */}
         <Bluefish id="bluefish4" width={500} height={500}>
           <Rect
             id="rect1"

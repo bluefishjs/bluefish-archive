@@ -196,7 +196,6 @@ export function Align(props: AlignProps) {
 
     for (const [placeable, alignment] of verticalPlaceables) {
       if (ownedByOther(props.id, placeable!, "y")) continue;
-      // const [verticalAlignment, horizontalAlignment] = alignment!;
       if (alignment === "top") {
         console.log("setting smart bbox", props.id, placeable!, verticalValue);
         setBBox(props.id, placeable!, { top: verticalValue });
@@ -207,7 +206,6 @@ export function Align(props: AlignProps) {
         }
         setBBox(props.id, placeable!, { top: verticalValue - height / 2 });
       } else if (alignment === "bottom") {
-        // placeable!.bottom = verticalValue;
         setBBox(props.id, placeable!, {
           top: verticalValue - getBBox(placeable!).height!,
         });
@@ -230,12 +228,6 @@ export function Align(props: AlignProps) {
         if (width === undefined) {
           continue;
         }
-        console.log(
-          "setting smart bbox",
-          props.id,
-          placeable!,
-          horizontalValue - width
-        );
         setBBox(props.id, placeable!, { left: horizontalValue - width });
       }
     }
