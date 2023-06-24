@@ -177,6 +177,8 @@ the align node.
       node.refId
     );
 
+    // debugger;
+
     // TODO: this will break if node.refId is a ref b/c then it doesn't have a transform
     if (
       _.every(
@@ -188,10 +190,11 @@ the align node.
     ) {
       // the x value is defined on the refId side
       // default all undefined transforms to 0 on the id side
-      for (const id of idSuffix) {
+      for (const idSf of idSuffix) {
         setScenegraph(
-          id,
+          idSf,
           produce((n: ScenegraphNode) => {
+            // debugger;
             const node = n as ScenegraphNode & { type: "node" };
             if (node.transform.translate.x === undefined) {
               node.transform.translate.x = 0;
@@ -231,9 +234,9 @@ the align node.
     ) {
       // the y value is defined on the refId side
       // default all undefined transforms to 0 on the id side
-      for (const id of idSuffix) {
+      for (const idSf of idSuffix) {
         setScenegraph(
-          id,
+          idSf,
           produce((n: ScenegraphNode) => {
             const node = n as ScenegraphNode & { type: "node" };
             if (node.transform.translate.y === undefined) {
@@ -268,6 +271,7 @@ the align node.
   };
 
   const getBBox = (id: string): BBox => {
+    // debugger;
     const { id: resolvedId, transform } = resolveRef(id);
     // const resolvedId = id;
     const node = scenegraph[resolvedId] as ScenegraphNode & { type: "node" }; // guaranteed by resolveRef
@@ -506,6 +510,7 @@ the align node.
     check: Id, // do we own this node
     axis: "x" | "y" // along this axis
   ): boolean => {
+    // debugger;
     const { id: resolvedId } = resolveRef(check);
     const node = scenegraph[resolvedId] as ScenegraphNode & { type: "node" }; // guaranteed by resolveRef
 
@@ -523,6 +528,7 @@ the align node.
     check: Id, // is this node already owned
     axis: "x" | "y" // along this axis
   ): boolean => {
+    // debugger;
     const { id: resolvedId } = resolveRef(check);
     const node = scenegraph[resolvedId] as ScenegraphNode & { type: "node" }; // guaranteed by resolveRef
 

@@ -69,7 +69,7 @@ const App: Component = () => {
         <option value="right">right</option>
       </select>
       <div>
-        <BluefishV2 id="bluefish" width={1000} height={200}>
+        {/* <BluefishV2 id="bluefish" width={1000} height={200}>
           <RectV2
             id="rect"
             x={x()}
@@ -89,8 +89,8 @@ const App: Component = () => {
             <RectV2 id="rect1" width={100} height={150} fill="steelblue" />
             <RectV2 id="rect2" width={50} height={50} fill="lightgreen" />
           </AlignV2>
-        </BluefishV2>
-        <BluefishV2 id="bluefish3" width={500} height={500}>
+        </BluefishV2> */}
+        <BluefishV2 id="bluefish3" width={500} height={200}>
           <RectV2
             id="rect1"
             x={x()}
@@ -100,13 +100,13 @@ const App: Component = () => {
             fill="steelblue"
           />
           <RectV2 id="rect2" width={50} height={50} fill="lightgreen" />
-          {/* TODO: I should get an error when trying to set x or y values on this... */}
-          <AlignV2 id="align" alignment={alignment() as Alignment2D}>
+          {/* NOTE: this update to x is ignored b/c the ref resolution already sets the position of AlignV2 */}
+          <AlignV2 id="align" x={0} alignment={alignment() as Alignment2D}>
             <RefV2 id="ref1" refId="rect1" />
             <RefV2 id="ref2" refId="rect2" />
           </AlignV2>
         </BluefishV2>
-        <BluefishV2 id="bluefish4" width={500} height={500}>
+        {/* <BluefishV2 id="bluefish4" width={500} height={500}>
           <RectV2
             id="rect1"
             x={x()}
@@ -116,7 +116,6 @@ const App: Component = () => {
             fill="steelblue"
           />
           <RectV2 id="rect2" width={50} height={50} fill="lightgreen" />
-          {/* TODO: I should get an error when trying to set x or y values on this... */}
           <AlignV2 id="align" alignment={alignment() as Alignment2D}>
             <RefV2 id="ref1" refId="rect1" />
             <RefV2 id="ref2" refId="rect2" />
@@ -125,7 +124,7 @@ const App: Component = () => {
             <RefV2 id="ref3" refId="rect2" />
             <RectV2 id="rect3" width={20} height={30} fill="magenta" />
           </AlignV2>
-        </BluefishV2>
+        </BluefishV2> */}
         {/* <Bluefish id="bluefish" width={1000} height={200}>
           <Rect
             id="rect"
