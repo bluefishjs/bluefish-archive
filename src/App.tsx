@@ -97,7 +97,6 @@ const App: Component = () => {
             <Ref id="ref2" refId="rect2" />
           </Align>
         </Bluefish>
-        {/* TODO: there is a bug with bottom and right alignment */}
         <Bluefish id="bluefish4" width={500} height={500}>
           <Rect
             id="rect1"
