@@ -6,12 +6,13 @@ import {
   createScenegraph,
   ParentIDContext,
 } from "./scenegraph";
-import { ParentProps, createUniqueId } from "solid-js";
+import { ParentProps, Show, createUniqueId } from "solid-js";
 
 export type BluefishProps = ParentProps<{
   width: number;
   height: number;
   id?: string;
+  debug?: boolean;
 }>;
 
 declare global {
@@ -115,7 +116,9 @@ export function Bluefish(props: BluefishProps) {
         </Layout> */}
         </ParentIDContext.Provider>
       </ScenegraphContext.Provider>
-      <pre>{JSON.stringify(scenegraph, null, 2)}</pre>
+      <Show when={props.debug === true}>
+        <pre>{JSON.stringify(scenegraph, null, 2)}</pre>
+      </Show>
     </>
   );
 }

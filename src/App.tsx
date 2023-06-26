@@ -8,6 +8,7 @@ import Bluefish from "./bluefish";
 import Rect from "./rect";
 import Align, { Alignment2D } from "./align";
 import Ref from "./ref";
+import { Alignment1DVertical, Alignment1DHorizontal } from "./align";
 
 const App: Component = () => {
   const [x, setX] = createSignal(0);
@@ -108,6 +109,35 @@ const App: Component = () => {
           />
           <Rect id="rect2" width={50} height={50} fill="lightgreen" />
           <Align id="align" alignment={alignment() as Alignment2D}>
+            <Ref id="ref1" refId="rect1" />
+            <Ref id="ref2" refId="rect2" />
+          </Align>
+          <Align id="align2" alignment={alignment() as Alignment2D}>
+            <Ref id="ref3" refId="rect2" />
+            <Rect id="rect3" width={20} height={30} fill="magenta" />
+          </Align>
+        </Bluefish>
+        <Bluefish id="bluefish5" width={500} height={500}>
+          <Rect
+            id="rect1"
+            x={x()}
+            y={0}
+            width={100}
+            height={150}
+            fill="steelblue"
+          />
+          <Rect id="rect2" width={50} height={50} fill="lightgreen" />
+          <Align
+            id="align"
+            alignment={verticalAlignment() as Alignment1DVertical}
+          >
+            <Ref id="ref1" refId="rect1" />
+            <Ref id="ref2" refId="rect2" />
+          </Align>
+          <Align
+            id="align.5"
+            alignment={horizontalAlignment() as Alignment1DHorizontal}
+          >
             <Ref id="ref1" refId="rect1" />
             <Ref id="ref2" refId="rect2" />
           </Align>
