@@ -66,6 +66,32 @@ export const Layout: Component<LayoutProps> = (props) => {
   //   untrack(() => console.log(JSON.parse(JSON.stringify(scenegraph))));
   // });
 
+  // evaluate the child props before running the effect so that children's layout functions are
+  // called before the parent's layout function
+  // h/t Erik Demaine
+  const jsx = (
+    <ParentIDContext.Provider value={props.id}>
+      <Dynamic
+        component={props.paint}
+        // TODO: this is a hack to get reactivity to work
+        bbox={mergeProps({}, () => ({
+          left: scenegraph[props.id]?.bbox?.left ?? 0,
+          top: scenegraph[props.id]?.bbox?.top ?? 0,
+          width: scenegraph[props.id]?.bbox?.width ?? 0,
+          height: scenegraph[props.id]?.bbox?.height ?? 0,
+        }))}
+        transform={mergeProps({}, () => ({
+          translate: {
+            x: scenegraph[props.id]?.transform?.translate?.x ?? 0,
+            y: scenegraph[props.id]?.transform?.translate?.y ?? 0,
+          },
+        }))}
+      >
+        {props.children}
+      </Dynamic>
+    </ParentIDContext.Provider>
+  );
+
   createEffect(() => {
     const id = props.id;
     console.log("layout", props.id);
@@ -106,28 +132,27 @@ export const Layout: Component<LayoutProps> = (props) => {
   //   return scenegraph[props.id]?.transform ?? { translate: { x: 0, y: 0 } };
   // };
 
-  return (
-    <ParentIDContext.Provider value={props.id}>
-      <Dynamic
-        component={props.paint}
-        // TODO: this is a hack to get reactivity to work
-        bbox={mergeProps({}, () => ({
-          left: scenegraph[props.id]?.bbox?.left ?? 0,
-          top: scenegraph[props.id]?.bbox?.top ?? 0,
-          width: scenegraph[props.id]?.bbox?.width ?? 0,
-          height: scenegraph[props.id]?.bbox?.height ?? 0,
-        }))}
-        transform={mergeProps({}, () => ({
-          translate: {
-            x: scenegraph[props.id]?.transform?.translate?.x ?? 0,
-            y: scenegraph[props.id]?.transform?.translate?.y ?? 0,
-          },
-        }))}
-      >
-        {props.children}
-      </Dynamic>
-    </ParentIDContext.Provider>
-  );
+  return jsx;
+  // <ParentIDContext.Provider value={props.id}>
+  //   <Dynamic
+  //     component={props.paint}
+  //     // TODO: this is a hack to get reactivity to work
+  //     bbox={mergeProps({}, () => ({
+  //       left: scenegraph[props.id]?.bbox?.left ?? 0,
+  //       top: scenegraph[props.id]?.bbox?.top ?? 0,
+  //       width: scenegraph[props.id]?.bbox?.width ?? 0,
+  //       height: scenegraph[props.id]?.bbox?.height ?? 0,
+  //     }))}
+  //     transform={mergeProps({}, () => ({
+  //       translate: {
+  //         x: scenegraph[props.id]?.transform?.translate?.x ?? 0,
+  //         y: scenegraph[props.id]?.transform?.translate?.y ?? 0,
+  //       },
+  //     }))}
+  //   >
+  //     {props.children}
+  //   </Dynamic>
+  // </ParentIDContext.Provider>
 };
 
 export default Layout;
