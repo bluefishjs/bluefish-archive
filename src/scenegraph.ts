@@ -508,7 +508,7 @@ the align node.
   const ownedByUs = (
     id: Id, // with respect to this node
     check: Id, // do we own this node
-    axis: "x" | "y" // along this axis
+    axis: "x" | "y" | "width" | "height" // along this axis
   ): boolean => {
     // debugger;
     const { id: resolvedId } = resolveRef(check);
@@ -518,6 +518,10 @@ the align node.
       return node.transformOwners.translate.x === id;
     } else if (axis === "y") {
       return node.transformOwners.translate.y === id;
+    } else if (axis === "width") {
+      return node.bboxOwners.width === id;
+    } else if (axis === "height") {
+      return node.bboxOwners.height === id;
     } else {
       throw new Error("ownedByUs: axis is neither x nor y");
     }
@@ -526,7 +530,7 @@ the align node.
   const ownedByOther = (
     id: Id, // with respect to this node
     check: Id, // is this node already owned
-    axis: "x" | "y" // along this axis
+    axis: "x" | "y" | "width" | "height" // along this axis
   ): boolean => {
     // debugger;
     const { id: resolvedId } = resolveRef(check);
@@ -541,6 +545,14 @@ the align node.
       return (
         node.transformOwners.translate.y !== undefined &&
         node.transformOwners.translate.y !== id
+      );
+    } else if (axis === "width") {
+      return (
+        node.bboxOwners.width !== undefined && node.bboxOwners.width !== id
+      );
+    } else if (axis === "height") {
+      return (
+        node.bboxOwners.height !== undefined && node.bboxOwners.height !== id
       );
     } else {
       throw new Error("ownedByOther: axis is neither x nor y");
@@ -576,8 +588,16 @@ export type ScenegraphContextType = {
   ) => void;
   getBBox: (id: Id) => BBox;
   setBBox: (owner: Id, id: Id, bbox: BBox) => void;
-  ownedByUs: (id: Id, check: Id, axis: "x" | "y") => boolean;
-  ownedByOther: (id: Id, check: Id, axis: "x" | "y") => boolean;
+  ownedByUs: (
+    id: Id,
+    check: Id,
+    axis: "x" | "y" | "width" | "height"
+  ) => boolean;
+  ownedByOther: (
+    id: Id,
+    check: Id,
+    axis: "x" | "y" | "width" | "height"
+  ) => boolean;
 };
 
 export const ScenegraphContext = createContext<ScenegraphContextType | null>(

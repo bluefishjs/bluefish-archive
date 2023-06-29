@@ -7,8 +7,9 @@ import styles from "./App.module.css";
 import Bluefish from "./bluefish";
 import Rect from "./rect";
 import Align, { Alignment2D } from "./align";
+import Distribute from "./distribute";
 import Ref from "./ref";
-import { Alignment1DVertical, Alignment1DHorizontal } from "./align";
+import { AlignmentVertical, AlignmentHorizontal } from "./align";
 
 const App: Component = () => {
   const [x, setX] = createSignal(0);
@@ -61,6 +62,36 @@ const App: Component = () => {
         <option value="right">right</option>
       </select>
       <div>
+        {/* TODO: Align(Rect, Rect), Align(Ref, Ref) doesn't work... */}
+        <Bluefish id="bluefish-variable" width={1000} height={200}>
+          <Rect id={`box`} y={0} height={40} width={40} fill={"#e2ebf6"} />
+          <Rect id={`name`} x={0} width={10} height={10} fill="magenta" />
+          <Align id={`alignRow`} alignment="centerY">
+            <Ref id={`alignrowRef1`} refId={`name`} />
+            <Ref id={`alignrowRef2`} refId={`box`} />
+          </Align>
+          <Distribute id={`distribute`} direction="horizontal" spacing={5}>
+            <Ref id={`rowRef1`} refId={`name`} />
+            <Ref id={`rowRef2`} refId={`box`} />
+          </Distribute>
+          <Align id={`align1`} alignment="bottomCenter">
+            <Rect
+              id={`boxBorderBottom`}
+              height={2}
+              width={40}
+              fill={"#a6b3b6"}
+            />
+            <Ref id={`ref2`} refId={`box`} />
+          </Align>
+          <Align id={`align2`} alignment="centerLeft">
+            <Rect id={`boxBorderLeft`} height={40} width={2} fill={"#a6b3b6"} />
+            <Ref id={`ref4`} refId={`box`} />
+          </Align>
+          <Align id={`align3`} alignment="center">
+            <Rect id={`valueName`} width={10} height={10} fill="green" />
+            <Ref id={`ref6`} refId={`box`} />
+          </Align>
+        </Bluefish>
         <Bluefish id="bluefish" width={1000} height={200}>
           <Rect
             id="rect"
@@ -129,14 +160,14 @@ const App: Component = () => {
           <Rect id="rect2" width={50} height={50} fill="lightgreen" />
           <Align
             id="align"
-            alignment={verticalAlignment() as Alignment1DVertical}
+            alignment={verticalAlignment() as AlignmentVertical}
           >
             <Ref id="ref1" refId="rect1" />
             <Ref id="ref2" refId="rect2" />
           </Align>
           <Align
             id="align.5"
-            alignment={horizontalAlignment() as Alignment1DHorizontal}
+            alignment={horizontalAlignment() as AlignmentHorizontal}
           >
             <Ref id="ref1" refId="rect1" />
             <Ref id="ref2" refId="rect2" />
