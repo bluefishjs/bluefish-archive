@@ -6,11 +6,11 @@ import Align from "../align";
 import Ref from "../ref";
 import { StackSlot } from "./stack-slot";
 import Distribute from "../distribute";
-// import Text from "../text";
+import Text from "../text";
 
 export type GlobalFrameProps = {
   id?: Id;
-  variables: any;
+  variables: { variable: string; value: string }[];
 };
 
 export function GlobalFrame(props: GlobalFrameProps) {
@@ -24,14 +24,15 @@ export function GlobalFrame(props: GlobalFrameProps) {
       {/* Global Frame and relevant text */}
       <Rect id={`frame${id}`} height={300} width={200} fill={"#e2ebf6"} />
       <Rect id={`frameBorder${id}`} height={300} width={5} fill={"#a6b3b6"} />
-      {/* <Text
-        name={opIdLabel}
+      {/* TODO: there is a bug where the text is showing up lower than I expect it to... */}
+      <Text
+        id={`label${id}`}
         contents={"Global Frame"}
-        fontSize={"24px"}
-        fontFamily={fontFamily}
+        font-size={"24px"}
+        font-family={fontFamily}
         fill={"black"}
-      /> */}
-      <Rect id={`label${id}`} fill="black" width={100} height={20} />
+      />
+      {/* <Rect id={`label${id}`} fill="black" width={100} height={20} /> */}
       <Align id={`align1${id}`} alignment="topCenter">
         <Ref id={`ref1${id}`} refId={`label${id}`} />
         <Ref id={`ref2${id}`} refId={`frame${id}`} />
@@ -44,7 +45,13 @@ export function GlobalFrame(props: GlobalFrameProps) {
         <Ref id={`ref3${id}`} refId={`label${id}`} />
         <Group id={`frameVariables${id}`}>
           <For each={props.variables}>
-            {(variable: any, i) => <StackSlot id={`stackSlot${id}-${i()}`} />}
+            {(variable: any, i) => (
+              <StackSlot
+                id={`stackSlot${id}-${i()}`}
+                variable={variable.variable}
+                value={variable.value}
+              />
+            )}
           </For>
           <Align id={`alignStackSlot${id}`} alignment="right">
             <For each={props.variables}>

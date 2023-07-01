@@ -66,48 +66,23 @@ const App: Component = () => {
       </select>
       <div>
         <Bluefish id="bluefish-globalframetest" width={1000} height={200}>
-          <GlobalFrame id={`globalFrame`} variables={[0, 1, 2]} />
-        </Bluefish>
-        <Bluefish id="bluefish-variable" width={1000} height={200}>
-          <Distribute id={`distribute`} direction="vertical" spacing={20}>
-            <StackSlot />
-            <StackSlot />
-            <StackSlot />
-          </Distribute>
-          {/* <Group id={`group`}>
-            <Rect id={`box`} y={0} height={40} width={40} fill={"#e2ebf6"} />
-            <Rect id={`name`} x={0} width={10} height={10} fill="magenta" />
-            <Align id={`alignRow`} alignment="centerY">
-              <Ref id={`alignrowRef1`} refId={`name`} />
-              <Ref id={`alignrowRef2`} refId={`box`} />
-            </Align>
-            <Distribute id={`distribute`} direction="horizontal" spacing={5}>
-              <Ref id={`rowRef1`} refId={`name`} />
-              <Ref id={`rowRef2`} refId={`box`} />
-            </Distribute>
-            <Align id={`align1`} alignment="bottomCenter">
-              <Rect
-                id={`boxBorderBottom`}
-                height={2}
-                width={40}
-                fill={"#a6b3b6"}
-              />
-              <Ref id={`ref2`} refId={`box`} />
-            </Align>
-            <Align id={`align2`} alignment="centerLeft">
-              <Rect
-                id={`boxBorderLeft`}
-                height={40}
-                width={2}
-                fill={"#a6b3b6"}
-              />
-              <Ref id={`ref4`} refId={`box`} />
-            </Align>
-            <Align id={`align3`} alignment="center">
-              <Rect id={`valueName`} width={10} height={10} fill="green" />
-              <Ref id={`ref6`} refId={`box`} />
-            </Align>
-          </Group> */}
+          <GlobalFrame
+            id={`globalFrame`}
+            variables={[
+              {
+                variable: "x",
+                value: "1",
+              },
+              {
+                variable: "y",
+                value: "2",
+              },
+              {
+                variable: "z",
+                value: "3",
+              },
+            ]}
+          />
         </Bluefish>
         <Bluefish id="bluefish" width={1000} height={200}>
           <Rect
