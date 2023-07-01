@@ -288,6 +288,5 @@ export function Align(props: AlignProps) {
     </Layout>
   );
 }
-Align.displayName = "Align";
 
 export default Align;

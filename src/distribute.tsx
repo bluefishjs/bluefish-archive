@@ -13,7 +13,7 @@ export type DistributeProps = ParentProps<{
   spacing?: number;
 }>;
 
-export const Distribute = (props: DistributeProps) => {
+export function Distribute(props: DistributeProps) {
   const { getBBox, setBBox, ownedByOther } = useScenegraph();
 
   const layout = (childIds: Id[]) => {
@@ -52,8 +52,7 @@ export const Distribute = (props: DistributeProps) => {
         // we expect all heights to be owned by other
         for (const childId of childIds) {
           if (!ownedByOther(props.id, childId, "height")) {
-            // TODO: make this error message better
-            throw new Error("invalid options");
+            throw new Error(`${childId}'s height is undefined`);
           }
         }
 
@@ -65,8 +64,7 @@ export const Distribute = (props: DistributeProps) => {
         // we expect all heights to be owned by other
         for (const childId of childIds) {
           if (!ownedByOther(props.id, childId, "height")) {
-            // TODO: make this error message better
-            throw new Error("invalid options");
+            throw new Error(`${childId}'s height is undefined`);
           }
         }
 
@@ -149,8 +147,7 @@ export const Distribute = (props: DistributeProps) => {
         // we expect all widths to be owned by other
         for (const childId of childIds) {
           if (!ownedByOther(props.id, childId, "width")) {
-            // TODO: make this error message better
-            throw new Error("invalid options");
+            throw new Error(`${childId}'s width is undefined`);
           }
         }
 
@@ -162,8 +159,7 @@ export const Distribute = (props: DistributeProps) => {
         // we expect all widths to be owned by other
         for (const childId of childIds) {
           if (!ownedByOther(props.id, childId, "width")) {
-            // TODO: make this error message better
-            throw new Error("invalid options");
+            throw new Error(`${childId}'s width is undefined`);
           }
         }
 
@@ -239,7 +235,6 @@ export const Distribute = (props: DistributeProps) => {
       {props.children}
     </Layout>
   );
-};
-Distribute.displayName = "Distribute";
+}
 
 export default Distribute;

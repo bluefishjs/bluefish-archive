@@ -1,69 +1,68 @@
 // Inspired by Jetpack Compose and looking through my Bluefish examples
+namespace Stratified {
+  export declare function Group(...args: any[]): any;
+  export declare function Row(...args: any[]): any;
+  export declare function Col(...args: any[]): any;
+  export declare function BFText(text: string): any;
+  export declare function Distribute(...args: any[]): any;
+  export declare function Align(...args: any[]): any;
 
-declare function Group(...args: any[]): any;
-declare function Row(...args: any[]): any;
-declare function Col(...args: any[]): any;
-declare function BFText(text: string): any;
-
-declare function Distribute(...args: any[]): any;
-declare function Align(...args: any[]): any;
-
-// Elliot's example
-const example1 = () => {
-  return Group(
-    BFText("10").name("top"),
-    Row(BFText("SUM").name("sum"), BFText("n")).name("row"),
-    BFText("n = 1").name("bottom")
-  ).constraint(({ top, sum, row, bottom }: any) => {
+  // Elliot's example
+  const example1 = () => {
     return Group(
-      Distribute("vertical", top, row, bottom),
-      // at this point the y coordinates of top, row, and bottom are known and the x coordinates are
-      // unknown
-      // the position of sum has been completely locally determined because of row
-      Align("horizontal", top, sum, bottom)
-      // at this point the align works by first reading the x coordinates of top, sum, and bottom
-      // b/c sum was determined locally already, it's x coordinate is known by inferring a default
-      // position for row
-      // the x coordinates of top and bottom are then aligned with sum
-    );
-  });
-};
+      BFText("10").name("top"),
+      Row(BFText("SUM").name("sum"), BFText("n")).name("row"),
+      BFText("n = 1").name("bottom")
+    ).constraint(({ top, sum, row, bottom }: any) => {
+      return Group(
+        Distribute("vertical", top, row, bottom),
+        // at this point the y coordinates of top, row, and bottom are known and the x coordinates are
+        // unknown
+        // the position of sum has been completely locally determined because of row
+        Align("horizontal", top, sum, bottom)
+        // at this point the align works by first reading the x coordinates of top, sum, and bottom
+        // b/c sum was determined locally already, it's x coordinate is known by inferring a default
+        // position for row
+        // the x coordinates of top and bottom are then aligned with sum
+      );
+    });
+  };
 
-// Elliot's example with Distribute and Align swapped
-const example2 = () => {
-  return Group(
-    BFText("10").name("top"),
-    Row(BFText("SUM").name("sum"), BFText("n")).name("row"),
-    BFText("n = 1").name("bottom")
-  ).constraint(({ top, sum, row, bottom }: any) => {
-    // TODO: maybe the group doesn't make sense here b/c going another level of constraint might not
-    // actually work
+  // Elliot's example with Distribute and Align swapped
+  const example2 = () => {
     return Group(
-      Align("horizontal", top, sum, bottom),
-      // at this point the x coordinates of top, sum, and bottom are known
-      // row's x coordinate has been defaulted to 0 because sum's x coordinate was written
-      Distribute("vertical", top, row, bottom)
-      // at this point the y coordinates of top, row, and bottom are set to a default value since
-      // none of them had values before this
-    );
-  });
-};
+      BFText("10").name("top"),
+      Row(BFText("SUM").name("sum"), BFText("n")).name("row"),
+      BFText("n = 1").name("bottom")
+    ).constraint(({ top, sum, row, bottom }: any) => {
+      // TODO: maybe the group doesn't make sense here b/c going another level of constraint might not
+      // actually work
+      return Group(
+        Align("horizontal", top, sum, bottom),
+        // at this point the x coordinates of top, sum, and bottom are known
+        // row's x coordinate has been defaulted to 0 because sum's x coordinate was written
+        Distribute("vertical", top, row, bottom)
+        // at this point the y coordinates of top, row, and bottom are set to a default value since
+        // none of them had values before this
+      );
+    });
+  };
 
-// Row definition
-const example3 = () => {
-  return Group(
-    BFText("a").name("a"),
-    BFText("b").name("b"),
-    BFText("c").name("c")
-  ).constraint(({ a, b, c }: any) => {
+  // Row definition
+  const example3 = () => {
     return Group(
-      Align("horizontal", a, b, c),
-      Distribute("horizontal", a, b, c)
-    );
-  });
-};
+      BFText("a").name("a"),
+      BFText("b").name("b"),
+      BFText("c").name("c")
+    ).constraint(({ a, b, c }: any) => {
+      return Group(
+        Align("horizontal", a, b, c),
+        Distribute("horizontal", a, b, c)
+      );
+    });
+  };
 
-/* <Group>
+  /* <Group>
       <Plot
         name={plot}
         data={wheat}
@@ -114,31 +113,31 @@ const example3 = () => {
       ))}
     </Group> */
 
-// playfair
-const monarchs: any[] = [];
-const example4 = () => {
-  return Group(
-    Plot(BarY(), Area(), Line(), Line(), Rect().name("monarchName")).name(
-      "plot"
-    )
-  ).constrain(({ monarchName, plot }: any) => {
+  // playfair
+  const monarchs: any[] = [];
+  const example4 = () => {
     return Group(
-      Align("top", plot, monarchName.get(0)),
-      Align("centerHorizontally", ...monarchs.map((m) => m.name)),
-      ...monarchs.map((m, i) =>
-        Col(
-          monarchName.get(i),
-          BFText(m.name)
-            .fontStyle("italic")
-            .fontSize("12px")
-            .fontFamily("serif")
-        )
+      Plot(BarY(), Area(), Line(), Line(), Rect().name("monarchName")).name(
+        "plot"
       )
-    );
-  });
-};
+    ).constrain(({ monarchName, plot }: any) => {
+      return Group(
+        Align("top", plot, monarchName.get(0)),
+        Align("centerHorizontally", ...monarchs.map((m) => m.name)),
+        ...monarchs.map((m, i) =>
+          Col(
+            monarchName.get(i),
+            BFText(m.name)
+              .fontStyle("italic")
+              .fontSize("12px")
+              .fontFamily("serif")
+          )
+        )
+      );
+    });
+  };
 
-/* Takeaways
+  /* Takeaways
 
 I think this kind of syntax is doable with syntactic sugar. Basically you just append the
 constraints to the group and proceed as normal? There are a couple things to note here though:
@@ -161,21 +160,24 @@ constraints to the group and proceed as normal? There are a couple things to not
   what can be safely nested since only element things can be nested and not constraint things.
 */
 
-function BarY(): any {
-  throw new Error("Function not implemented.");
+  function BarY(): any {
+    throw new Error("Function not implemented.");
+  }
+
+  function Area(): any {
+    throw new Error("Function not implemented.");
+  }
+
+  function Line(): any {
+    throw new Error("Function not implemented.");
+  }
+
+  function Rect(): any {
+    throw new Error("Function not implemented.");
+  }
+  function Plot(...args: any[]): any {
+    throw new Error("Function not implemented.");
+  }
 }
 
-function Area(): any {
-  throw new Error("Function not implemented.");
-}
-
-function Line(): any {
-  throw new Error("Function not implemented.");
-}
-
-function Rect(): any {
-  throw new Error("Function not implemented.");
-}
-function Plot(...args: any[]): any {
-  throw new Error("Function not implemented.");
-}
+export {};
