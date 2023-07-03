@@ -41,45 +41,46 @@ export function GlobalFrame(props: GlobalFrameProps) {
         <Ref id={`ref6${id}`} refId={`frameBorder${id}`} />
         <Ref id={`ref7${id}`} refId={`frame${id}`} />
       </Align>
-      <Distribute id={`distribute${id}`} direction="vertical" spacing={10}>
-        <Ref id={`ref3${id}`} refId={`label${id}`} />
-        <Group id={`frameVariables${id}`}>
+      <Group id={`frameVariables${id}`}>
+        <For each={props.variables}>
+          {(variable: any, i) => (
+            <StackSlot
+              id={`stackSlot${id}-${i()}`}
+              variable={variable.variable}
+              value={variable.value}
+            />
+          )}
+        </For>
+        <Align id={`alignStackSlot${id}`} alignment="right">
           <For each={props.variables}>
             {(variable: any, i) => (
-              <StackSlot
-                id={`stackSlot${id}-${i()}`}
-                variable={variable.variable}
-                value={variable.value}
+              <Ref
+                id={`alignRefStackSlot${id}-${i()}`}
+                refId={`stackSlot${id}-${i()}`}
               />
             )}
           </For>
-          <Align id={`alignStackSlot${id}`} alignment="right">
-            <For each={props.variables}>
-              {(variable: any, i) => (
-                <Ref
-                  id={`alignRefStackSlot${id}-${i()}`}
-                  refId={`stackSlot${id}-${i()}`}
-                />
-              )}
-            </For>
-          </Align>
-          <Distribute
-            id={`distributeStackSlot${id}`}
-            direction="vertical"
-            spacing={10}
-          >
-            <For each={props.variables}>
-              {(variable: any, i) => (
-                <Ref
-                  id={`distributeRefStackSlot${id}-${i()}`}
-                  refId={`stackSlot${id}-${i()}`}
-                />
-              )}
-            </For>
-          </Distribute>
-        </Group>
+        </Align>
+        <Distribute
+          id={`distributeStackSlot${id}`}
+          direction="vertical"
+          spacing={10}
+        >
+          <For each={props.variables}>
+            {(variable: any, i) => (
+              <Ref
+                id={`distributeRefStackSlot${id}-${i()}`}
+                refId={`stackSlot${id}-${i()}`}
+              />
+            )}
+          </For>
+        </Distribute>
+      </Group>
+      <Distribute id={`distribute${id}`} direction="vertical" spacing={10}>
+        <Ref id={`ref3${id}`} refId={`label${id}`} />
+        <Ref id={`ref2000${id}`} refId={`frameVariables${id}`} />
       </Distribute>
-      <Align id={`align2${id}`} alignment="right">
+      <Align id={`align2DEBUG${id}`} alignment="right">
         <Ref id={`ref4${id}`} refId={`frameVariables${id}`} />
         <Ref id={`ref5${id}`} refId={`label${id}`} />
       </Align>

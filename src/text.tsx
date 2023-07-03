@@ -16,7 +16,7 @@ export type TextProps = JSX.TextSVGAttributes<SVGTextElement> & {
   }>;
 
 export function Text(props: TextProps) {
-  const [contents, rest] = splitProps(props, ["contents"]);
+  const [_, rest] = splitProps(props, ["contents", "id"]);
 
   const mergedFont = mergeProps(
     {
@@ -40,15 +40,13 @@ export function Text(props: TextProps) {
     childIds = Array.from(childIds);
 
     return {
-      // TODO: for some reason using the left and top values breaks things when I thought it would
-      // make them better...
       bbox: {
-        // left: measurements.left,
-        left: 0,
+        left: measurements().left,
+        // left: 0,
         // right: measurements.right,
         width: measurements().right - measurements().left,
-        // top: measurements.fontTop,
-        top: 0,
+        top: measurements().fontTop,
+        // top: 0,
         height: measurements().fontHeight,
         // bottom: measurements.fontDescent,
       },

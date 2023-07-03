@@ -462,7 +462,7 @@ the align node.
           node.transformOwners.translate.x === owner ||
           node.transformOwners.translate.x === undefined
         ) {
-          proposedTransform.translate.x = bbox.left;
+          proposedTransform.translate.x = bbox.left - node.bbox.left!;
         }
       }
 
@@ -482,7 +482,7 @@ the align node.
           node.transformOwners.translate.y === owner ||
           node.transformOwners.translate.y === undefined
         ) {
-          proposedTransform.translate.y = bbox.top;
+          proposedTransform.translate.y = bbox.top - node.bbox.top!;
         }
       }
 
