@@ -34,12 +34,12 @@ export function GlobalFrame(props: GlobalFrameProps) {
       />
       {/* <Rect id={`label${id}`} fill="black" width={100} height={20} /> */}
       <Align id={`align1${id}`} alignment="topCenter">
-        <Ref id={`ref1${id}`} refId={`label${id}`} />
-        <Ref id={`ref2${id}`} refId={`frame${id}`} />
+        <Ref refId={`label${id}`} />
+        <Ref refId={`frame${id}`} />
       </Align>
       <Align id={`align3${id}`} alignment="centerLeft">
-        <Ref id={`ref6${id}`} refId={`frameBorder${id}`} />
-        <Ref id={`ref7${id}`} refId={`frame${id}`} />
+        <Ref refId={`frameBorder${id}`} />
+        <Ref refId={`frame${id}`} />
       </Align>
       <Group id={`frameVariables${id}`}>
         <For each={props.variables}>
@@ -53,12 +53,7 @@ export function GlobalFrame(props: GlobalFrameProps) {
         </For>
         <Align id={`alignStackSlot${id}`} alignment="right">
           <For each={props.variables}>
-            {(variable: any, i) => (
-              <Ref
-                id={`alignRefStackSlot${id}-${i()}`}
-                refId={`stackSlot${id}-${i()}`}
-              />
-            )}
+            {(variable: any, i) => <Ref refId={`stackSlot${id}-${i()}`} />}
           </For>
         </Align>
         <Distribute
@@ -67,22 +62,17 @@ export function GlobalFrame(props: GlobalFrameProps) {
           spacing={10}
         >
           <For each={props.variables}>
-            {(variable: any, i) => (
-              <Ref
-                id={`distributeRefStackSlot${id}-${i()}`}
-                refId={`stackSlot${id}-${i()}`}
-              />
-            )}
+            {(variable: any, i) => <Ref refId={`stackSlot${id}-${i()}`} />}
           </For>
         </Distribute>
       </Group>
       <Distribute id={`distribute${id}`} direction="vertical" spacing={10}>
-        <Ref id={`ref3${id}`} refId={`label${id}`} />
-        <Ref id={`ref2000${id}`} refId={`frameVariables${id}`} />
+        <Ref refId={`label${id}`} />
+        <Ref refId={`frameVariables${id}`} />
       </Distribute>
-      <Align id={`align2DEBUG${id}`} alignment="right">
-        <Ref id={`ref4${id}`} refId={`frameVariables${id}`} />
-        <Ref id={`ref5${id}`} refId={`label${id}`} />
+      <Align id={`align2${id}`} alignment="right">
+        <Ref refId={`frameVariables${id}`} />
+        <Ref refId={`label${id}`} />
       </Align>
     </Group>
   );

@@ -3,6 +3,7 @@ import {
   Component,
   JSX,
   ParentProps,
+  batch,
   createEffect,
   createMemo,
   createRenderEffect,
@@ -62,8 +63,8 @@ export const Layout: Component<LayoutProps> = (props) => {
   );
 
   createEffect(() => {
-    const id = props.id;
-    console.log("layout", props.id);
+    // const id = props.id;
+    // console.log("layout", props.id);
     // for (const childId of scenegraph[props.id]?.children) {
     //   // runLayout
     //   const node = untrack(() => getNode(scenegraph, childId));
@@ -75,7 +76,14 @@ export const Layout: Component<LayoutProps> = (props) => {
     );
     // setBBox(props.id, bbox, props.id, transform);
     mergeBBoxAndTransform(props.id, props.id, bbox, transform);
-    untrack(() => console.log(JSON.parse(JSON.stringify(scenegraph))));
+    // console.log(
+    //   "layout",
+    //   props.id,
+    //   JSON.parse(JSON.stringify({ bbox, transform })),
+    //   JSON.parse(JSON.stringify(untrack(() => getBBox(props.id)))),
+    //   "DONE"
+    // );
+    // untrack(() => console.log(JSON.parse(JSON.stringify(scenegraph))));
   });
 
   return jsx;

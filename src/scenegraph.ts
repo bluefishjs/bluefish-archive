@@ -2,7 +2,7 @@ import { SetStoreFunction, createStore, produce } from "solid-js/store";
 import { getLCAChainSuffixes } from "./lcaUtil";
 import _ from "lodash";
 import { maybeAdd, maybeAddAll, maybeDiv, maybeSub } from "./maybeUtil";
-import { createContext, untrack, useContext } from "solid-js";
+import { createContext, useContext } from "solid-js";
 
 export type Id = string;
 
@@ -419,10 +419,7 @@ the align node.
   };
 
   const setBBox = (owner: Id, id: Id, bbox: BBox) => {
-    // debugger;
-    const { id: resolvedId, transform: accumulatedTransform } = untrack(() =>
-      resolveRef(id)
-    );
+    const { id: resolvedId, transform: accumulatedTransform } = resolveRef(id);
 
     // if any of the bbox values are NaN (undefined is ok), console.error and skip
     for (const key of Object.keys(bbox) as Array<keyof BBox>) {
@@ -437,70 +434,59 @@ the align node.
       }
     }
 
-    const { proposedBBox, proposedTransform } = untrack(() => {
-      // debugger;
-      const node = scenegraph[resolvedId] as ScenegraphNode & { type: "node" }; // guaranteed by resolveRef
+    const node = scenegraph[resolvedId] as ScenegraphNode & { type: "node" }; // guaranteed by resolveRef
 
-      const proposedBBox: BBox = {};
-      const proposedTransform: Transform = {
-        translate: {},
-      };
+    const proposedBBox: BBox = {};
+    const proposedTransform: Transform = {
+      translate: {},
+    };
 
-      if (bbox.left !== undefined) {
-        if (accumulatedTransform.translate.x === undefined) {
-          console.error(
-            `setBBox: ${owner} tried to update ${resolvedId}'s bbox.left with ${bbox.left}, but the accumulated transform.translate.x is undefined. Skipping...`
-          );
-        }
-        if (
-          node.bboxOwners.left === owner ||
-          node.bboxOwners.left === undefined
-        ) {
-          proposedBBox.left = bbox.left;
-          proposedTransform.translate.x = 0;
-        } else if (
-          node.transformOwners.translate.x === owner ||
-          node.transformOwners.translate.x === undefined
-        ) {
-          proposedTransform.translate.x = bbox.left - node.bbox.left!;
-        }
+    if (bbox.left !== undefined) {
+      if (accumulatedTransform.translate.x === undefined) {
+        console.error(
+          `setBBox: ${owner} tried to update ${resolvedId}'s bbox.left with ${bbox.left}, but the accumulated transform.translate.x is undefined. Skipping...`
+        );
       }
-
-      if (bbox.top !== undefined) {
-        if (accumulatedTransform.translate.y === undefined) {
-          console.error(
-            `setBBox: ${owner} tried to update ${resolvedId}'s bbox.top with ${bbox.top}, but the accumulated transform.translate.y is undefined. Skipping...`
-          );
-        }
-        if (
-          node.bboxOwners.top === owner ||
-          node.bboxOwners.top === undefined
-        ) {
-          proposedBBox.top = bbox.top;
-          proposedTransform.translate.y = 0;
-        } else if (
-          node.transformOwners.translate.y === owner ||
-          node.transformOwners.translate.y === undefined
-        ) {
-          proposedTransform.translate.y = bbox.top - node.bbox.top!;
-        }
+      if (
+        node.bboxOwners.left === owner ||
+        node.bboxOwners.left === undefined
+      ) {
+        proposedBBox.left = bbox.left;
+        proposedTransform.translate.x = 0;
+      } else if (
+        node.transformOwners.translate.x === owner ||
+        node.transformOwners.translate.x === undefined
+      ) {
+        proposedTransform.translate.x = bbox.left - node.bbox.left!;
       }
+    }
 
-      proposedTransform.translate.x = maybeAdd(
-        proposedTransform.translate.x,
-        accumulatedTransform.translate.x
-      );
+    if (bbox.top !== undefined) {
+      if (accumulatedTransform.translate.y === undefined) {
+        console.error(
+          `setBBox: ${owner} tried to update ${resolvedId}'s bbox.top with ${bbox.top}, but the accumulated transform.translate.y is undefined. Skipping...`
+        );
+      }
+      if (node.bboxOwners.top === owner || node.bboxOwners.top === undefined) {
+        proposedBBox.top = bbox.top;
+        proposedTransform.translate.y = 0;
+      } else if (
+        node.transformOwners.translate.y === owner ||
+        node.transformOwners.translate.y === undefined
+      ) {
+        proposedTransform.translate.y = bbox.top - node.bbox.top!;
+      }
+    }
 
-      proposedTransform.translate.y = maybeAdd(
-        proposedTransform.translate.y,
-        accumulatedTransform.translate.y
-      );
+    proposedTransform.translate.x = maybeAdd(
+      proposedTransform.translate.x,
+      accumulatedTransform.translate.x
+    );
 
-      return {
-        proposedBBox,
-        proposedTransform,
-      };
-    });
+    proposedTransform.translate.y = maybeAdd(
+      proposedTransform.translate.y,
+      accumulatedTransform.translate.y
+    );
 
     mergeBBoxAndTransform(owner, resolvedId, proposedBBox, proposedTransform);
   };

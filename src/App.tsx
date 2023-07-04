@@ -13,6 +13,8 @@ import Group from "./group";
 import { AlignmentVertical, AlignmentHorizontal } from "./align";
 import { StackSlot } from "./python-tutor/stack-slot";
 import GlobalFrame from "./python-tutor/global-frame";
+import HeapObject from "./python-tutor/heap-object";
+import ElmTuple from "./python-tutor/elm-tuple";
 
 const App: Component = () => {
   const [x, setX] = createSignal(0);
@@ -65,6 +67,22 @@ const App: Component = () => {
         <option value="right">right</option>
       </select>
       <div>
+        <Bluefish id="bluefish-heapobjecttest" width={1000} height={200}>
+          <HeapObject
+            objectType="tuple"
+            objectValues={[
+              { type: "string", value: "1" },
+              { type: "string", value: "2" },
+            ]}
+          />
+        </Bluefish>
+        <Bluefish id="bluefish-elmtupletest" width={1000} height={200}>
+          <ElmTuple
+            tupleIndex="0"
+            tupleData={{ type: "string", value: "1" }}
+            objectId="fooooo"
+          />
+        </Bluefish>
         <Bluefish id="bluefish-globalframetest" width={1000} height={200}>
           <GlobalFrame
             id={`globalFrame`}

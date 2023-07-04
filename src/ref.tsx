@@ -1,5 +1,6 @@
-import { Component, useContext } from "solid-js";
+import { Component, createEffect, useContext } from "solid-js";
 import { Id, UNSAFE_useScenegraph, ParentIDContext } from "./scenegraph";
+import withBluefish from "./withBluefish";
 
 // The properties we want:
 // every time the refId's bbox is updated, it should be propagated to the id
@@ -17,18 +18,25 @@ export type RefProps = {
   refId: Id;
 };
 
-export const Ref: Component<RefProps> = (props) => {
+export const Ref = withBluefish((props: RefProps) => {
   const { id, refId } = props;
 
   const parentId = useContext(ParentIDContext);
-  const { createRef } = UNSAFE_useScenegraph();
+  const { createRef, getBBox } = UNSAFE_useScenegraph();
 
   if (parentId === null) {
     throw new Error("Ref must be a child of a Layout");
   }
   createRef(id, refId, parentId);
 
+  // touch the refId's bbox to ensure ref is resolved immediately
+  // createEffect(() => {
+  //   console.log("ref", props.id, props.refId);
+  //   getBBox(id);
+  //   console.log("ref", props.id, JSON.parse(JSON.stringify(getBBox(id))));
+  // });
+
   return <></>;
-};
+});
 
 export default Ref;

@@ -3,6 +3,7 @@ import { Layout } from "./layout";
 import _, { get, startsWith } from "lodash";
 import { maybe, maybeAdd, maybeMax, maybeMin, maybeSub } from "./maybeUtil";
 import { BBox, Id, Transform, useScenegraph } from "./scenegraph";
+import withBluefish from "./withBluefish";
 
 export type Alignment2D =
   | "topLeft"
@@ -107,12 +108,17 @@ export type AlignProps = ParentProps<{
   alignment?: Alignment2D | Alignment1D;
 }>;
 
-export function Align(props: AlignProps) {
+export const Align = withBluefish((props: AlignProps) => {
   // const { children, id } = props;
   const { getBBox, setBBox, ownedByUs, ownedByOther } = useScenegraph();
 
   const layout = (childIds: Id[] /* , getBBox: (id: string) => BBox */) => {
     childIds = Array.from(childIds);
+
+    if (props.id.endsWith("DEBUG")) {
+      debugger;
+    }
+
     // console.log("align", id);
     // TODO: this is currently side-effectful and cannot be removed. I think this is because the ref
     // bbox is not updated until it is read, and this update does not seem propagate until the
@@ -197,7 +203,6 @@ export function Align(props: AlignProps) {
     for (const [placeable, alignment] of verticalPlaceables) {
       if (ownedByOther(props.id, placeable!, "y")) continue;
       if (alignment === "top") {
-        console.log("setting smart bbox", props.id, placeable!, verticalValue);
         setBBox(props.id, placeable!, { top: verticalValue });
       } else if (alignment === "centerY") {
         const height = getBBox(placeable!).height;
@@ -287,6 +292,6 @@ export function Align(props: AlignProps) {
       {props.children}
     </Layout>
   );
-}
+});
 
 export default Align;

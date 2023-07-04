@@ -1,16 +1,18 @@
+import { JSX } from "solid-js/jsx-runtime";
 import { Layout } from "./layout";
-import { BBox, Transform } from "./scenegraph";
+import { BBox, Id, Transform } from "./scenegraph";
+import { splitProps } from "solid-js";
+import withBluefish from "./withBluefish";
 
-export type RectProps = {
-  id: string;
+export type RectProps = JSX.RectSVGAttributes<SVGRectElement> & {
+  id: Id;
   x?: number;
   y?: number;
   width: number;
   height: number;
-  fill: string;
 };
 
-export function Rect(props: RectProps) {
+export const Rect = withBluefish((props: RectProps) => {
   const layout = () => {
     return {
       bbox: {
@@ -29,20 +31,22 @@ export function Rect(props: RectProps) {
   };
 
   const paint = (paintProps: { bbox: BBox; transform: Transform }) => {
+    const [_, rest] = splitProps(props, ["id", "x", "y", "width", "height"]);
+
     return (
       <rect
+        {...rest}
         x={
           (paintProps.bbox.left ?? 0) + (paintProps.transform.translate.x ?? 0)
         }
         y={(paintProps.bbox.top ?? 0) + (paintProps.transform.translate.y ?? 0)}
         width={paintProps.bbox.width}
         height={paintProps.bbox.height}
-        fill={props.fill}
       />
     );
   };
 
   return <Layout id={props.id} layout={layout} paint={paint} />;
-}
+});
 
 export default Rect;

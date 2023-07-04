@@ -20,6 +20,10 @@ export function Distribute(props: DistributeProps) {
     // debugger;
     childIds = Array.from(childIds);
 
+    if (props.id.endsWith("DEBUG")) {
+      debugger;
+    }
+
     if (props.direction === "vertical") {
       let height: number;
       let spacing: number;
@@ -52,7 +56,9 @@ export function Distribute(props: DistributeProps) {
         // we expect all heights to be owned by other
         for (const childId of childIds) {
           if (!ownedByOther(props.id, childId, "height")) {
-            throw new Error(`${childId}'s height is undefined`);
+            // throw new Error(`${childId}'s height is undefined`);
+            console.error(`Distribute: ${childId}'s height is undefined`);
+            return { bbox: {}, transform: { translate: {} } };
           }
         }
 
@@ -64,7 +70,9 @@ export function Distribute(props: DistributeProps) {
         // we expect all heights to be owned by other
         for (const childId of childIds) {
           if (!ownedByOther(props.id, childId, "height")) {
-            throw new Error(`${childId}'s height is undefined`);
+            // throw new Error(`${childId}'s height is undefined`);
+            console.error(`Distribute: ${childId}'s height is undefined`);
+            return { bbox: {}, transform: { translate: {} } };
           }
         }
 
@@ -147,7 +155,9 @@ export function Distribute(props: DistributeProps) {
         // we expect all widths to be owned by other
         for (const childId of childIds) {
           if (!ownedByOther(props.id, childId, "width")) {
-            throw new Error(`${childId}'s width is undefined`);
+            // throw new Error(`${childId}'s width is undefined`);
+            console.error(`Distribute: ${childId}'s width is undefined`);
+            return { bbox: {}, transform: { translate: {} } };
           }
         }
 
@@ -159,7 +169,9 @@ export function Distribute(props: DistributeProps) {
         // we expect all widths to be owned by other
         for (const childId of childIds) {
           if (!ownedByOther(props.id, childId, "width")) {
-            throw new Error(`${childId}'s width is undefined`);
+            // throw new Error(`${childId}'s width is undefined`);
+            console.error(`Distribute: ${childId}'s width is undefined`);
+            return { bbox: {}, transform: { translate: {} } };
           }
         }
 

@@ -28,6 +28,10 @@ export function Group(props: GroupProps) {
   const layout = (childIds: Id[]) => {
     childIds = Array.from(childIds);
 
+    if (props.id.endsWith("DEBUG")) {
+      debugger;
+    }
+
     const bboxes = {
       left: childIds.map((childId) => getBBox(childId).left),
       top: childIds.map((childId) => getBBox(childId).top),
