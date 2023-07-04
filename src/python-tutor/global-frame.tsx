@@ -33,11 +33,11 @@ export function GlobalFrame(props: GlobalFrameProps) {
         fill={"black"}
       />
       {/* <Rect id={`label${id}`} fill="black" width={100} height={20} /> */}
-      <Align id={`align1${id}`} alignment="topCenter">
+      <Align alignment="topCenter">
         <Ref refId={`label${id}`} />
         <Ref refId={`frame${id}`} />
       </Align>
-      <Align id={`align3${id}`} alignment="centerLeft">
+      <Align alignment="centerLeft">
         <Ref refId={`frameBorder${id}`} />
         <Ref refId={`frame${id}`} />
       </Align>
@@ -51,26 +51,22 @@ export function GlobalFrame(props: GlobalFrameProps) {
             />
           )}
         </For>
-        <Align id={`alignStackSlot${id}`} alignment="right">
+        <Align alignment="right">
           <For each={props.variables}>
             {(variable: any, i) => <Ref refId={`stackSlot${id}-${i()}`} />}
           </For>
         </Align>
-        <Distribute
-          id={`distributeStackSlot${id}`}
-          direction="vertical"
-          spacing={10}
-        >
+        <Distribute direction="vertical" spacing={10}>
           <For each={props.variables}>
             {(variable: any, i) => <Ref refId={`stackSlot${id}-${i()}`} />}
           </For>
         </Distribute>
       </Group>
-      <Distribute id={`distribute${id}`} direction="vertical" spacing={10}>
+      <Distribute direction="vertical" spacing={10}>
         <Ref refId={`label${id}`} />
         <Ref refId={`frameVariables${id}`} />
       </Distribute>
-      <Align id={`align2${id}`} alignment="right">
+      <Align alignment="right">
         <Ref refId={`frameVariables${id}`} />
         <Ref refId={`label${id}`} />
       </Align>

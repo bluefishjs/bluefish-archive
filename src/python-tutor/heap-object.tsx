@@ -46,42 +46,24 @@ export function HeapObject(props: ObjectProps) {
             />
           )}
         </For>
-        <Align id={`align1-${id()}`} alignment="centerY">
+        <Align alignment="centerY">
           <For each={props.objectValues}>
-            {(elementData, index) => (
-              <Ref
-                id={`ref1-${index()}-${id()}`}
-                refId={`elm_${index()}_${id()}`}
-              />
-            )}
+            {(elementData, index) => <Ref refId={`elm_${index()}_${id()}`} />}
           </For>
         </Align>
-        <Distribute
-          id={`distribute1-${id()}`}
-          direction="horizontal"
-          spacing={0}
-        >
+        <Distribute direction="horizontal" spacing={0}>
           <For each={props.objectValues}>
-            {(elementData, index) => (
-              <Ref
-                id={`ref2-${index()}-${id()}`}
-                refId={`elm_${index()}_${id()}`}
-              />
-            )}
+            {(elementData, index) => <Ref refId={`elm_${index()}_${id()}`} />}
           </For>
         </Distribute>
       </Group>
-      <Distribute
-        id={`distribute2-${id()}`}
-        direction={"vertical"}
-        spacing={10}
-      >
-        <Ref id={`ref3-${id()}`} refId={`objectTypeRef${id()}`} />
-        <Ref id={`ref4-${id()}`} refId={objectRef} />
+      <Distribute direction={"vertical"} spacing={10}>
+        <Ref refId={`objectTypeRef${id()}`} />
+        <Ref refId={objectRef} />
       </Distribute>
-      <Align id={`align2-${id()}`} alignment={"left"}>
-        <Ref id={`ref5-${id()}`} refId={`objectTypeRef${id()}`} />
-        <Ref id={`ref6-${id()}`} refId={objectRef} />
+      <Align alignment={"left"}>
+        <Ref refId={`objectTypeRef${id()}`} />
+        <Ref refId={objectRef} />
       </Align>
     </Group>
   );

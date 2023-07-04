@@ -4,6 +4,7 @@ import { BBox, Id, Transform, useScenegraph } from "./scenegraph";
 import { JSX } from "solid-js/jsx-runtime";
 import { ParentProps } from "solid-js";
 import { maybeMax } from "./maybeUtil";
+import withBluefish from "./withBluefish";
 
 // export type DistributeProps = SpaceVerticalProps | SpaceHorizontalProps;
 export type DistributeProps = ParentProps<{
@@ -13,7 +14,7 @@ export type DistributeProps = ParentProps<{
   spacing?: number;
 }>;
 
-export function Distribute(props: DistributeProps) {
+export const Distribute = withBluefish((props: DistributeProps) => {
   const { getBBox, setBBox, ownedByOther } = useScenegraph();
 
   const layout = (childIds: Id[]) => {
@@ -247,6 +248,6 @@ export function Distribute(props: DistributeProps) {
       {props.children}
     </Layout>
   );
-}
+});
 
 export default Distribute;
