@@ -6,9 +6,10 @@ import Ref from "../ref";
 import Align from "../align";
 import { For, createUniqueId } from "solid-js";
 import ElmTuple from "./elm-tuple";
+import withBluefish from "../withBluefish";
 
 export type ObjectProps = {
-  id?: Id;
+  id: Id;
   objectType: string;
   objectValues: {
     type: string;
@@ -16,11 +17,8 @@ export type ObjectProps = {
   }[];
 };
 
-// TODO: this doesn't work yet...
-export function HeapObject(props: ObjectProps) {
-  const uid = createUniqueId();
-
-  const id = () => props.id ?? uid;
+export const HeapObject = withBluefish((props: ObjectProps) => {
+  const id = () => props.id;
 
   const fontFamily = "verdana, arial, helvetica, sans-serif";
 
@@ -67,6 +65,6 @@ export function HeapObject(props: ObjectProps) {
       </Align>
     </Group>
   );
-}
+});
 
 export default HeapObject;

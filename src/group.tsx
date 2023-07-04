@@ -10,6 +10,7 @@ import {
   minOfMaybes,
 } from "./maybeUtil";
 import { startsWith } from "lodash";
+import withBluefish from "./withBluefish";
 
 export type GroupProps = ParentProps<{
   id: Id;
@@ -17,7 +18,7 @@ export type GroupProps = ParentProps<{
   y?: number;
 }>;
 
-export function Group(props: GroupProps) {
+export const Group = withBluefish((props: GroupProps) => {
   const { getBBox } = useScenegraph();
 
   // NOTE: unlike other layout functions. this one determines its bbox by *skipping* undefined
@@ -94,6 +95,6 @@ export function Group(props: GroupProps) {
       {props.children}
     </Layout>
   );
-}
+});
 
 export default Group;

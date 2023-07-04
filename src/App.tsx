@@ -15,6 +15,8 @@ import { StackSlot } from "./python-tutor/stack-slot";
 import GlobalFrame from "./python-tutor/global-frame";
 import HeapObject from "./python-tutor/heap-object";
 import ElmTuple from "./python-tutor/elm-tuple";
+import PythonTutor from "./python-tutor/python-tutor";
+import { pointer, stackSlot, tuple } from "./python-tutor/types";
 
 const App: Component = () => {
   const [x, setX] = createSignal(0);
@@ -67,6 +69,24 @@ const App: Component = () => {
         <option value="right">right</option>
       </select>
       <div>
+        <Bluefish id="bluefish-pythontutor-test" width={1000} height={500}>
+          <PythonTutor
+            stack={[
+              stackSlot("c", pointer(0)),
+              stackSlot("d", pointer(1)),
+              stackSlot("x", 5),
+            ]}
+            heap={[
+              tuple([1, pointer(1), pointer(2)]),
+              tuple([1, 4]),
+              tuple([3, 10]),
+            ]}
+            heapArrangement={[
+              [0, null, null],
+              [null, 1, 2],
+            ]}
+          />
+        </Bluefish>
         <Bluefish id="bluefish-heapobjecttest" width={1000} height={200}>
           <HeapObject
             objectType="tuple"
