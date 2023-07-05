@@ -3,13 +3,15 @@
   "version": "0.0.1",
   "description": "",
   "type": "module",
-  "files": ["dist"],
-  "main": "./dist/bluefish.umd.cjs",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/bluefish.umd.js",
   "module": "./dist/bluefish.js",
   "exports": {
     ".": {
       "import": "./dist/bluefish.js",
-      "require": "./dist/bluefish.umd.cjs"
+      "require": "./dist/bluefish.umd.js"
     }
   },
   "scripts": {
@@ -23,12 +25,12 @@
     "@types/node": "^20.3.3",
     "solid-devtools": "^0.27.3",
     "typescript": "^4.9.5",
-    "vite": "^4.1.1",
-    "vite-plugin-solid": "^2.5.0"
+    "vite": "^4.3.9",
+    "vite-plugin-solid": "^2.7.0"
   },
   "dependencies": {
     "@types/lodash": "^4.14.195",
     "lodash": "^4.17.21",
-    "solid-js": "^1.7.6"
+    "solid-js": "^1.7.7"
   }
 }
