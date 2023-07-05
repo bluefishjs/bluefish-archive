@@ -1,17 +1,17 @@
 {
   "name": "@bluefish-js/solid",
-  "version": "0.0.3",
-  "description": "",
+  "version": "0.0.4",
+  "description": "A SolidJS diagramming library",
   "type": "module",
   "files": [
     "dist"
   ],
-  "main": "./dist/bluefish.umd.js",
+  "main": "./dist/bluefish.umd.cjs",
   "module": "./dist/bluefish.js",
   "exports": {
     ".": {
       "import": "./dist/bluefish.js",
-      "require": "./dist/bluefish.umd.js"
+      "require": "./dist/bluefish.umd.cjs"
     }
   },
   "scripts": {
