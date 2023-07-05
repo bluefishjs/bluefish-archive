@@ -24,7 +24,7 @@ export default defineConfig(({ command }) => ({
     },
     target: "esnext",
     rollupOptions: {
-      external: ["solid-js", "solid-js/web", resolve(__dirname, "dev")],
+      external: ["solid-js", "solid-js/web"],
       output: {
         globals: {
           "solid-js": "solid",
