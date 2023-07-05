@@ -20,7 +20,7 @@ export default defineConfig(({ command }) => ({
     lib: {
       entry: resolve(__dirname, "src/index.ts"),
       name: "bluefish",
-      fileName: (format) => `bluefish.${format}.js`,
+      fileName: "bluefish",
     },
     target: "esnext",
     rollupOptions: {
