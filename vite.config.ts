@@ -1,8 +1,10 @@
 import { defineConfig } from "vite";
+import { resolve } from "path";
 import solidPlugin from "vite-plugin-solid";
 import devtools from "solid-devtools/vite";
 
-export default defineConfig({
+export default defineConfig(({ command }) => ({
+  publicDir: command === "serve" ? "public" : false,
   plugins: [
     devtools({
       /* features options - all disabled by default */
@@ -12,8 +14,23 @@ export default defineConfig({
   ],
   server: {
     port: 3000,
+    open: "/public/index.html",
   },
   build: {
+    lib: {
+      entry: resolve(__dirname, "src/index.ts"),
+      name: "bluefish",
+      fileName: (format) => `bluefish.${format}.js`,
+    },
     target: "esnext",
+    rollupOptions: {
+      external: ["solid-js", "solid-js/web", resolve(__dirname, "dev")],
+      output: {
+        globals: {
+          "solid-js": "solid",
+          "solid-js/web": "solid",
+        },
+      },
+    },
   },
-});
+}));

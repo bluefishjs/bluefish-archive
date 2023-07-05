@@ -1,12 +1,12 @@
-import Group from "../group";
-import Text from "../text";
-import { Id } from "../scenegraph";
-import Distribute from "../distribute";
-import Ref from "../ref";
-import Align from "../align";
+import Group from "../../src/group";
+import Text from "../../src/text";
+import { Id } from "../../src/scenegraph";
+import Distribute from "../../src/distribute";
+import Ref from "../../src/ref";
+import Align from "../../src/align";
 import { For, createUniqueId } from "solid-js";
 import ElmTuple from "./elm-tuple";
-import withBluefish from "../withBluefish";
+import withBluefish from "../../src/withBluefish";
 
 export type ObjectProps = {
   id: Id;

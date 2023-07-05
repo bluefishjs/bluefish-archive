@@ -1,10 +1,10 @@
 import { createUniqueId } from "solid-js";
-import Align from "../align";
-import Group from "../group";
-import Rect from "../rect";
-import Ref from "../ref";
-import { Id } from "../scenegraph";
-import Text from "../text";
+import Align from "../../src/align";
+import Group from "../../src/group";
+import Rect from "../../src/rect";
+import Ref from "../../src/ref";
+import { Id } from "../../src/scenegraph";
+import Text from "../../src/text";
 
 export type ElmTupleProps = {
   x?: number;
@@ -44,6 +44,7 @@ export function ElmTuple(props: ElmTupleProps) {
           id={`elmVal_${props.tupleIndex}_${props.objectId}`}
           contents={props.tupleData.value}
           font-size={"24px"}
+          font-family={fontFamily}
           fill={"black"}
         />
       ) : (

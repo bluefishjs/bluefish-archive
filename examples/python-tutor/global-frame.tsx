@@ -1,12 +1,12 @@
 import { For, createUniqueId } from "solid-js";
-import { Id } from "../scenegraph";
-import Rect from "../rect";
-import Group from "../group";
-import Align from "../align";
-import Ref from "../ref";
+import { Id } from "../../src/scenegraph";
+import Rect from "../../src/rect";
+import Group from "../../src/group";
+import Align from "../../src/align";
+import Ref from "../../src/ref";
 import { StackSlot } from "./stack-slot";
-import Distribute from "../distribute";
-import Text from "../text";
+import Distribute from "../../src/distribute";
+import Text from "../../src/text";
 
 export type GlobalFrameProps = {
   id?: Id;

@@ -1,9 +1,9 @@
-import Align from "../align";
-import Distribute from "../distribute";
-import Group from "../group";
-import Ref from "../ref";
-import { Id } from "../scenegraph";
-import withBluefish from "../withBluefish";
+import Align from "../../src/align";
+import Distribute from "../../src/distribute";
+import Group from "../../src/group";
+import Ref from "../../src/ref";
+import { Id } from "../../src/scenegraph";
+import withBluefish from "../../src/withBluefish";
 import GlobalFrame from "./global-frame";
 import Heap from "./heap";
 import { Address, HeapObject, StackSlot } from "./types";

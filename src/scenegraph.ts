@@ -33,23 +33,6 @@ export type TransformOwners = {
   };
 };
 
-function mergeObjects<T, U>(
-  obj1: Record<string, T>,
-  obj2: Record<string, U>
-): Record<string, T | U> {
-  const result: Record<string, T | U> = { ...obj1 };
-
-  for (const key in obj2) {
-    if (Object.prototype.hasOwnProperty.call(obj2, key)) {
-      if (typeof obj2[key] !== "undefined") {
-        result[key] = obj2[key];
-      }
-    }
-  }
-
-  return result;
-}
-
 export type ScenegraphNode =
   | {
       type: "node";

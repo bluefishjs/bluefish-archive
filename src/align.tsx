@@ -33,16 +33,6 @@ export type Alignment1DObjs = {
   [K in Alignment1D]: { [k in K]: boolean };
 }[Alignment1D];
 
-export type AlignAuxProps = {
-  alignments: [
-    AlignmentVertical | undefined,
-    AlignmentHorizontal | undefined
-  ][];
-} & {
-  x?: number;
-  y?: number;
-};
-
 const verticalAlignmentMap: {
   [K in Alignment2D | Alignment1D]: AlignmentVertical | undefined;
 } = {

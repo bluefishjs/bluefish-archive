@@ -1,7 +1,17 @@
 {
-  "name": "vite-template-solid",
+  "name": "@bluefish-js/solid",
   "version": "0.0.0",
   "description": "",
+  "type": "module",
+  "files": ["dist"],
+  "main": "./dist/bluefish.umd.cjs",
+  "module": "./dist/bluefish.js",
+  "exports": {
+    ".": {
+      "import": "./dist/bluefish.js",
+      "require": "./dist/bluefish.umd.cjs"
+    }
+  },
   "scripts": {
     "start": "vite",
     "dev": "vite",
@@ -10,6 +20,7 @@
   },
   "license": "MIT",
   "devDependencies": {
+    "@types/node": "^20.3.3",
     "solid-devtools": "^0.27.3",
     "typescript": "^4.9.5",
     "vite": "^4.1.1",
@@ -19,6 +30,5 @@
     "@types/lodash": "^4.14.195",
     "lodash": "^4.17.21",
     "solid-js": "^1.7.6"
-  },
-  "type": "module"
+  }
 }

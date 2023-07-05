@@ -2,21 +2,19 @@
 
 import { createSignal, type Component } from "solid-js";
 
-import logo from "./logo.svg";
-import styles from "./App.module.css";
-import Bluefish from "./bluefish";
-import Rect from "./rect";
-import Align, { Alignment2D } from "./align";
-import Distribute from "./distribute";
-import Ref from "./ref";
-import Group from "./group";
-import { AlignmentVertical, AlignmentHorizontal } from "./align";
-import { StackSlot } from "./python-tutor/stack-slot";
-import GlobalFrame from "./python-tutor/global-frame";
-import HeapObject from "./python-tutor/heap-object";
-import ElmTuple from "./python-tutor/elm-tuple";
-import PythonTutor from "./python-tutor/python-tutor";
-import { pointer, stackSlot, tuple } from "./python-tutor/types";
+import Bluefish from "../src/bluefish";
+import Rect from "../src/rect";
+import Align, { Alignment2D } from "../src/align";
+import Distribute from "../src/distribute";
+import Ref from "../src/ref";
+import Group from "../src/group";
+import { AlignmentVertical, AlignmentHorizontal } from "../src/align";
+import { StackSlot } from "../examples/python-tutor/stack-slot";
+import GlobalFrame from "../examples/python-tutor/global-frame";
+import HeapObject from "../examples/python-tutor/heap-object";
+import ElmTuple from "../examples/python-tutor/elm-tuple";
+import PythonTutor from "../examples/python-tutor/python-tutor";
+import { pointer, stackSlot, tuple } from "../examples/python-tutor/types";
 
 const App: Component = () => {
   const [x, setX] = createSignal(0);
@@ -69,11 +67,12 @@ const App: Component = () => {
         <option value="right">right</option>
       </select>
       <div>
+        <br />
         <Bluefish id="bluefish-pythontutor-test" width={1000} height={500}>
           <PythonTutor
             stack={[
-              stackSlot("c", pointer(0)),
-              stackSlot("d", pointer(1)),
+              stackSlot("a", pointer(0)),
+              stackSlot("b", pointer(1)),
               stackSlot("x", 5),
             ]}
             heap={[

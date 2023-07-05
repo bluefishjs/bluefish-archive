@@ -1,13 +1,13 @@
 import { For } from "solid-js";
-import Align from "../align";
-import Distribute from "../distribute";
-import Group from "../group";
-import Rect from "../rect";
-import { Id } from "../scenegraph";
-import withBluefish from "../withBluefish";
+import Align from "../../src/align";
+import Distribute from "../../src/distribute";
+import Group from "../../src/group";
+import Rect from "../../src/rect";
+import { Id } from "../../src/scenegraph";
+import withBluefish from "../../src/withBluefish";
 import HeapObject from "./heap-object";
 import { Address, HeapObject as HeapObjectType, formatValue } from "./types";
-import Ref from "../ref";
+import Ref from "../../src/ref";
 
 export type HeapProps = {
   id: Id;
