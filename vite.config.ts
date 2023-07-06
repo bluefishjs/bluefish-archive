@@ -19,16 +19,18 @@ export default defineConfig(({ command }) => ({
   build: {
     lib: {
       entry: resolve(__dirname, "src/index.ts"),
+      formats: ["es", "cjs", "umd"],
       name: "bluefish",
       fileName: "bluefish",
     },
     target: "esnext",
     rollupOptions: {
-      external: ["solid-js", "solid-js/web"],
+      external: ["solid-js", "solid-js/web", "solid-js/store"],
       output: {
         globals: {
-          "solid-js": "solid",
-          "solid-js/web": "solid",
+          "solid-js": "solidJs",
+          "solid-js/web": "web",
+          "solid-js/store": "store",
         },
       },
     },
