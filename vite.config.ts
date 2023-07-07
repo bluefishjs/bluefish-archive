@@ -7,8 +7,7 @@ export default defineConfig(({ command }) => ({
   publicDir: command === "serve" ? "public" : false,
   plugins: [
     devtools({
-      /* features options - all disabled by default */
-      autoname: true, // e.g. enable autoname
+      autoname: true,
     }),
     solidPlugin(),
   ],
@@ -17,6 +16,7 @@ export default defineConfig(({ command }) => ({
     open: "/public/index.html",
   },
   build: {
+    minify: false,
     lib: {
       entry: resolve(__dirname, "src/index.ts"),
       formats: ["es", "cjs", "umd"],
