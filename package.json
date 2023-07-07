@@ -1,6 +1,6 @@
 {
   "name": "@bluefish-js/solid",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "A SolidJS diagramming library",
   "type": "module",
   "files": [
@@ -30,7 +30,9 @@
   },
   "dependencies": {
     "@types/lodash": "^4.14.195",
-    "lodash": "^4.17.21",
+    "lodash": "^4.17.21"
+  },
+  "peerDependencies": {
     "solid-js": "^1.7.7"
   }
 }
