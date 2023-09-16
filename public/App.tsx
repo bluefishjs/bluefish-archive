@@ -15,6 +15,7 @@ import HeapObject from "../examples/python-tutor/heap-object";
 import ElmTuple from "../examples/python-tutor/elm-tuple";
 import PythonTutor from "../examples/python-tutor/python-tutor";
 import { pointer, stackSlot, tuple } from "../examples/python-tutor/types";
+import Circle from "../src/circle";
 
 const arr = Array.from({ length: 1000 }, (_, i) => i + 1);
 
@@ -70,6 +71,50 @@ const App: Component = () => {
       </select>
       <div>
         <br />
+        <Bluefish id="bluefish-planets" width={1000} height={500}>
+          <Circle
+            id="mercury"
+            cx={100}
+            cy={50}
+            r={15}
+            fill={"#EBE3CF"}
+            stroke-width={3}
+            stroke={"black"}
+          />
+          <Circle
+            id="venus"
+            r={36}
+            fill={"#DC933C"}
+            stroke-width={3}
+            stroke={"black"}
+          />
+          <Circle
+            id="earth"
+            r={38}
+            fill={"#179DD7"}
+            stroke-width={3}
+            stroke={"black"}
+          />
+          <Circle
+            id="mars"
+            r={21}
+            fill={"#F1CF8E"}
+            stroke-width={3}
+            stroke={"black"}
+          />
+          <Align alignment={"centerY"}>
+            <Ref refId="mercury" />
+            <Ref refId="venus" />
+            <Ref refId="earth" />
+            <Ref refId="mars" />
+          </Align>
+          <Distribute direction="horizontal" spacing={50}>
+            <Ref refId="mercury" />
+            <Ref refId="venus" />
+            <Ref refId="earth" />
+            <Ref refId="mars" />
+          </Distribute>
+        </Bluefish>
         <Bluefish id="bluefish-waterfall" width={1000} height={500}>
           <For each={arr}>
             {(item) => (
