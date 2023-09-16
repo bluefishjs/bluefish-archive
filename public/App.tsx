@@ -1,6 +1,6 @@
 // import "solid-devtools";
 
-import { createSignal, type Component } from "solid-js";
+import { createSignal, type Component, For } from "solid-js";
 
 import Bluefish from "../src/bluefish";
 import Rect from "../src/rect";
@@ -15,6 +15,8 @@ import HeapObject from "../examples/python-tutor/heap-object";
 import ElmTuple from "../examples/python-tutor/elm-tuple";
 import PythonTutor from "../examples/python-tutor/python-tutor";
 import { pointer, stackSlot, tuple } from "../examples/python-tutor/types";
+
+const arr = Array.from({ length: 1000 }, (_, i) => i + 1);
 
 const App: Component = () => {
   const [x, setX] = createSignal(0);
@@ -68,6 +70,29 @@ const App: Component = () => {
       </select>
       <div>
         <br />
+        <Bluefish id="bluefish-waterfall" width={1000} height={500}>
+          <For each={arr}>
+            {(item) => (
+              <Rect
+                id={`rect-${item}`}
+                width={20}
+                height={item * 20}
+                fill="steelblue"
+              />
+            )}
+          </For>
+          {/* <Align alignment={"bottom"}>
+            <For each={[1, 2, 3, 4, 5]}>
+              {(item) => <Ref refId={`rect-${item}`} />}
+            </For>
+          </Align> */}
+          <Distribute direction="vertical" spacing={0}>
+            <For each={arr}>{(item) => <Ref refId={`rect-${item}`} />}</For>
+          </Distribute>
+          <Distribute direction="horizontal" spacing={x()}>
+            <For each={arr}>{(item) => <Ref refId={`rect-${item}`} />}</For>
+          </Distribute>
+        </Bluefish>
         <Bluefish id="bluefish-pythontutor-test" width={1000} height={500}>
           <PythonTutor
             stack={[

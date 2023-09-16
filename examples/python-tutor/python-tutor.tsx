@@ -3,17 +3,16 @@ import Distribute from "../../src/distribute";
 import Group from "../../src/group";
 import Ref from "../../src/ref";
 import { Id } from "../../src/scenegraph";
-import withBluefish from "../../src/withBluefish";
+import withBluefish, { WithBluefishProps } from "../../src/withBluefish";
 import GlobalFrame from "./global-frame";
 import Heap from "./heap";
 import { Address, HeapObject, StackSlot } from "./types";
 
-export type PythonTutorProps = {
-  id: Id;
+export type PythonTutorProps = WithBluefishProps<{
   stack: StackSlot[];
   heap: HeapObject[];
   heapArrangement: (Address | null)[][];
-};
+}>;
 
 export const PythonTutor = withBluefish((props: PythonTutorProps) => {
   return (
