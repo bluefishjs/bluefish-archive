@@ -16,6 +16,7 @@ import ElmTuple from "../examples/python-tutor/elm-tuple";
 import PythonTutor from "../examples/python-tutor/python-tutor";
 import { pointer, stackSlot, tuple } from "../examples/python-tutor/types";
 import Circle from "../src/circle";
+import Text from "../src/text";
 
 const arr = Array.from({ length: 1000 }, (_, i) => i + 1);
 
@@ -102,7 +103,7 @@ const App: Component = () => {
             stroke-width={3}
             stroke={"black"}
           />
-          <Align alignment={"centerY"}>
+          <Align alignment="centerY">
             <Ref refId="mercury" />
             <Ref refId="venus" />
             <Ref refId="earth" />
@@ -113,6 +114,21 @@ const App: Component = () => {
             <Ref refId="venus" />
             <Ref refId="earth" />
             <Ref refId="mars" />
+          </Distribute>
+          <Text
+            id="label"
+            contents="Mercury"
+            font-family="Alegreya Sans, sans-serif"
+            font-weight={700}
+            font-size="14"
+          />
+          <Align alignment="centerX">
+            <Ref refId="mercury" />
+            <Ref refId="label" />
+          </Align>
+          <Distribute direction="vertical" spacing={10}>
+            <Ref refId="label" />
+            <Ref refId="mercury" />
           </Distribute>
         </Bluefish>
         <Bluefish id="bluefish-waterfall" width={1000} height={500}>
