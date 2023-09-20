@@ -444,6 +444,20 @@ the align node.
       }
     }
 
+    if (bbox.width !== undefined) {
+      if (
+        node.bboxOwners.width === owner ||
+        node.bboxOwners.width === undefined
+      ) {
+        proposedBBox.width = bbox.width;
+      } else {
+        console.error(
+          `setBBox: ${owner} tried to update ${resolvedId}'s bbox.width with ${bbox.width}, but it was already set by ${node.bboxOwners.width}. Only one component can set a bbox property. We skipped this update.`
+        );
+        return;
+      }
+    }
+
     if (bbox.top !== undefined) {
       if (accumulatedTransform.translate.y === undefined) {
         console.error(
@@ -458,6 +472,20 @@ the align node.
         node.transformOwners.translate.y === undefined
       ) {
         proposedTransform.translate.y = bbox.top - node.bbox.top!;
+      }
+    }
+
+    if (bbox.height !== undefined) {
+      if (
+        node.bboxOwners.height === owner ||
+        node.bboxOwners.height === undefined
+      ) {
+        proposedBBox.height = bbox.height;
+      } else {
+        console.error(
+          `setBBox: ${owner} tried to update ${resolvedId}'s bbox.height with ${bbox.height}, but it was already set by ${node.bboxOwners.height}. Only one component can set a bbox property. We skipped this update.`
+        );
+        return;
       }
     }
 

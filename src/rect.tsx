@@ -8,8 +8,8 @@ export type RectProps = JSX.RectSVGAttributes<SVGRectElement> & {
   id: Id;
   x?: number;
   y?: number;
-  width: number;
-  height: number;
+  width?: number;
+  height?: number;
 };
 
 export const Rect = withBluefish((props: RectProps) => {

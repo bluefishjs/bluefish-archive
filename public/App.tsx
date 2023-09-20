@@ -17,11 +17,15 @@ import PythonTutor from "../examples/python-tutor/python-tutor";
 import { pointer, stackSlot, tuple } from "../examples/python-tutor/types";
 import Circle from "../src/circle";
 import Text from "../src/text";
+import Background from "../src/background";
+import Txt from "../src/text/text";
 
 const arr = Array.from({ length: 1000 }, (_, i) => i + 1);
 
 const App: Component = () => {
   const [x, setX] = createSignal(0);
+  const wordArr = () => Array.from({ length: x() }, (_) => "Mercury");
+  const words = () => wordArr().join(" ");
 
   const [horizontalAlignment, setHorizontalAlignment] = createSignal("centerX");
 
@@ -71,6 +75,28 @@ const App: Component = () => {
         <option value="right">right</option>
       </select>
       <div>
+        {wordArr().length}
+        <Bluefish id="visx-text" width={1000} height={500}>
+          <Txt
+            id="text"
+            font-family="Alegreya Sans, sans-serif"
+            font-weight={700}
+            font-size="14"
+            vertical-anchor="start"
+            width={500}
+          >
+            {words()}
+          </Txt>
+        </Bluefish>
+        {/* <Txt
+          font-family="Alegreya Sans, sans-serif"
+          font-weight={700}
+          font-size="14"
+          vertical-anchor="start"
+          width={500}
+        >
+          {words()}
+        </Txt> */}
         <br />
         <Bluefish id="bluefish-planets" width={1000} height={500}>
           <Circle
@@ -115,21 +141,31 @@ const App: Component = () => {
             <Ref refId="earth" />
             <Ref refId="mars" />
           </Distribute>
-          <Text
+          <Txt
             id="label"
-            contents="Mercury"
-            font-family="Alegreya Sans, sans-serif"
-            font-weight={700}
-            font-size="14"
-          />
+            // font-family="Alegreya Sans, sans-serif"
+            // font-weight={700}
+            // font-size="14"
+            vertical-anchor="start"
+            width={500}
+          >
+            Mercury
+          </Txt>
           <Align alignment="centerX">
-            <Ref refId="mercury" />
-            <Ref refId="label" />
+            <Ref id="mercuryRefAlign" refId="label" />
+            <Ref id="labelRefAlign" refId="mercury" />
           </Align>
           <Distribute direction="vertical" spacing={10}>
-            <Ref refId="label" />
-            <Ref refId="mercury" />
+            <Ref id="mercuryRefDistribute" refId="label" />
+            <Ref id="labelRefDistribute" refId="mercury" />
           </Distribute>
+          <Background
+            id="background"
+            background={<Rect stroke="black" fill="none" stroke-width="3" />}
+          >
+            <Ref id="mercuryRefBackground" refId="mercury" />
+            <Ref id="labelRefBackground" refId="label" />
+          </Background>
         </Bluefish>
         <Bluefish id="bluefish-waterfall" width={1000} height={500}>
           <For each={arr}>
@@ -257,7 +293,7 @@ const App: Component = () => {
             <Rect id="rect2" width={50} height={50} fill="lightgreen" />
           </Align>
         </Bluefish>
-        <Bluefish id="bluefish3" width={500} height={200}>
+        {/* <Bluefish id="bluefish3" width={500} height={200}>
           <Rect
             id="rect1"
             x={x()}
@@ -266,13 +302,13 @@ const App: Component = () => {
             height={150}
             fill="steelblue"
           />
-          <Rect id="rect2" width={50} height={50} fill="lightgreen" />
-          {/* NOTE: this update to x is ignored b/c the ref resolution already sets the position of Align */}
-          <Align id="align" x={0} alignment={alignment() as Alignment2D}>
+          <Rect id="rect2" width={50} height={50} fill="lightgreen" /> */}
+        {/* NOTE: this update to x is ignored b/c the ref resolution already sets the position of Align */}
+        {/* <Align id="align" x={0} alignment={alignment() as Alignment2D}>
             <Ref id="ref1" refId="rect1" />
             <Ref id="ref2" refId="rect2" />
           </Align>
-        </Bluefish>
+        </Bluefish> */}
         <Bluefish id="bluefish4" width={500} height={500}>
           <Rect
             id="rect1"
