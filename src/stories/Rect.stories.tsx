@@ -12,7 +12,7 @@ type Story = StoryObj<typeof Rect>;
 export const FirstStory: Story = {
   args: {
     width: 300,
-    height: 100,
+    height: 200,
     fill: "red",
     x: 30,
     y: 30,
