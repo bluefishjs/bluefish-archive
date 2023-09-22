@@ -22,7 +22,7 @@
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "test-storybook": "test-storybook",
-    "chromatic": "npx chromatic --project-token=chpt_3acaaa8c4de82c4"
+    "chromatic": "pnpm dlx chromatic --project-token=chpt_3acaaa8c4de82c4"
   },
   "license": "MIT",
   "devDependencies": {

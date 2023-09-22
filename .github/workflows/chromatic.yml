@@ -1,0 +1,23 @@
+# .github/workflows/chromatic.yml
+
+# Workflow name
+name: "Chromatic"
+
+# Event for the workflow
+on: push
+
+# List of jobs
+jobs:
+  chromatic-deployment:
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Install dependencies
+        run: pnpm
+      - name: Publish to Chromatic
+        uses: chromaui/action@v1
+        with:
+          projectToken: chpt_3acaaa8c4de82c4
+          exitZeroOnChanges: true
