@@ -23,3 +23,18 @@ export const FirstStory: Story = {
     </Bluefish>
   ),
 };
+
+export const SecondStory: Story = {
+  args: {
+    width: 100,
+    height: 100,
+    fill: "blue",
+    x: 30,
+    y: 30,
+  },
+  render: (props) => (
+    <Bluefish width={500} height={500}>
+      <Rect {...props} />
+    </Bluefish>
+  ),
+};
