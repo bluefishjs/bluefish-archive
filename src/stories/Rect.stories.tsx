@@ -11,7 +11,7 @@ type Story = StoryObj<typeof Rect>;
 
 export const FirstStory: Story = {
   args: {
-    width: 100,
+    width: 300,
     height: 100,
     fill: "red",
     x: 30,
@@ -28,7 +28,7 @@ export const SecondStory: Story = {
   args: {
     width: 100,
     height: 100,
-    fill: "blue",
+    fill: "steelblue",
     x: 30,
     y: 30,
   },

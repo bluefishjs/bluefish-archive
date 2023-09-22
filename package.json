@@ -21,7 +21,8 @@
     "serve": "vite preview",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "test-storybook": "test-storybook"
+    "test-storybook": "test-storybook",
+    "chromatic": "npx chromatic --project-token=chpt_3acaaa8c4de82c4"
   },
   "license": "MIT",
   "devDependencies": {
@@ -32,6 +33,7 @@
     "@storybook/test-runner": "^0.13.0",
     "@storybook/testing-library": "^0.2.1",
     "@types/node": "^20.3.3",
+    "chromatic": "^7.2.0",
     "playwright": "^1.38.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -51,5 +53,7 @@
   },
   "peerDependencies": {
     "solid-js": "^1.7.7"
-  }
+  },
+  "readme": "ERROR: No README data found!",
+  "_id": "@bluefish-js/solid@0.0.9"
 }
