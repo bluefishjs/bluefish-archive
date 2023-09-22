@@ -1,14 +1,10 @@
-# .github/workflows/chromatic.yml
-
-# Workflow name
 name: "Chromatic"
 
-# Event for the workflow
 on: push
 
-# List of jobs
 jobs:
   chromatic-deployment:
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
