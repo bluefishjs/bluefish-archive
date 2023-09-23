@@ -1,21 +1,25 @@
 import { createEffect } from "solid-js";
-import { TextProps } from "./types";
+import { TextProps, WordsWithDims } from "./types";
 import useText from "./useText";
 
-function computeBoundingBox(props: TextProps): {
+type FnProps = TextProps & {
+  wordsByLines: WordsWithDims[];
+  startDy: string;
+  transform: string;
+};
+
+function computeBoundingBox(props: FnProps): {
   x: number;
   y: number;
   width: number;
   height: number;
 } {
-  const { wordsByLines, startDy, transform } = useText(props);
-
   // Compute width. This depends on the props.width, actual text width, and the scaleToFit prop.
   let width = () => {
     let width = props.width || 0;
-    if (wordsByLines().length > 0) {
+    if (props.wordsByLines.length > 0) {
       const maxWidthLine = Math.max(
-        ...wordsByLines().map((line) => line.width || 0)
+        ...props.wordsByLines.map((line) => line.width || 0)
       );
       if (props.scaleToFit) {
         width = Math.min(maxWidthLine, props.width || maxWidthLine);
@@ -27,9 +31,9 @@ function computeBoundingBox(props: TextProps): {
     // Adjust x and y for any transformations.
     // Note: This implementation only considers scaling transformations.
     // If other transformations are added (like skewing), this needs to be updated.
-    if (transform()) {
+    if (props.transform) {
       const scaleMatch = () =>
-        /matrix\(([^,]+),[^,]+,[^,]+,[^,]+,[^,]+,[^,]+\)/.exec(transform());
+        /matrix\(([^,]+),[^,]+,[^,]+,[^,]+,[^,]+,[^,]+\)/.exec(props.transform);
       if (scaleMatch()) {
         const scale = () => parseFloat(scaleMatch()![1]);
         width *= scale();
@@ -42,7 +46,7 @@ function computeBoundingBox(props: TextProps): {
 
   // height is the sum of each line's height, plus the space between each line.
   const height = () =>
-    wordsByLines().reduce(
+    props.wordsByLines.reduce(
       (height, line, index) => height + (line.height || 0),
       0
     );
@@ -53,7 +57,7 @@ function computeBoundingBox(props: TextProps): {
     // Adjust x and y based on vertical-anchor prop.
     switch (props["vertical-anchor"]) {
       case "start":
-        y += parseFloat(startDy());
+        y += parseFloat(props.startDy);
         break;
       case "middle":
         y += height() / 2;

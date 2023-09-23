@@ -42,7 +42,19 @@ export default function Text(props: TextProps) {
   const { wordsByLines, startDy, transform } = useText(props);
 
   const layout = () => {
-    const bbox = computeBoundingBox(props);
+    const bbox = computeBoundingBox(
+      mergeProps(props, {
+        get wordsByLines() {
+          return wordsByLines();
+        },
+        get startDy() {
+          return startDy();
+        },
+        get transform() {
+          return transform();
+        },
+      })
+    );
 
     return {
       bbox: {

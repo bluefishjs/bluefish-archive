@@ -1,7 +1,7 @@
 import reduceCSSCalc from "reduce-css-calc";
 import { TextProps, WordsWithDims } from "./types";
 import getStringDims from "./getStringDims";
-import { Accessor, mergeProps } from "solid-js";
+import { Accessor, createMemo, mergeProps } from "solid-js";
 
 function isNumber(val: unknown): val is number {
   return typeof val === "number";
@@ -35,31 +35,34 @@ export default function useText(props: TextProps): {
 
   const isXOrYNotValid = !isXOrYInValid(props.x) || !isXOrYInValid(props.y);
 
-  const words = () =>
+  const words = createMemo(() =>
     props.children == null
       ? []
-      : props.children.toString().split(/(?:(?!\u00A0+)\s+)/);
+      : props.children.toString().split(/(?:(?!\u00A0+)\s+)/)
+  );
 
-  const wordsWithDims = () =>
+  const wordsWithDims = createMemo(() =>
     words().map((word) => ({
       word,
       wordWidth: getStringDims(word, props)?.width || 0,
       wordHeight: getStringDims(word, props)?.height || 0,
-    }));
+    }))
+  );
 
-  const spaceDims = () => ({
+  const spaceDims = createMemo(() => ({
     width: getStringDims("\u00A0", props)?.width || 0,
     height: getStringDims("\u00A0", props)?.height || 0,
-  });
+  }));
 
-  const wordsByLines = () => {
+  const wordsByLines = createMemo(() => {
     if (isXOrYNotValid) {
       return [];
     }
 
     // Only perform calculations if using features that require them (multiline, scaleToFit)
     if (props.width || props.scaleToFit) {
-      return wordsWithDims().reduce(
+      const start_time = performance.now();
+      const ret = wordsWithDims().reduce(
         (result: WordsWithDims[], { word, wordWidth, wordHeight }) => {
           const currentLine = result[result.length - 1];
 
@@ -89,6 +92,10 @@ export default function useText(props: TextProps): {
         },
         []
       );
+      const end_time = performance.now();
+      // console.log(`wordsByLines took ${end_time - start_time} ms`);
+
+      return ret;
     }
 
     return [
@@ -99,7 +106,7 @@ export default function useText(props: TextProps): {
             : props.children.toString().split(/(?:(?!\u00A0+)\s+)/),
       },
     ];
-  };
+  });
 
   const startDy = () => {
     const startDyStr = isXOrYNotValid
