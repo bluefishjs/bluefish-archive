@@ -2,19 +2,25 @@ import _ from "lodash";
 import Layout from "./layout";
 import { BBox, Id, Transform, useScenegraph } from "./scenegraph";
 import { JSX } from "solid-js/jsx-runtime";
-import { ParentProps, mergeProps } from "solid-js";
+import { ParentProps, Show, mergeProps } from "solid-js";
 import { maybeMax } from "./maybeUtil";
 import withBluefish from "./withBluefish";
+import Rect from "./rect";
 
 export type BackgroundProps = ParentProps<{
   id: Id;
-  background: JSX.Element;
+  background?: JSX.Element;
   padding?: number;
 }>;
 
 export const Background = withBluefish((props: BackgroundProps) => {
   const { getBBox, setBBox, ownedByOther } = useScenegraph();
-  props = mergeProps({ padding: 5 }, props);
+  props = mergeProps(
+    {
+      padding: 5,
+    },
+    props
+  );
 
   const layout = (childIds: Id[]) => {
     // debugger;
@@ -85,7 +91,12 @@ export const Background = withBluefish((props: BackgroundProps) => {
 
   return (
     <Layout id={props.id} layout={layout} paint={paint}>
-      {props.background}
+      <Show
+        when={props.background}
+        fallback={<Rect stroke="black" fill="none" stroke-width="3" />}
+      >
+        {props.background}
+      </Show>
       {props.children}
     </Layout>
   );

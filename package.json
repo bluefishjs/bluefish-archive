@@ -49,6 +49,7 @@
   "dependencies": {
     "@types/lodash": "^4.14.195",
     "lodash": "^4.17.21",
+    "perfect-arrows": "^0.3.7",
     "reduce-css-calc": "^2.1.8"
   },
   "peerDependencies": {

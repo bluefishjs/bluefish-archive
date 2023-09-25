@@ -16,9 +16,9 @@ import ElmTuple from "../examples/python-tutor/elm-tuple";
 import PythonTutor from "../examples/python-tutor/python-tutor";
 import { pointer, stackSlot, tuple } from "../examples/python-tutor/types";
 import Circle from "../src/circle";
-import Text from "../src/text";
 import Background from "../src/background";
-import Txt from "../src/text/text";
+import Text from "../src/text/text";
+import Arrow from "../src/arrow";
 
 const arr = Array.from({ length: 1000 }, (_, i) => i + 1);
 
@@ -77,7 +77,7 @@ const App: Component = () => {
       <div>
         {wordArr().length}
         <Bluefish id="visx-text" width={1000} height={500}>
-          <Txt
+          <Text
             id="text"
             font-family="Alegreya Sans, sans-serif"
             font-weight={700}
@@ -86,7 +86,7 @@ const App: Component = () => {
             width={500}
           >
             {words()}
-          </Txt>
+          </Text>
         </Bluefish>
         {/* <Txt
           font-family="Alegreya Sans, sans-serif"
@@ -99,73 +99,73 @@ const App: Component = () => {
         </Txt> */}
         <br />
         <Bluefish id="bluefish-planets" width={1000} height={500}>
-          <Circle
-            id="mercury"
-            cx={100}
-            cy={50}
-            r={15}
-            fill={"#EBE3CF"}
-            stroke-width={3}
-            stroke={"black"}
-          />
-          <Circle
-            id="venus"
-            r={36}
-            fill={"#DC933C"}
-            stroke-width={3}
-            stroke={"black"}
-          />
-          <Circle
-            id="earth"
-            r={38}
-            fill={"#179DD7"}
-            stroke-width={3}
-            stroke={"black"}
-          />
-          <Circle
-            id="mars"
-            r={21}
-            fill={"#F1CF8E"}
-            stroke-width={3}
-            stroke={"black"}
-          />
-          <Align alignment="centerY">
-            <Ref refId="mercury" />
-            <Ref refId="venus" />
-            <Ref refId="earth" />
-            <Ref refId="mars" />
-          </Align>
-          <Distribute direction="horizontal" spacing={50}>
-            <Ref refId="mercury" />
-            <Ref refId="venus" />
-            <Ref refId="earth" />
-            <Ref refId="mars" />
-          </Distribute>
-          <Txt
-            id="label"
-            // font-family="Alegreya Sans, sans-serif"
-            // font-weight={700}
-            // font-size="14"
-            vertical-anchor="start"
-            width={500}
-          >
-            Mercury
-          </Txt>
-          <Align alignment="centerX">
-            <Ref id="mercuryRefAlign" refId="label" />
-            <Ref id="labelRefAlign" refId="mercury" />
-          </Align>
-          <Distribute direction="vertical" spacing={10}>
-            <Ref id="mercuryRefDistribute" refId="label" />
-            <Ref id="labelRefDistribute" refId="mercury" />
-          </Distribute>
-          <Background
-            id="background"
-            background={<Rect stroke="black" fill="none" stroke-width="3" />}
-          >
-            <Ref id="mercuryRefBackground" refId="mercury" />
-            <Ref id="labelRefBackground" refId="label" />
-          </Background>
+          <Group x={10} y={10}>
+            <Circle
+              id="mercury"
+              r={15}
+              fill={"#EBE3CF"}
+              stroke-width={3}
+              stroke={"black"}
+            />
+            <Circle
+              id="venus"
+              r={36}
+              fill={"#DC933C"}
+              stroke-width={3}
+              stroke={"black"}
+            />
+            <Circle
+              id="earth"
+              r={38}
+              fill={"#179DD7"}
+              stroke-width={3}
+              stroke={"black"}
+            />
+            <Circle
+              id="mars"
+              r={21}
+              fill={"#F1CF8E"}
+              stroke-width={3}
+              stroke={"black"}
+            />
+            <Align alignment="centerY">
+              <Ref refId="mercury" />
+              <Ref refId="venus" />
+              <Ref refId="earth" />
+              <Ref refId="mars" />
+            </Align>
+            <Distribute direction="horizontal" spacing={50}>
+              <Ref refId="mercury" />
+              <Ref refId="venus" />
+              <Ref refId="earth" />
+              <Ref refId="mars" />
+            </Distribute>
+            <Text id="label" vertical-anchor="start" width={500}>
+              Mercury
+            </Text>
+            <Align alignment="centerX">
+              <Ref id="mercuryRefAlign" refId="label" />
+              <Ref id="labelRefAlign" refId="mercury" />
+            </Align>
+            <Distribute direction="vertical" spacing={60}>
+              <Ref id="mercuryRefDistribute" refId="label" />
+              <Ref id="labelRefDistribute" refId="mercury" />
+            </Distribute>
+            <Background id="background2">
+              <Ref refId="mercury" />
+              <Ref refId="venus" />
+              <Ref refId="earth" />
+              <Ref refId="mars" />
+            </Background>
+            <Background id="background">
+              <Ref id="mercuryRefBackground" refId="mercury" />
+              <Ref id="labelRefBackground" refId="label" />
+            </Background>
+            <Arrow id="arrow">
+              <Ref id="labelRefArrow" refId="label" />
+              <Ref id="mercuryRefArrow" refId="mercury" />
+            </Arrow>
+          </Group>
         </Bluefish>
         <Bluefish id="bluefish-waterfall" width={1000} height={500}>
           <For each={arr}>

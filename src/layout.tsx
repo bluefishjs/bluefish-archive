@@ -30,6 +30,7 @@ export type LayoutProps = ParentProps<{
     bbox: BBox;
     transform: Transform;
     children: JSX.Element;
+    customData?: any;
   }) => JSX.Element;
 }>;
 
@@ -37,8 +38,14 @@ export const Layout: Component<LayoutProps> = (props) => {
   // const [isFirstRender, setIsFirstRender] = useState(true);
 
   const parentId = useContext(ParentIDContext);
-  const { scenegraph, getBBox, setBBox, createNode, mergeBBoxAndTransform } =
-    UNSAFE_useScenegraph();
+  const {
+    scenegraph,
+    getBBox,
+    setBBox,
+    createNode,
+    mergeBBoxAndTransform,
+    setCustomData,
+  } = UNSAFE_useScenegraph();
 
   createNode(props.id, parentId);
 
@@ -56,6 +63,7 @@ export const Layout: Component<LayoutProps> = (props) => {
             y: scenegraph[props.id]?.transform?.translate?.y ?? 0,
           },
         }}
+        customData={scenegraph[props.id]?.customData}
       >
         {props.children}
       </Dynamic>
@@ -71,11 +79,12 @@ export const Layout: Component<LayoutProps> = (props) => {
     //   untrack(() => node.runLayout());
     // }
     // debugger;
-    const { bbox, transform } = props.layout(
+    const { bbox, transform, customData } = props.layout(
       scenegraph[props.id]?.children /* , getBBox */
     );
     // setBBox(props.id, bbox, props.id, transform);
     mergeBBoxAndTransform(props.id, props.id, bbox, transform);
+    setCustomData(props.id, customData);
     // console.log(
     //   "layout",
     //   props.id,

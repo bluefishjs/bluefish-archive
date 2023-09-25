@@ -42,6 +42,7 @@ export type ScenegraphNode =
       transformOwners: TransformOwners;
       children: Set<Id>;
       parent: Id | null;
+      customData?: any;
     }
   | {
       type: "ref";
@@ -66,6 +67,7 @@ export const createScenegraph = (): ScenegraphContextType => {
       transformOwners: { translate: {} },
       children: new Set(),
       parent: parentId,
+      customData: { customData: {} },
     });
 
     if (parentId !== null) {
@@ -110,7 +112,9 @@ export const createScenegraph = (): ScenegraphContextType => {
   // TODO: doesn't support ref of ref
   const resolveRef = (
     id: Id,
-    accumulatedTransform: Transform = { translate: { x: 0, y: 0 } }
+    accumulatedTransform: Transform = {
+      translate: { x: 0, y: 0 },
+    }
   ): {
     id: Id;
     transform: Transform;
@@ -401,6 +405,19 @@ the align node.
     );
   };
 
+  const setCustomData = (id: Id, customData: any) => {
+    setScenegraph(
+      id,
+      produce((n: ScenegraphNode) => {
+        const node = n as ScenegraphNode & { type: "node" }; // guaranteed by resolveRef
+
+        if (customData !== undefined) {
+          node.customData = customData;
+        }
+      })
+    );
+  };
+
   const setBBox = (owner: Id, id: Id, bbox: BBox) => {
     const { id: resolvedId, transform: accumulatedTransform } = resolveRef(id);
 
@@ -565,6 +582,7 @@ the align node.
     resolveRef,
     mergeBBoxAndTransform,
     // API
+    setCustomData,
     getBBox,
     setBBox,
     ownedByUs,
@@ -583,6 +601,7 @@ export type ScenegraphContextType = {
     bbox: BBox,
     transform: Transform
   ) => void;
+  setCustomData: (id: Id, customData: any) => void;
   getBBox: (id: Id) => BBox;
   setBBox: (owner: Id, id: Id, bbox: BBox) => void;
   ownedByUs: (
@@ -630,4 +649,5 @@ export type LayoutFn = (
 ) => {
   bbox: Partial<BBox>;
   transform: Transform;
+  customData?: any;
 };
