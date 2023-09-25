@@ -17,7 +17,7 @@ export const Background = withBluefish((props: BackgroundProps) => {
   const { getBBox, setBBox, ownedByOther } = useScenegraph();
   props = mergeProps(
     {
-      padding: 5,
+      padding: 10,
     },
     props
   );

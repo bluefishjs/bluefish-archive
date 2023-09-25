@@ -42,7 +42,7 @@ export const Arrow = withBluefish((props: ArrowProps) => {
         stretch: 0.5,
         stretchMin: 40,
         stretchMax: 420,
-        padStart: 0,
+        padStart: 5,
         padEnd: 20,
         flip: false,
         straights: true,

@@ -100,67 +100,83 @@ const App: Component = () => {
         <br />
         <Bluefish id="bluefish-planets" width={1000} height={500}>
           <Group x={10} y={10}>
-            <Circle
+            <Rect
               id="mercury"
-              r={15}
-              fill={"#EBE3CF"}
-              stroke-width={3}
-              stroke={"black"}
+              width={30}
+              height={30}
+              fill={"#0E2954"}
+              stroke-width={2}
+              stroke={"#272829"}
+              rx={6}
             />
-            <Circle
+            <Rect
               id="venus"
-              r={36}
-              fill={"#DC933C"}
-              stroke-width={3}
-              stroke={"black"}
+              width={50}
+              height={50}
+              fill={"#1F6E8C"}
+              stroke-width={2}
+              stroke={"#272829"}
+              rx={6}
             />
-            <Circle
+            <Rect
               id="earth"
-              r={38}
-              fill={"#179DD7"}
-              stroke-width={3}
-              stroke={"black"}
+              width={70}
+              height={70}
+              fill={"#2E8A99"}
+              stroke-width={2}
+              stroke={"#272829"}
+              rx={6}
             />
-            <Circle
+            <Rect
               id="mars"
-              r={21}
-              fill={"#F1CF8E"}
-              stroke-width={3}
-              stroke={"black"}
+              width={90}
+              height={90}
+              fill={"#84A7A1"}
+              stroke-width={2}
+              stroke={"#272829"}
+              rx={6}
             />
-            <Align alignment="centerY">
+            <Align alignment="centerX">
               <Ref refId="mercury" />
               <Ref refId="venus" />
               <Ref refId="earth" />
               <Ref refId="mars" />
             </Align>
-            <Distribute direction="horizontal" spacing={50}>
+            <Distribute direction="vertical" spacing={50}>
               <Ref refId="mercury" />
               <Ref refId="venus" />
               <Ref refId="earth" />
               <Ref refId="mars" />
             </Distribute>
             <Text id="label" vertical-anchor="start" width={500}>
-              Mercury
+              Expanding
             </Text>
-            <Align alignment="centerX">
+            <Align alignment="centerY">
               <Ref id="mercuryRefAlign" refId="label" />
               <Ref id="labelRefAlign" refId="mercury" />
             </Align>
-            <Distribute direction="vertical" spacing={60}>
-              <Ref id="mercuryRefDistribute" refId="label" />
+            <Distribute direction="horizontal" spacing={60}>
               <Ref id="labelRefDistribute" refId="mercury" />
+              <Ref id="mercuryRefDistribute" refId="label" />
             </Distribute>
-            <Background id="background2">
+            {/* <Background
+              id="background"
+              background={
+                <Rect
+                  id="background-rect"
+                  stroke="black"
+                  fill="none"
+                  stroke-width="3"
+                  stroke-dasharray="5,5"
+                  rx={6}
+                />
+              }
+            >
               <Ref refId="mercury" />
               <Ref refId="venus" />
               <Ref refId="earth" />
               <Ref refId="mars" />
-            </Background>
-            <Background id="background">
-              <Ref id="mercuryRefBackground" refId="mercury" />
-              <Ref id="labelRefBackground" refId="label" />
-            </Background>
+            </Background> */}
             <Arrow id="arrow">
               <Ref id="labelRefArrow" refId="label" />
               <Ref id="mercuryRefArrow" refId="mercury" />
