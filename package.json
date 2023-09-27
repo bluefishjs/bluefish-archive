@@ -47,7 +47,9 @@
     "vite-plugin-solid": "^2.7.0"
   },
   "dependencies": {
+    "@types/d3-scale": "^4.0.5",
     "@types/lodash": "^4.14.195",
+    "d3-scale": "^4.0.2",
     "lodash": "^4.17.21",
     "perfect-arrows": "^0.3.7",
     "reduce-css-calc": "^2.1.8"

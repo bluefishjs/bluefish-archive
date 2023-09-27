@@ -19,6 +19,8 @@ import Circle from "../src/circle";
 import Background from "../src/background";
 import Text from "../src/text/text";
 import Arrow from "../src/arrow";
+import { Plot } from "../src/plot/plot";
+import { Dot } from "../src/plot/dot";
 
 const arr = Array.from({ length: 1000 }, (_, i) => i + 1);
 
@@ -75,7 +77,7 @@ const App: Component = () => {
         <option value="right">right</option>
       </select>
       <div>
-        {wordArr().length}
+        {/* {wordArr().length}
         <Bluefish id="visx-text" width={1000} height={500}>
           <Text
             id="text"
@@ -87,7 +89,7 @@ const App: Component = () => {
           >
             {words()}
           </Text>
-        </Bluefish>
+        </Bluefish> */}
         {/* <Txt
           font-family="Alegreya Sans, sans-serif"
           font-weight={700}
@@ -98,92 +100,76 @@ const App: Component = () => {
           {words()}
         </Txt> */}
         <br />
-        <Bluefish id="bluefish-planets" width={1000} height={500}>
-          <Group x={10} y={10}>
-            <Rect
-              id="mercury"
-              width={30}
-              height={30}
+        <Bluefish width={300} height={100}>
+          <Group x={0} y={0}>
+            <Circle
+              id="circle1"
+              r={15}
               fill={"#0E2954"}
               stroke-width={2}
               stroke={"#272829"}
-              rx={6}
             />
-            <Rect
-              id="venus"
-              width={50}
-              height={50}
-              fill={"#1F6E8C"}
+            <Circle
+              id="circle2"
+              r={15}
+              fill={"#0E2954"}
               stroke-width={2}
               stroke={"#272829"}
-              rx={6}
             />
-            <Rect
-              id="earth"
-              width={70}
-              height={70}
-              fill={"#2E8A99"}
-              stroke-width={2}
-              stroke={"#272829"}
-              rx={6}
-            />
-            <Rect
-              id="mars"
-              width={90}
-              height={90}
-              fill={"#84A7A1"}
-              stroke-width={2}
-              stroke={"#272829"}
-              rx={6}
-            />
-            <Align alignment="centerX">
-              <Ref refId="mercury" />
-              <Ref refId="venus" />
-              <Ref refId="earth" />
-              <Ref refId="mars" />
-            </Align>
-            <Distribute direction="vertical" spacing={50}>
-              <Ref refId="mercury" />
-              <Ref refId="venus" />
-              <Ref refId="earth" />
-              <Ref refId="mars" />
-            </Distribute>
-            <Text id="label" vertical-anchor="start" width={500}>
-              Expanding
-            </Text>
             <Align alignment="centerY">
-              <Ref id="mercuryRefAlign" refId="label" />
-              <Ref id="labelRefAlign" refId="mercury" />
+              <Ref refId="circle1" />
+              <Ref refId="circle2" />
             </Align>
-            <Distribute direction="horizontal" spacing={60}>
-              <Ref id="labelRefDistribute" refId="mercury" />
-              <Ref id="mercuryRefDistribute" refId="label" />
+            <Distribute direction="horizontal" spacing={50}>
+              <Ref refId="circle1" />
+              <Ref refId="circle2" />
             </Distribute>
-            {/* <Background
-              id="background"
-              background={
+            <Background id="background" padding={20}>
+              <Ref refId="circle1" />
+              <Ref refId="circle2" />
+            </Background>
+            {/* <Text id="text">Mercury</Text> */}
+            <Rect id="text" width={20} height={10} fill="magenta" />
+            <Distribute direction="vertical" spacing={20}>
+              <Ref refId="background" />
+              <Ref refId="text" />
+            </Distribute>
+            <Align alignment="centerX">
+              <Ref refId="text" />
+              <Ref refId="background" />
+            </Align>
+            <Arrow padEnd={10} stroke-width={2}>
+              <Ref refId="text" />
+              <Ref refId="circle2" />
+            </Arrow>
+          </Group>
+        </Bluefish>
+        <Bluefish>
+          <Circle r={15} fill={"#0E2954"} stroke-width={2} stroke={"#272829"} />
+        </Bluefish>
+        <Bluefish width={500} height={500}>
+          <Group x={10} y={10}>
+            <Background
+              background={() => (
                 <Rect
-                  id="background-rect"
                   stroke="black"
                   fill="none"
                   stroke-width="3"
                   stroke-dasharray="5,5"
                   rx={6}
                 />
-              }
+              )}
             >
-              <Ref refId="mercury" />
-              <Ref refId="venus" />
-              <Ref refId="earth" />
-              <Ref refId="mars" />
-            </Background> */}
-            <Arrow id="arrow">
-              <Ref id="labelRefArrow" refId="label" />
-              <Ref id="mercuryRefArrow" refId="mercury" />
-            </Arrow>
+              <Circle
+                r={15}
+                fill={"#0E2954"}
+                stroke-width={2}
+                stroke={"#272829"}
+              />
+            </Background>
           </Group>
         </Bluefish>
-        <Bluefish id="bluefish-waterfall" width={1000} height={500}>
+        {/* <Bluefish id="bluefish-waterfall" width={1000} height={500}>
           <For each={arr}>
             {(item) => (
               <Rect
@@ -194,19 +180,14 @@ const App: Component = () => {
               />
             )}
           </For>
-          {/* <Align alignment={"bottom"}>
-            <For each={[1, 2, 3, 4, 5]}>
-              {(item) => <Ref refId={`rect-${item}`} />}
-            </For>
-          </Align> */}
           <Distribute direction="vertical" spacing={0}>
             <For each={arr}>{(item) => <Ref refId={`rect-${item}`} />}</For>
           </Distribute>
           <Distribute direction="horizontal" spacing={x()}>
             <For each={arr}>{(item) => <Ref refId={`rect-${item}`} />}</For>
           </Distribute>
-        </Bluefish>
-        <Bluefish id="bluefish-pythontutor-test" width={1000} height={500}>
+        </Bluefish> */}
+        {/* <Bluefish id="bluefish-pythontutor-test" width={1000} height={500}>
           <PythonTutor
             stack={[
               stackSlot("a", pointer(0)),
@@ -223,8 +204,8 @@ const App: Component = () => {
               [null, 1, 2],
             ]}
           />
-        </Bluefish>
-        <Bluefish id="bluefish-heapobjecttest" width={1000} height={200}>
+        </Bluefish> */}
+        {/* <Bluefish id="bluefish-heapobjecttest" width={1000} height={200}>
           <HeapObject
             objectType="tuple"
             objectValues={[
@@ -239,8 +220,8 @@ const App: Component = () => {
             tupleData={{ type: "string", value: "1" }}
             objectId="fooooo"
           />
-        </Bluefish>
-        <Bluefish id="bluefish-globalframetest" width={1000} height={200}>
+        </Bluefish> */}
+        {/* <Bluefish id="bluefish-globalframetest" width={1000} height={200}>
           <GlobalFrame
             id={`globalFrame`}
             variables={[
@@ -258,8 +239,8 @@ const App: Component = () => {
               },
             ]}
           />
-        </Bluefish>
-        <Bluefish id="bluefish5" width={500} height={500}>
+        </Bluefish> */}
+        {/* <Bluefish id="bluefish5" width={500} height={500}>
           <Rect
             id="rect1"
             x={x()}
@@ -287,8 +268,8 @@ const App: Component = () => {
             <Ref id="ref3" refId="rect2" />
             <Rect id="rect3" width={20} height={30} fill="magenta" />
           </Align>
-        </Bluefish>
-        <Bluefish id="bluefish" width={1000} height={200}>
+        </Bluefish> */}
+        {/* <Bluefish id="bluefish" width={1000} height={200}>
           <Rect
             id="rect"
             x={x()}
@@ -308,7 +289,7 @@ const App: Component = () => {
             <Rect id="rect1" width={100} height={150} fill="steelblue" />
             <Rect id="rect2" width={50} height={50} fill="lightgreen" />
           </Align>
-        </Bluefish>
+        </Bluefish> */}
         {/* <Bluefish id="bluefish3" width={500} height={200}>
           <Rect
             id="rect1"
@@ -325,7 +306,7 @@ const App: Component = () => {
             <Ref id="ref2" refId="rect2" />
           </Align>
         </Bluefish> */}
-        <Bluefish id="bluefish4" width={500} height={500}>
+        {/* <Bluefish id="bluefish4" width={500} height={500}>
           <Rect
             id="rect1"
             x={x()}
@@ -358,7 +339,7 @@ const App: Component = () => {
             <Ref id="ref3" refId="rect2" />
             <Rect id="rect3" width={20} height={30} fill="magenta" />
           </Align>
-        </Bluefish>
+        </Bluefish> */}
       </div>
     </>
   );

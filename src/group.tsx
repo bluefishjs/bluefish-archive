@@ -41,7 +41,7 @@ export const Group = withBluefish((props: GroupProps) => {
     };
 
     // const left = maybeMin(bboxes.left);
-    const left = minOfMaybes(bboxes.left);
+    const left = minOfMaybes(bboxes.left) ?? 0;
 
     // const right = maybeMax(
     //   bboxes.left.map((left, i) => maybeAdd(left, bboxes.width[i]))
@@ -51,7 +51,7 @@ export const Group = withBluefish((props: GroupProps) => {
     );
 
     // const top = maybeMin(bboxes.top);
-    const top = minOfMaybes(bboxes.top);
+    const top = minOfMaybes(bboxes.top) ?? 0;
 
     // const bottom = maybeMax(
     //   bboxes.top.map((top, i) => maybeAdd(top, bboxes.height[i]))

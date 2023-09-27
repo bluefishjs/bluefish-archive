@@ -1,15 +1,20 @@
+import Layout from "./layout";
+import { maxOfMaybes, maybeAdd, maybeSub, minOfMaybes } from "./maybeUtil";
 import {
   ScenegraphContext,
   ScenegraphNode,
   Transform,
   createScenegraph,
   ParentIDContext,
+  Id,
+  BBox,
 } from "./scenegraph";
-import { ParentProps, Show, createUniqueId } from "solid-js";
+import { JSX, ParentProps, Show, createUniqueId, mergeProps } from "solid-js";
 
 export type BluefishProps = ParentProps<{
-  width: number;
-  height: number;
+  width?: number;
+  height?: number;
+  padding?: number;
   id?: string;
   debug?: boolean;
 }>;
@@ -21,11 +26,19 @@ declare global {
 }
 
 export function Bluefish(props: BluefishProps) {
+  props = mergeProps(
+    {
+      padding: 10,
+    },
+    props
+  );
+
   // const bboxStore = useMemo(() => observable.map(), []);
   // const bboxStore = useMemo(() => createScenegraph(), []);
   // const bboxStore = createScenegraph();
   const scenegraphContext = createScenegraph();
-  const { scenegraph, createNode } = scenegraphContext;
+  const { scenegraph, createNode, getBBox, ownedByOther, ownedByUs, setBBox } =
+    scenegraphContext;
 
   // const autoGenId = useId();
   const autoGenId = createUniqueId();
@@ -56,64 +69,82 @@ export function Bluefish(props: BluefishProps) {
     createNode(id, null);
   }
 
-  // const layout = useCallback(
-  //   (childIds: Id[]) => {
-  //     for (const childId of childIds) {
-  //       getBBox(childId);
-  //     }
+  const layout = (childIds: Id[]) => {
+    childIds = Array.from(childIds);
 
-  //     return {
-  //       bbox: {
-  //         left: 0,
-  //         top: 0,
-  //         width: props.width,
-  //         height: props.height,
-  //       },
-  //       transform: {
-  //         translate: {
-  //           x: 0,
-  //           y: 0,
-  //         },
-  //       },
-  //     };
-  //   },
-  //   [getBBox, props.height, props.width]
-  // );
+    // get the bbox of the children
+    const bboxes = {
+      left: childIds.map((childId) => getBBox(childId).left),
+      top: childIds.map((childId) => getBBox(childId).top),
+      width: childIds.map((childId) => getBBox(childId).width),
+      height: childIds.map((childId) => getBBox(childId).height),
+    };
 
-  // const paint = useCallback(
-  //   ({
-  //     bbox,
-  //     transform,
-  //     children,
-  //   }: PropsWithChildren<{ bbox: BBox; transform: Transform }>) => {
-  //     return (
-  //       <svg
-  //         width={props.width}
-  //         height={props.height}
-  //         viewBox={`0 0 ${props.width} ${props.height}`}
-  //       >
-  //         {props.children}
-  //       </svg>
-  //     );
-  //   },
-  //   [props.children, props.height, props.width]
-  // );
+    for (const childId of childIds) {
+      if (!ownedByOther(id, childId, "x") && !ownedByUs(id, childId, "x")) {
+        setBBox(id, childId, { left: 0 });
+      }
+
+      if (!ownedByOther(id, childId, "y") && !ownedByUs(id, childId, "y")) {
+        setBBox(id, childId, { top: 0 });
+      }
+    }
+
+    // find our bounding box
+    const left = minOfMaybes(bboxes.left) ?? 0;
+    const top = minOfMaybes(bboxes.top) ?? 0;
+    const right = maxOfMaybes(
+      bboxes.left.map((left, i) => maybeAdd(left, bboxes.width[i]))
+    );
+    const bottom = maxOfMaybes(
+      bboxes.top.map((top, i) => maybeAdd(top, bboxes.height[i]))
+    );
+    const width = maybeSub(right, left);
+    const height = maybeSub(bottom, top);
+
+    return {
+      bbox: {
+        left: left ?? 0,
+        top: top ?? 0,
+        width: width ?? props.width,
+        height: height ?? props.height,
+      },
+      transform: {
+        translate: {
+          x: 0,
+          y: 0,
+        },
+      },
+    };
+  };
+
+  const paint = (paintProps: {
+    bbox: BBox;
+    transform: Transform;
+    children: JSX.Element;
+  }) => {
+    const width = () => paintProps.bbox.width! + props.padding! * 2;
+    const height = () => paintProps.bbox.height! + props.padding! * 2;
+
+    return (
+      <svg
+        width={width()}
+        height={height()}
+        viewBox={`${-props.padding!} ${-props.padding!} ${width()} ${height()}`}
+      >
+        {props.children}
+      </svg>
+    );
+  };
 
   return (
     <>
       <ScenegraphContext.Provider value={scenegraphContext}>
-        <ParentIDContext.Provider value={id}>
-          <svg
-            width={props.width}
-            height={props.height}
-            viewBox={`0 0 ${props.width} ${props.height}`}
-          >
+        <Layout id={id} layout={layout} paint={paint}>
+          <ParentIDContext.Provider value={id}>
             {props.children}
-          </svg>
-          {/* <Layout id={id} layout={layout} paint={paint}>
-          {props.children}
-        </Layout> */}
-        </ParentIDContext.Provider>
+          </ParentIDContext.Provider>
+        </Layout>
       </ScenegraphContext.Provider>
       <Show when={props.debug === true}>
         <pre>{JSON.stringify(scenegraph, null, 2)}</pre>

@@ -1,19 +1,43 @@
-import { JSX, ParentProps, Show, createEffect, untrack } from "solid-js";
+import {
+  JSX,
+  ParentProps,
+  Show,
+  createEffect,
+  mergeProps,
+  untrack,
+} from "solid-js";
 import { Layout } from "./layout";
 import _, { get, startsWith } from "lodash";
 import { maybe, maybeAdd, maybeMax, maybeMin, maybeSub } from "./maybeUtil";
 import { BBox, Id, Transform, useScenegraph } from "./scenegraph";
 import withBluefish from "./withBluefish";
-import { getBoxToBoxArrow } from "perfect-arrows";
+import { ArrowOptions, getBoxToBoxArrow } from "perfect-arrows";
 
-export type ArrowProps = ParentProps<{
-  id: Id;
-  x?: number;
-  y?: number;
-  start?: boolean;
-}>;
+export type ArrowProps = ParentProps<
+  {
+    id: Id;
+    x?: number;
+    y?: number;
+    start?: boolean;
+    "stroke-width"?: number;
+  } & ArrowOptions
+>;
 
 export const Arrow = withBluefish((props: ArrowProps) => {
+  props = mergeProps(
+    {
+      bow: 0.2,
+      stretch: 0.5,
+      stretchMin: 40,
+      stretchMax: 420,
+      padStart: 5,
+      padEnd: 20,
+      flip: false,
+      straights: true,
+      "stroke-width": 3,
+    },
+    props
+  );
   // const { children, id } = props;
   const { getBBox, setBBox, ownedByUs, ownedByOther } = useScenegraph();
 
@@ -36,17 +60,7 @@ export const Arrow = withBluefish((props: ArrowProps) => {
       toBBox.top ?? 0,
       toBBox.width ?? 0,
       toBBox.height ?? 0,
-      {
-        // todo: make these props...
-        bow: 0.2,
-        stretch: 0.5,
-        stretchMin: 40,
-        stretchMax: 420,
-        padStart: 5,
-        padEnd: 20,
-        flip: false,
-        straights: true,
-      }
+      props
     );
 
     // just take the combined bbox of the two children
@@ -75,6 +89,7 @@ export const Arrow = withBluefish((props: ArrowProps) => {
         ae: arrow[6],
         as: arrow[7],
         ec: arrow[8],
+        fromBBox: fromBBox,
       },
     };
   };
@@ -86,6 +101,24 @@ export const Arrow = withBluefish((props: ArrowProps) => {
     customData?: any;
   }) => {
     const endAngleAsDegrees = () => paintProps.customData.ae * (180 / Math.PI);
+    const arrowHeadPoints = () => {
+      const points = [
+        [0, -2],
+        [4, 0],
+        [0, 2],
+      ];
+
+      // scale points by stroke-width
+      points.forEach((point) => {
+        point[0] *= props["stroke-width"]!;
+        point[1] *= props["stroke-width"]!;
+      });
+
+      // stringify the points
+      return points
+        .map((point) => point.map((coord) => coord.toString()).join(","))
+        .join(" ");
+    };
 
     return (
       <Show
@@ -108,13 +141,23 @@ export const Arrow = withBluefish((props: ArrowProps) => {
             d={`M${paintProps.customData.sx},${paintProps.customData.sy} Q${paintProps.customData.cx},${paintProps.customData.cy} ${paintProps.customData.ex},${paintProps.customData.ey}`}
             fill="none"
             stroke="black"
-            stroke-width="3"
+            stroke-width={props["stroke-width"]}
           />
           <polygon
-            points="0,-6 12,0, 0,6"
+            points={arrowHeadPoints()}
             transform={`translate(${paintProps.customData.ex},${
               paintProps.customData.ey
             }) rotate(${endAngleAsDegrees()})`}
+          />
+          {/* fromBBox rect */}
+          <rect
+            x={paintProps.customData.fromBBox?.left}
+            y={paintProps.customData.fromBBox?.top}
+            width={paintProps.customData.fromBBox?.width}
+            height={paintProps.customData.fromBBox?.height}
+            fill="none"
+            stroke="red"
+            stroke-width="1"
           />
           {paintProps.children}
         </g>

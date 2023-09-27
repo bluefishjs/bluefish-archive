@@ -4,10 +4,11 @@ import useText from "./useText";
 import { BBox, Transform } from "../scenegraph";
 import Layout from "../layout";
 import computeBoundingBox from "./textBBox";
+import withBluefish from "../withBluefish";
 
 const SVG_STYLE = { overflow: "visible" };
 
-export default function Text(props: TextProps) {
+export const Text = withBluefish((props: TextProps) => {
   props = mergeProps(
     {
       // dx: 0,
@@ -99,4 +100,6 @@ export default function Text(props: TextProps) {
   };
 
   return <Layout id={props.id} layout={layout} paint={paint} />;
-}
+});
+
+export default Text;

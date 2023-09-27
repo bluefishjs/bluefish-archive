@@ -19,7 +19,7 @@ type Story = StoryObj;
 export const Planets: Story = {
   render: () => {
     return (
-      <Bluefish id="bluefish-planets" width={1000} height={500}>
+      <Bluefish id="bluefish-planets" padding={20}>
         <Group x={10} y={10}>
           <Circle
             id="mercury"
