@@ -89,7 +89,6 @@ export const Arrow = withBluefish((props: ArrowProps) => {
         ae: arrow[6],
         as: arrow[7],
         ec: arrow[8],
-        fromBBox: fromBBox,
       },
     };
   };
@@ -148,16 +147,6 @@ export const Arrow = withBluefish((props: ArrowProps) => {
             transform={`translate(${paintProps.customData.ex},${
               paintProps.customData.ey
             }) rotate(${endAngleAsDegrees()})`}
-          />
-          {/* fromBBox rect */}
-          <rect
-            x={paintProps.customData.fromBBox?.left}
-            y={paintProps.customData.fromBBox?.top}
-            width={paintProps.customData.fromBBox?.width}
-            height={paintProps.customData.fromBBox?.height}
-            fill="none"
-            stroke="red"
-            stroke-width="1"
           />
           {paintProps.children}
         </g>
