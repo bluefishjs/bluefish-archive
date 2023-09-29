@@ -193,7 +193,6 @@ export const Align = withBluefish((props: AlignProps) => {
       if (alignment === "top") {
         placeable!.bbox.top = verticalValue;
       } else if (alignment === "centerY") {
-        console.log("setting bbox top", verticalValue, placeable!.bbox.height);
         const height = placeable!.bbox.height;
         if (height === undefined) {
           continue;

@@ -44,14 +44,14 @@ export default function useText(props: TextProps): {
   const wordsWithDims = createMemo(() =>
     words().map((word) => ({
       word,
-      wordWidth: getStringDims(word, props)?.width || 0,
-      wordHeight: getStringDims(word, props)?.height || 0,
+      wordWidth: getStringDims(word, props)?.width ?? 0,
+      wordHeight: getStringDims(word, props)?.height ?? 0,
     }))
   );
 
   const spaceDims = createMemo(() => ({
-    width: getStringDims("\u00A0", props)?.width || 0,
-    height: getStringDims("\u00A0", props)?.height || 0,
+    width: getStringDims("\u00A0", props)?.width ?? 0,
+    height: getStringDims("\u00A0", props)?.height ?? 0,
   }));
 
   const wordsByLines = createMemo(() => {
@@ -59,53 +59,38 @@ export default function useText(props: TextProps): {
       return [];
     }
 
-    // Only perform calculations if using features that require them (multiline, scaleToFit)
-    if (props.width || props.scaleToFit) {
-      const start_time = performance.now();
-      const ret = wordsWithDims().reduce(
-        (result: WordsWithDims[], { word, wordWidth, wordHeight }) => {
-          const currentLine = result[result.length - 1];
+    const ret = wordsWithDims().reduce(
+      (result: WordsWithDims[], { word, wordWidth, wordHeight }) => {
+        const currentLine = result[result.length - 1];
 
-          if (
-            currentLine &&
-            (props.width == null ||
-              props.scaleToFit ||
-              (currentLine.width || 0) + wordWidth + spaceDims().width <
-                props.width)
-          ) {
-            // Word can be added to an existing line
-            currentLine.words.push(word);
-            currentLine.width = currentLine.width || 0;
-            currentLine.width += wordWidth + spaceDims().width;
-            currentLine.height = Math.max(currentLine.height || 0, wordHeight);
-          } else {
-            // Add first word to line or word is too long to scaleToFit on existing line
-            const newLine = {
-              words: [word],
-              width: wordWidth,
-              height: wordHeight,
-            };
-            result.push(newLine);
-          }
+        if (
+          currentLine &&
+          (props.width === undefined ||
+            props.scaleToFit ||
+            (currentLine.width ?? 0) + wordWidth + spaceDims().width <
+              props.width)
+        ) {
+          // Word can be added to an existing line
+          currentLine.words.push(word);
+          currentLine.width = currentLine.width ?? 0;
+          currentLine.width += wordWidth + spaceDims().width;
+          currentLine.height = Math.max(currentLine.height ?? 0, wordHeight);
+        } else {
+          // Add first word to line or word is too long to scaleToFit on existing line
+          const newLine = {
+            words: [word],
+            width: wordWidth,
+            height: wordHeight,
+          };
+          result.push(newLine);
+        }
 
-          return result;
-        },
-        []
-      );
-      const end_time = performance.now();
-      // console.log(`wordsByLines took ${end_time - start_time} ms`);
-
-      return ret;
-    }
-
-    return [
-      {
-        words:
-          props.children == null
-            ? []
-            : props.children.toString().split(/(?:(?!\u00A0+)\s+)/),
+        return result;
       },
-    ];
+      []
+    );
+
+    return ret;
   });
 
   const startDy = () => {
