@@ -33,6 +33,17 @@ export type TransformOwners = {
   };
 };
 
+export type ChildNode = {
+  name: Id;
+  bbox: BBox;
+  owned: {
+    x: boolean;
+    y: boolean;
+    width: boolean;
+    height: boolean;
+  };
+};
+
 export type ScenegraphNode =
   | {
       type: "node";
@@ -551,6 +562,92 @@ the align node.
     }
   };
 
+  const createChildRepr = (owner: Id, childId: Id): ChildNode => {
+    return {
+      name: childId,
+      bbox: {
+        get left() {
+          return getBBox(childId).left;
+        },
+        set left(left: number | undefined) {
+          if (left === undefined) {
+            console.error(
+              `${owner} tried to set ${childId}'s left to undefined. Skipping...`
+            );
+            return;
+          }
+
+          setBBox(owner, childId, { left });
+        },
+        get top() {
+          return getBBox(childId).top;
+        },
+        set top(top: number | undefined) {
+          if (top === undefined) {
+            console.error(
+              `${owner} tried to set ${childId}'s top to undefined. Skipping...`
+            );
+            return;
+          }
+
+          setBBox(owner, childId, { top });
+        },
+        get width() {
+          return getBBox(childId).width;
+        },
+        set width(width: number | undefined) {
+          if (width === undefined) {
+            console.error(
+              `${owner} tried to set ${childId}'s width to undefined. Skipping...`
+            );
+            return;
+          }
+
+          setBBox(owner, childId, { width });
+        },
+        get height() {
+          return getBBox(childId).height;
+        },
+        set height(height: number | undefined) {
+          if (height === undefined) {
+            console.error(
+              `${owner} tried to set ${childId}'s height to undefined. Skipping...`
+            );
+            return;
+          }
+
+          setBBox(owner, childId, { height });
+        },
+        get right() {
+          return maybeAdd(this.left, this.width);
+        },
+        get bottom() {
+          return maybeAdd(this.top, this.height);
+        },
+        get centerX() {
+          return maybeAdd(this.left, maybeDiv(this.width, 2));
+        },
+        get centerY() {
+          return maybeAdd(this.top, maybeDiv(this.height, 2));
+        },
+      },
+      owned: {
+        get x() {
+          return ownedByOther(owner, childId, "x");
+        },
+        get y() {
+          return ownedByOther(owner, childId, "y");
+        },
+        get width() {
+          return ownedByOther(owner, childId, "width");
+        },
+        get height() {
+          return ownedByOther(owner, childId, "height");
+        },
+      },
+    };
+  };
+
   return {
     scenegraph,
     // constructors
@@ -563,8 +660,8 @@ the align node.
     setCustomData,
     getBBox,
     setBBox,
-    // ownedByUs,
     ownedByOther,
+    createChildRepr,
   };
 };
 
@@ -592,6 +689,7 @@ export type ScenegraphContextType = {
     check: Id,
     axis: "x" | "y" | "width" | "height"
   ) => boolean;
+  createChildRepr: (owner: Id, childId: Id) => ChildNode;
 };
 
 export const ScenegraphContext = createContext<ScenegraphContextType | null>(
@@ -621,10 +719,7 @@ export const UNSAFE_useScenegraph = () => {
 
 export const ParentIDContext = createContext<Id | null>(null);
 
-export type LayoutFn = (
-  childIds: Id[],
-  getBBox?: (id: string) => BBox
-) => {
+export type LayoutFn = (childNodes: ChildNode[]) => {
   bbox: Partial<BBox>;
   transform: Transform;
   customData?: any;

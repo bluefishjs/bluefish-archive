@@ -127,6 +127,72 @@ const App: Component = () => {
         <option value="right">right</option>
       </select>
       <div>
+        <Bluefish id="bluefish-planets" padding={20}>
+          <Group x={10} y={10}>
+            <Circle
+              id="mercury"
+              r={15}
+              fill={"#EBE3CF"}
+              stroke-width={3}
+              stroke={"black"}
+            />
+            <Circle
+              id="venus"
+              r={36}
+              fill={"#DC933C"}
+              stroke-width={3}
+              stroke={"black"}
+            />
+            <Circle
+              id="earth"
+              r={38}
+              fill={"#179DD7"}
+              stroke-width={3}
+              stroke={"black"}
+            />
+            <Circle
+              id="mars"
+              r={21}
+              fill={"#F1CF8E"}
+              stroke-width={3}
+              stroke={"black"}
+            />
+            <Align alignment="centerY">
+              <Ref refId="mercury" />
+              <Ref refId="venus" />
+              <Ref refId="earth" />
+              <Ref refId="mars" />
+            </Align>
+            <Distribute direction="horizontal" spacing={50}>
+              <Ref refId="mercury" />
+              <Ref refId="venus" />
+              <Ref refId="earth" />
+              <Ref refId="mars" />
+            </Distribute>
+            {/* <Text id="label" vertical-anchor="start" width={500}>
+            Mercury
+          </Text> */}
+            <Rect id="label" width={20} height={10} fill="magenta" />
+            <Align alignment="centerX">
+              <Ref id="labelrefalign" refId="label" />
+              <Ref id="mercuryrefalign" refId="mercury" />
+            </Align>
+            <Distribute direction="vertical" spacing={60}>
+              <Ref id="mercuryRefDistribute" refId="label" />
+              <Ref id="labelRefDistribute" refId="mercury" />
+            </Distribute>
+            {/* <Background id="background">
+            <Ref refId="mercury" />
+            <Ref refId="venus" />
+            <Ref refId="earth" />
+            <Ref refId="mars" />
+          </Background> */}
+            <Arrow id="arrow">
+              <Ref id="labelRefArrow" refId="label" />
+              <Ref id="mercuryRefArrow" refId="mercury" />
+            </Arrow>
+          </Group>
+        </Bluefish>
         <Bluefish width={500} height={500} padding={20} debug>
           <Background
             id="background"

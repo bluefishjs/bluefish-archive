@@ -9,7 +9,7 @@ import {
 import { Layout } from "./layout";
 import _, { get, startsWith } from "lodash";
 import { maybe, maybeAdd, maybeMax, maybeMin, maybeSub } from "./maybeUtil";
-import { BBox, Id, Transform, useScenegraph } from "./scenegraph";
+import { BBox, Id, Transform, useScenegraph, ChildNode } from "./scenegraph";
 import withBluefish from "./withBluefish";
 import { ArrowOptions, getBoxToBoxArrow } from "perfect-arrows";
 
@@ -39,17 +39,16 @@ export const Arrow = withBluefish((props: ArrowProps) => {
     props
   );
   // const { children, id } = props;
-  const { getBBox, setBBox, ownedByOther } = useScenegraph();
 
-  const layout = (childIds: Id[] /* , getBBox: (id: string) => BBox */) => {
+  const layout = (childIds: ChildNode[]) => {
     childIds = Array.from(childIds);
 
     if (props.id.endsWith("DEBUG")) {
       debugger;
     }
 
-    const fromBBox = getBBox(childIds[0]);
-    const toBBox = getBBox(childIds[1]);
+    const fromBBox = childIds[0].bbox;
+    const toBBox = childIds[1].bbox;
 
     const arrow = getBoxToBoxArrow(
       fromBBox.left ?? 0,

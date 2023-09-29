@@ -41,11 +41,10 @@ export const Layout: Component<LayoutProps> = (props) => {
   const parentId = useContext(ParentIDContext);
   const {
     scenegraph,
-    getBBox,
-    setBBox,
     createNode,
     mergeBBoxAndTransform,
     setCustomData,
+    createChildRepr,
   } = UNSAFE_useScenegraph();
 
   createNode(props.id, parentId);
@@ -81,7 +80,9 @@ export const Layout: Component<LayoutProps> = (props) => {
     // }
     // debugger;
     const { bbox, transform, customData } = props.layout(
-      scenegraph[props.id]?.children /* , getBBox */
+      Array.from(scenegraph[props.id]?.children ?? []).map((childId: Id) =>
+        createChildRepr(props.id, childId)
+      )
     );
     // setBBox(props.id, bbox, props.id, transform);
     mergeBBoxAndTransform(props.id, props.id, bbox, transform);

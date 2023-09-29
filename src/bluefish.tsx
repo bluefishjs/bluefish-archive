@@ -8,6 +8,7 @@ import {
   ParentIDContext,
   Id,
   BBox,
+  ChildNode,
 } from "./scenegraph";
 import { JSX, ParentProps, Show, createUniqueId, mergeProps } from "solid-js";
 
@@ -37,8 +38,7 @@ export function Bluefish(props: BluefishProps) {
   // const bboxStore = useMemo(() => createScenegraph(), []);
   // const bboxStore = createScenegraph();
   const scenegraphContext = createScenegraph();
-  const { scenegraph, createNode, getBBox, ownedByOther, setBBox } =
-    scenegraphContext;
+  const { scenegraph, createNode } = scenegraphContext;
 
   // const autoGenId = useId();
   const autoGenId = createUniqueId();
@@ -69,24 +69,24 @@ export function Bluefish(props: BluefishProps) {
     createNode(id, null);
   }
 
-  const layout = (childIds: Id[]) => {
+  const layout = (childIds: ChildNode[]) => {
     childIds = Array.from(childIds);
 
     // get the bbox of the children
     const bboxes = {
-      left: childIds.map((childId) => getBBox(childId).left),
-      top: childIds.map((childId) => getBBox(childId).top),
-      width: childIds.map((childId) => getBBox(childId).width),
-      height: childIds.map((childId) => getBBox(childId).height),
+      left: childIds.map((childId) => childId.bbox.left),
+      top: childIds.map((childId) => childId.bbox.top),
+      width: childIds.map((childId) => childId.bbox.width),
+      height: childIds.map((childId) => childId.bbox.height),
     };
 
     for (const childId of childIds) {
-      if (!ownedByOther(id, childId, "x")) {
-        setBBox(id, childId, { left: 0 });
+      if (!childId.owned.x) {
+        childId.bbox.left = 0;
       }
 
-      if (!ownedByOther(id, childId, "y")) {
-        setBBox(id, childId, { top: 0 });
+      if (!childId.owned.y) {
+        childId.bbox.top = 0;
       }
     }
 

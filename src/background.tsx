@@ -1,6 +1,6 @@
 import _ from "lodash";
 import Layout from "./layout";
-import { BBox, Id, Transform, useScenegraph } from "./scenegraph";
+import { BBox, ChildNode, Id, Transform, useScenegraph } from "./scenegraph";
 import { JSX } from "solid-js/jsx-runtime";
 import { ParentProps, Show, mergeProps } from "solid-js";
 import { maybeMax, maybeMin, maybeSub } from "./maybeUtil";
@@ -16,7 +16,6 @@ export type BackgroundProps = ParentProps<{
 }>;
 
 export const Background = withBluefish((props: BackgroundProps) => {
-  const { getBBox, setBBox, ownedByOther } = useScenegraph();
   props = mergeProps(
     {
       padding: 10,
@@ -24,7 +23,7 @@ export const Background = withBluefish((props: BackgroundProps) => {
     props
   );
 
-  const layout = (childIds: Id[]) => {
+  const layout = (childIds: ChildNode[]) => {
     // debugger;
     childIds = Array.from(childIds);
 
@@ -36,90 +35,67 @@ export const Background = withBluefish((props: BackgroundProps) => {
 
     let left: number;
     let top: number;
-    if (!ownedByOther(props.id, backgroundChild, "x")) {
+    if (!backgroundChild.owned.x) {
       // infer x from rest
       const x =
         maybeMin(
           rest
-            .filter((childId) => ownedByOther(props.id, childId, "x"))
-            .map((childId) => getBBox(childId).left)
+            .filter((childNode) => childNode.owned.x)
+            .map((childNode) => childNode.bbox.left)
         ) ?? 0;
       left = x - props.padding!;
-      setBBox(props.id, backgroundChild, { left });
+      backgroundChild.bbox.left = left;
     } else {
       throw new Error("Background x must be inferred from children");
     }
-    if (!ownedByOther(props.id, backgroundChild, "y")) {
+    if (!backgroundChild.owned.y) {
       // infer y from rest
       const y =
         maybeMin(
           rest
-            .filter((childId) => ownedByOther(props.id, childId, "y"))
-            .map((childId) => getBBox(childId).top)
+            .filter((childNode) => childNode.owned.y)
+            .map((childNode) => childNode.bbox.top)
         ) ?? 0;
       top = y - props.padding!;
-      setBBox(props.id, backgroundChild, { top });
+      backgroundChild.bbox.top = top;
     } else {
       throw new Error("Background y must be inferred from children");
     }
 
-    if (!ownedByOther(props.id, backgroundChild, "width")) {
+    if (!backgroundChild.owned.width) {
       // infer width from rest
       const right = Math.max(
         ...rest
-          .filter((childId) => ownedByOther(props.id, childId, "x"))
-          .filter((childId) => ownedByOther(props.id, childId, "width"))
-          .map((childId) => getBBox(childId).left! + getBBox(childId).width!)
+          .filter((childNode) => childNode.owned.x && childNode.owned.width)
+          .map((childNode) => childNode.bbox.left! + childNode.bbox.width!)
       );
-      setBBox(props.id, backgroundChild, {
-        width: right - left + props.padding!,
-      });
+      backgroundChild.bbox.width = right - left + props.padding!;
     } else {
       // center all children horizontally in the background
-      const width = getBBox(backgroundChild).width!;
-
       for (const childId of rest) {
-        if (ownedByOther(props.id, childId, "x")) continue;
-        setBBox(props.id, childId, {
-          // left: left + (width - getBBox(childId).width!) / 2,
-          // left: 0,
-          left: left,
-        });
+        if (childId.owned.x) continue;
+        childId.bbox.left = left;
       }
     }
 
-    if (!ownedByOther(props.id, backgroundChild, "height")) {
+    if (!backgroundChild.owned.height) {
       // infer height from rest
       const bottom = Math.max(
         ...rest
-          .filter((childId) => ownedByOther(props.id, childId, "y"))
-          .filter((childId) => ownedByOther(props.id, childId, "height"))
-          .map(
-            (childId) =>
-              (getBBox(childId).top ?? top) + getBBox(childId).height!
-          )
+          .filter((childNode) => childNode.owned.y && childNode.owned.height)
+          .map((childNode) => childNode.bbox.top! + childNode.bbox.height!)
       );
-      setBBox(props.id, backgroundChild, {
-        height: bottom - top + props.padding!,
-      });
+      backgroundChild.bbox.height = bottom - top + props.padding!;
     } else {
       // center all children vertically in the background
-      const height = getBBox(backgroundChild).height!;
-
       for (const childId of rest) {
-        if (ownedByOther(props.id, childId, "y")) continue;
-        const bbox = getBBox(childId);
-        const childHeight = bbox.height!;
-        const top = bbox.top!;
-        setBBox(props.id, childId, {
-          // top: top + (height - childHeight) / 2,
-          top: 0,
-        });
+        if (childId.owned.y) continue;
+        childId.bbox.top = top;
       }
     }
 
     return {
-      bbox: getBBox(backgroundChild),
+      bbox: backgroundChild.bbox,
       transform: {
         translate: {
           x: maybeSub(props.x, left),

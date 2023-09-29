@@ -2,7 +2,7 @@ import { JSX, ParentProps, untrack } from "solid-js";
 import { Layout } from "./layout";
 import _, { get, startsWith } from "lodash";
 import { maybe, maybeAdd, maybeMax, maybeMin, maybeSub } from "./maybeUtil";
-import { BBox, Id, Transform, useScenegraph } from "./scenegraph";
+import { BBox, ChildNode, Id, Transform, useScenegraph } from "./scenegraph";
 import withBluefish from "./withBluefish";
 
 export type Alignment2D =
@@ -100,10 +100,8 @@ export type AlignProps = ParentProps<{
 
 export const Align = withBluefish((props: AlignProps) => {
   // const { children, id } = props;
-  const { getBBox, setBBox, ownedByOther } = useScenegraph();
-
-  const layout = (childIds: Id[] /* , getBBox: (id: string) => BBox */) => {
-    childIds = Array.from(childIds);
+  const layout = (childNodes: ChildNode[]) => {
+    childNodes = Array.from(childNodes);
 
     if (props.id.endsWith("DEBUG")) {
       debugger;
@@ -125,29 +123,29 @@ export const Align = withBluefish((props: AlignProps) => {
     //   }
     // }
 
-    const verticalAlignments = childIds
+    const verticalAlignments = childNodes
       .map((m) => /* m.guidePrimary ?? */ props.alignment)
       .map((alignment) => maybe(alignment, verticalAlignment));
 
-    const horizontalAlignments = childIds
+    const horizontalAlignments = childNodes
       .map((m) => /* m.guidePrimary ?? */ props.alignment)
       .map((alignment) => maybe(alignment, horizontalAlignment));
 
-    const verticalPlaceables = _.zip(childIds, verticalAlignments).filter(
+    const verticalPlaceables = _.zip(childNodes, verticalAlignments).filter(
       ([placeable, alignment]) => alignment !== undefined
     );
 
-    const horizontalPlaceables = _.zip(childIds, horizontalAlignments).filter(
+    const horizontalPlaceables = _.zip(childNodes, horizontalAlignments).filter(
       ([placeable, alignment]) => alignment !== undefined
     );
 
     // TODO: should be able to filter by ownership instead
     const verticalValueArr = verticalPlaceables
-      .filter(([placeable, _]) => ownedByOther(props.id, placeable!, "y"))
+      .filter(([placeable, _]) => placeable!.owned.y)
       .map(([placeable, alignment]) => {
         return [
           placeable,
-          alignment !== undefined ? getBBox(placeable!)[alignment] : undefined,
+          alignment !== undefined ? placeable!.bbox[alignment] : undefined,
         ];
       })
       .filter(
@@ -172,11 +170,11 @@ export const Align = withBluefish((props: AlignProps) => {
     // TODO: we maybe have the invariant that value is always defined when the placeable is owned...
 
     const horizontalValueArr = horizontalPlaceables
-      .filter(([placeable, _]) => ownedByOther(props.id, placeable!, "x"))
+      .filter(([placeable, _]) => placeable!.owned.x)
       .map(([placeable, alignment]) => {
         return [
           placeable,
-          alignment !== undefined ? getBBox(placeable!)[alignment] : undefined,
+          alignment !== undefined ? placeable!.bbox[alignment] : undefined,
         ];
       })
       .filter(
@@ -191,48 +189,47 @@ export const Align = withBluefish((props: AlignProps) => {
         : (horizontalValueArr[0][1] as number);
 
     for (const [placeable, alignment] of verticalPlaceables) {
-      if (ownedByOther(props.id, placeable!, "y")) continue;
+      if (placeable!.owned.y) continue;
       if (alignment === "top") {
-        setBBox(props.id, placeable!, { top: verticalValue });
+        placeable!.bbox.top = verticalValue;
       } else if (alignment === "centerY") {
-        const height = getBBox(placeable!).height;
+        console.log("setting bbox top", verticalValue, placeable!.bbox.height);
+        const height = placeable!.bbox.height;
         if (height === undefined) {
           continue;
         }
-        setBBox(props.id, placeable!, { top: verticalValue - height / 2 });
+        placeable!.bbox.top = verticalValue - height / 2;
       } else if (alignment === "bottom") {
-        setBBox(props.id, placeable!, {
-          top: verticalValue - getBBox(placeable!).height!,
-        });
+        placeable!.bbox.top = verticalValue - placeable!.bbox.height!;
       }
     }
 
     for (const [placeable, alignment] of horizontalPlaceables) {
-      if (ownedByOther(props.id, placeable!, "x")) continue;
+      if (placeable!.owned.x) continue;
       if (alignment === "left") {
-        setBBox(props.id, placeable!, { left: horizontalValue });
+        placeable!.bbox.left = horizontalValue;
       } else if (alignment === "centerX") {
-        const width = getBBox(placeable!).width;
+        const width = placeable!.bbox.width;
         if (width === undefined) {
           continue;
         }
-        setBBox(props.id, placeable!, { left: horizontalValue - width / 2 });
+        placeable!.bbox.left = horizontalValue - width / 2;
       } else if (alignment === "right") {
         // placeable!.right = horizontalValue;
-        const width = getBBox(placeable!).width;
+        const width = placeable!.bbox.width;
         if (width === undefined) {
           continue;
         }
-        setBBox(props.id, placeable!, { left: horizontalValue - width });
+        placeable!.bbox.left = horizontalValue - width;
       }
     }
 
     // TODO: this part seems like it might cause a loop...
     const bboxes = {
-      left: childIds.map((childId) => getBBox(childId).left),
-      top: childIds.map((childId) => getBBox(childId).top),
-      width: childIds.map((childId) => getBBox(childId).width),
-      height: childIds.map((childId) => getBBox(childId).height),
+      left: childNodes.map((childNode) => childNode.bbox.left),
+      top: childNodes.map((childNode) => childNode.bbox.top),
+      width: childNodes.map((childNode) => childNode.bbox.width),
+      height: childNodes.map((childNode) => childNode.bbox.height),
     };
 
     const left = maybeMin(bboxes.left);

@@ -8,6 +8,7 @@ import Distribute from "../distribute";
 import Group from "../group";
 import Ref from "../ref";
 import Text from "../text";
+import Rect from "../rect";
 
 const meta: Meta = {
   title: "Example/Planets",
@@ -65,12 +66,12 @@ export const Planets: Story = {
             Mercury
           </Text>
           <Align alignment="centerX">
-            <Ref id="mercuryRefAlign" refId="label" />
-            <Ref id="labelRefAlign" refId="mercury" />
+            <Ref refId="label" />
+            <Ref refId="mercury" />
           </Align>
           <Distribute direction="vertical" spacing={60}>
-            <Ref id="mercuryRefDistribute" refId="label" />
-            <Ref id="labelRefDistribute" refId="mercury" />
+            <Ref refId="label" />
+            <Ref refId="mercury" />
           </Distribute>
           <Background id="background">
             <Ref refId="mercury" />
@@ -79,8 +80,8 @@ export const Planets: Story = {
             <Ref refId="mars" />
           </Background>
           <Arrow id="arrow">
-            <Ref id="labelRefArrow" refId="label" />
-            <Ref id="mercuryRefArrow" refId="mercury" />
+            <Ref refId="label" />
+            <Ref refId="mercury" />
           </Arrow>
         </Group>
       </Bluefish>
