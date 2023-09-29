@@ -100,7 +100,7 @@ export type AlignProps = ParentProps<{
 
 export const Align = withBluefish((props: AlignProps) => {
   // const { children, id } = props;
-  const { getBBox, setBBox, ownedByUs, ownedByOther } = useScenegraph();
+  const { getBBox, setBBox, ownedByOther } = useScenegraph();
 
   const layout = (childIds: Id[] /* , getBBox: (id: string) => BBox */) => {
     childIds = Array.from(childIds);
@@ -143,7 +143,7 @@ export const Align = withBluefish((props: AlignProps) => {
 
     // TODO: should be able to filter by ownership instead
     const verticalValueArr = verticalPlaceables
-      .filter(([placeable, _]) => !ownedByUs(props.id, placeable!, "y"))
+      .filter(([placeable, _]) => ownedByOther(props.id, placeable!, "y"))
       .map(([placeable, alignment]) => {
         return [
           placeable,
@@ -172,7 +172,7 @@ export const Align = withBluefish((props: AlignProps) => {
     // TODO: we maybe have the invariant that value is always defined when the placeable is owned...
 
     const horizontalValueArr = horizontalPlaceables
-      .filter(([placeable, _]) => !ownedByUs(props.id, placeable!, "x"))
+      .filter(([placeable, _]) => ownedByOther(props.id, placeable!, "x"))
       .map(([placeable, alignment]) => {
         return [
           placeable,

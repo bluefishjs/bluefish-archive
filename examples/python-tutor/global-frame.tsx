@@ -27,11 +27,12 @@ export function GlobalFrame(props: GlobalFrameProps) {
       {/* TODO: there is a bug where the text is showing up lower than I expect it to... */}
       <Text
         id={`label${id}`}
-        contents={"Global Frame"}
         font-size={"24px"}
         font-family={fontFamily}
         fill={"black"}
-      />
+      >
+        Global Frame
+      </Text>
       {/* <Rect id={`label${id}`} fill="black" width={100} height={20} /> */}
       <Align alignment="topCenter">
         <Ref refId={`label${id}`} />

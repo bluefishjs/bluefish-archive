@@ -519,28 +519,6 @@ the align node.
     mergeBBoxAndTransform(owner, resolvedId, proposedBBox, proposedTransform);
   };
 
-  const ownedByUs = (
-    id: Id, // with respect to this node
-    check: Id, // do we own this node
-    axis: "x" | "y" | "width" | "height" // along this axis
-  ): boolean => {
-    // debugger;
-    const { id: resolvedId } = resolveRef(check);
-    const node = scenegraph[resolvedId] as ScenegraphNode & { type: "node" }; // guaranteed by resolveRef
-
-    if (axis === "x") {
-      return node.transformOwners.translate.x === id;
-    } else if (axis === "y") {
-      return node.transformOwners.translate.y === id;
-    } else if (axis === "width") {
-      return node.bboxOwners.width === id;
-    } else if (axis === "height") {
-      return node.bboxOwners.height === id;
-    } else {
-      throw new Error("ownedByUs: axis is neither x nor y");
-    }
-  };
-
   const ownedByOther = (
     id: Id, // with respect to this node
     check: Id, // is this node already owned
@@ -585,7 +563,7 @@ the align node.
     setCustomData,
     getBBox,
     setBBox,
-    ownedByUs,
+    // ownedByUs,
     ownedByOther,
   };
 };
@@ -604,11 +582,11 @@ export type ScenegraphContextType = {
   setCustomData: (id: Id, customData: any) => void;
   getBBox: (id: Id) => BBox;
   setBBox: (owner: Id, id: Id, bbox: BBox) => void;
-  ownedByUs: (
-    id: Id,
-    check: Id,
-    axis: "x" | "y" | "width" | "height"
-  ) => boolean;
+  // ownedByUs: (
+  //   id: Id,
+  //   check: Id,
+  //   axis: "x" | "y" | "width" | "height"
+  // ) => boolean;
   ownedByOther: (
     id: Id,
     check: Id,
@@ -627,8 +605,8 @@ export const useScenegraph = () => {
     throw new Error("useScenegraph must be used within a ScenegraphProvider");
   }
 
-  const { getBBox, setBBox, ownedByUs, ownedByOther } = context;
-  return { getBBox, setBBox, ownedByUs, ownedByOther };
+  const { getBBox, setBBox, ownedByOther } = context;
+  return { getBBox, setBBox, ownedByOther };
 };
 
 export const UNSAFE_useScenegraph = () => {

@@ -37,7 +37,7 @@ export function Bluefish(props: BluefishProps) {
   // const bboxStore = useMemo(() => createScenegraph(), []);
   // const bboxStore = createScenegraph();
   const scenegraphContext = createScenegraph();
-  const { scenegraph, createNode, getBBox, ownedByOther, ownedByUs, setBBox } =
+  const { scenegraph, createNode, getBBox, ownedByOther, setBBox } =
     scenegraphContext;
 
   // const autoGenId = useId();
@@ -81,11 +81,11 @@ export function Bluefish(props: BluefishProps) {
     };
 
     for (const childId of childIds) {
-      if (!ownedByOther(id, childId, "x") && !ownedByUs(id, childId, "x")) {
+      if (!ownedByOther(id, childId, "x")) {
         setBBox(id, childId, { left: 0 });
       }
 
-      if (!ownedByOther(id, childId, "y") && !ownedByUs(id, childId, "y")) {
+      if (!ownedByOther(id, childId, "y")) {
         setBBox(id, childId, { top: 0 });
       }
     }

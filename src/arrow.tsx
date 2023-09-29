@@ -39,7 +39,7 @@ export const Arrow = withBluefish((props: ArrowProps) => {
     props
   );
   // const { children, id } = props;
-  const { getBBox, setBBox, ownedByUs, ownedByOther } = useScenegraph();
+  const { getBBox, setBBox, ownedByOther } = useScenegraph();
 
   const layout = (childIds: Id[] /* , getBBox: (id: string) => BBox */) => {
     childIds = Array.from(childIds);

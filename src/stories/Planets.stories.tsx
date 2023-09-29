@@ -7,7 +7,7 @@ import Circle from "../circle";
 import Distribute from "../distribute";
 import Group from "../group";
 import Ref from "../ref";
-import Text from "../text/text";
+import Text from "../text";
 
 const meta: Meta = {
   title: "Example/Planets",

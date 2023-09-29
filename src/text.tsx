@@ -1,59 +1,73 @@
-import _ from "lodash";
-import { measureText } from "./measure-text";
-import { JSX } from "solid-js/jsx-runtime";
+import { For, Ref, mergeProps, splitProps } from "solid-js";
+import { TextProps } from "./text/types";
+import useText from "./text/useText";
+import { BBox, Transform } from "./scenegraph";
 import Layout from "./layout";
-import { BBox, Id, Transform } from "./scenegraph";
-import { mergeProps, splitProps } from "solid-js";
+import computeBoundingBox from "./text/textBBox";
+import withBluefish from "./withBluefish";
 
-// TODO: allow text within the text element instead of on contents arg
+const SVG_STYLE = { overflow: "visible" };
 
-export type TextProps = JSX.TextSVGAttributes<SVGTextElement> & {
-  id: Id;
-  contents: string;
-} & Partial<{
-    x: number;
-    y: number;
-  }>;
-
-export function Text(props: TextProps) {
-  const [_, rest] = splitProps(props, ["contents", "id"]);
-
-  const mergedFont = mergeProps(
+export const Text = withBluefish((props: TextProps) => {
+  props = mergeProps(
     {
-      "font-style": "normal",
-      "font-family": "sans-serif",
-      "font-size": "12px",
-      "font-weight": "normal",
-    },
+      // dx: 0,
+      // dy: 0,
+      "text-anchor": "start",
+      "vertical-anchor": "end",
+      "line-height": "1em",
+      "cap-height": "0.71em", // Magic number from d3
+      "font-family": "Alegreya Sans, sans-serif",
+      "font-weight": 700,
+      "font-size": "14",
+      x: 0,
+      y: 0,
+    } as const,
     props
   );
 
-  const measurements = () =>
-    measureText(
-      props.contents,
-      `${mergedFont["font-style"] ?? ""} ${mergedFont["font-weight"] ?? ""} ${
-        mergedFont["font-size"] ?? ""
-      } ${mergedFont["font-family"] ?? ""}`
-    );
+  const [_, textProps] = splitProps(props, [
+    "id",
+    "dx",
+    "dy",
+    "innerRef",
+    "innerTextRef",
+    "vertical-anchor",
+    "angle",
+    "line-height",
+    "scaleToFit",
+    "cap-height",
+    "width",
+  ]);
 
-  const layout = (childIds: Id[]) => {
-    childIds = Array.from(childIds);
+  const { wordsByLines, startDy, transform } = useText(props);
+
+  const layout = () => {
+    const bbox = computeBoundingBox(
+      mergeProps(props, {
+        get wordsByLines() {
+          return wordsByLines();
+        },
+        get startDy() {
+          return startDy();
+        },
+        get transform() {
+          return transform();
+        },
+      })
+    );
 
     return {
       bbox: {
-        left: measurements().left,
-        // left: 0,
-        // right: measurements.right,
-        width: measurements().right - measurements().left,
-        top: measurements().fontTop,
-        // top: 0,
-        height: measurements().fontHeight,
-        // bottom: measurements.fontDescent,
+        left: bbox.x,
+        top: bbox.y,
+        width: bbox.width,
+        height: bbox.height,
       },
       transform: {
         translate: {
-          // x: props.x,
-          // y: props.y,
+          x: props.dx !== undefined ? parseFloat(`${props.dx}`) : undefined,
+          y: props.dy !== undefined ? parseFloat(`${props.dy}`) : undefined,
         },
       },
     };
@@ -61,27 +75,31 @@ export function Text(props: TextProps) {
 
   const paint = (paintProps: { bbox: BBox; transform: Transform }) => {
     return (
-      <text
-        {...rest}
-        // TODO: I'm not sure why this is necessary to get the text be positioned correctly...
-        alignment-baseline="hanging"
-        x={
-          (paintProps.bbox.left ?? 0) +
-          (paintProps.transform.translate.x ?? 0) /* +
-            measurements().left */
-        }
-        y={
-          (paintProps.bbox.top ?? 0) +
-          (paintProps.transform.translate.y ?? 0) /* +
-            measurements().fontTop */
-        }
+      <g
+        ref={props.innerRef}
+        transform={`translate(${paintProps.transform.translate.x}, ${paintProps.transform.translate.y})`}
+        style={SVG_STYLE}
       >
-        {props.contents}
-      </text>
+        {wordsByLines().length > 0 ? (
+          <text ref={props.innerTextRef} transform={transform()} {...textProps}>
+            <For each={wordsByLines()}>
+              {(line, index) => (
+                <tspan
+                  x={props.x}
+                  dy={index() === 0 ? startDy() : props["line-height"]}
+                  cap-height={props["cap-height"]}
+                >
+                  {line.words.join(" ")}
+                </tspan>
+              )}
+            </For>
+          </text>
+        ) : null}
+      </g>
     );
   };
 
   return <Layout id={props.id} layout={layout} paint={paint} />;
-}
+});
 
 export default Text;

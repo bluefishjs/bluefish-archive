@@ -17,10 +17,12 @@ import PythonTutor from "../examples/python-tutor/python-tutor";
 import { pointer, stackSlot, tuple } from "../examples/python-tutor/types";
 import Circle from "../src/circle";
 import Background from "../src/background";
-import Text from "../src/text/text";
+import Text from "../src/text";
 import Arrow from "../src/arrow";
 import { Plot } from "../src/plot/plot";
 import { Dot } from "../src/plot/dot";
+import { Blob } from "../src/blob";
+import { PaperScope, Path, Point, Size } from "paper/dist/paper-core";
 
 const arr = Array.from({ length: 1000 }, (_, i) => i + 1);
 
@@ -34,6 +36,54 @@ const App: Component = () => {
   const [verticalAlignment, setVerticalAlignment] = createSignal("centerY");
 
   const [alignment, setAlignment] = createSignal("center");
+
+  const canvas = document.createElement("canvas");
+  const paperScope = new PaperScope();
+  paperScope.setup(canvas);
+  const dims = {
+    x: 50,
+    y: 25,
+    width: 200,
+    height: 100,
+  };
+  let myPath = new Path.Rectangle(
+    new Point(dims.x, dims.y),
+    new Size(dims.width, dims.height)
+  );
+  // const myPath = new Path();
+  // myPath.add(new Point(50, 75));
+  // myPath.add(new Point(50, 25));
+  // myPath.add(new Point(150, 25));
+  // myPath.add(new Point(150, 75));
+  myPath.insert(
+    4,
+    new Point(
+      dims.x + dims.width / 2,
+      dims.y + dims.height - (dims.height * 5) / 50
+    )
+  );
+
+  const dims2 = {
+    x: 50,
+    y: 50,
+    width: 100,
+    height: 50,
+  };
+  let myPath2 = new Path.Rectangle(
+    new Point(dims2.x, dims2.y),
+    new Size(dims2.width, dims2.height)
+  );
+  myPath2.insert(
+    2,
+    new Point(dims2.x + dims2.width / 2, dims2.y + (dims2.height * 5) / 50)
+  );
+  myPath2.insert(
+    5,
+    new Point(
+      dims2.x + dims2.width / 2,
+      dims2.y + dims2.height - (dims2.height * 5) / 50
+    )
+  );
 
   return (
     <>
@@ -77,6 +127,62 @@ const App: Component = () => {
         <option value="right">right</option>
       </select>
       <div>
+        <Bluefish width={500} height={500} padding={20} debug>
+          <Background
+            id="background"
+            x={10}
+            y={10}
+            padding={20}
+            background={() => (
+              <Blob
+                id="blob"
+                path={myPath}
+                stroke="black"
+                stroke-width={3}
+                fill="lightgreen"
+              />
+            )}
+          >
+            <Text id="x">x</Text>
+            <Background
+              id="background2"
+              background={() => (
+                <Blob
+                  id="blob2"
+                  path={myPath2}
+                  stroke="black"
+                  stroke-width={3}
+                  fill={"palegreen"}
+                />
+              )}
+            >
+              <Text id="borel">Borel sets</Text>
+            </Background>
+            <Align id="align" alignment="centerY">
+              <Ref refId="x" />
+              <Ref refId="blob2" />
+            </Align>
+            <Distribute id="distribute" direction="horizontal" spacing={20}>
+              <Ref id="ref-background2" refId="background2" />
+              <Ref id="ref-x" refId="x" />
+            </Distribute>
+          </Background>
+          {/* <Text id="text" vertical-anchor="start" width={500}>
+            label
+          </Text>
+          <Align alignment="centerX">
+            <Ref refId="text" />
+            <Ref refId="background" />
+          </Align>
+          <Distribute direction="vertical" spacing={20}>
+            <Ref refId="background" />
+            <Ref refId="text" />
+          </Distribute>
+          <Arrow flip>
+            <Ref refId="text" />
+            <Ref refId="circle" />
+          </Arrow> */}
+        </Bluefish>
         {/* {wordArr().length}
         <Bluefish id="visx-text" width={1000} height={500}>
           <Text
@@ -144,202 +250,6 @@ const App: Component = () => {
             </Arrow>
           </Group>
         </Bluefish>
-        <Bluefish>
-          <Circle r={15} fill={"#0E2954"} stroke-width={2} stroke={"#272829"} />
-        </Bluefish>
-        <Bluefish width={500} height={500}>
-          <Group x={10} y={10}>
-            <Background
-              background={() => (
-                <Rect
-                  stroke="black"
-                  fill="none"
-                  stroke-width="3"
-                  stroke-dasharray="5,5"
-                  rx={6}
-                />
-              )}
-            >
-              <Circle
-                r={15}
-                fill={"#0E2954"}
-                stroke-width={2}
-                stroke={"#272829"}
-              />
-            </Background>
-          </Group>
-        </Bluefish>
-        {/* <Bluefish id="bluefish-waterfall" width={1000} height={500}>
-          <For each={arr}>
-            {(item) => (
-              <Rect
-                id={`rect-${item}`}
-                width={20}
-                height={item * 20}
-                fill="steelblue"
-              />
-            )}
-          </For>
-          <Distribute direction="vertical" spacing={0}>
-            <For each={arr}>{(item) => <Ref refId={`rect-${item}`} />}</For>
-          </Distribute>
-          <Distribute direction="horizontal" spacing={x()}>
-            <For each={arr}>{(item) => <Ref refId={`rect-${item}`} />}</For>
-          </Distribute>
-        </Bluefish> */}
-        {/* <Bluefish id="bluefish-pythontutor-test" width={1000} height={500}>
-          <PythonTutor
-            stack={[
-              stackSlot("a", pointer(0)),
-              stackSlot("b", pointer(1)),
-              stackSlot("x", 5),
-            ]}
-            heap={[
-              tuple([1, pointer(1), pointer(2)]),
-              tuple([1, 4]),
-              tuple([3, 10]),
-            ]}
-            heapArrangement={[
-              [0, null, null],
-              [null, 1, 2],
-            ]}
-          />
-        </Bluefish> */}
-        {/* <Bluefish id="bluefish-heapobjecttest" width={1000} height={200}>
-          <HeapObject
-            objectType="tuple"
-            objectValues={[
-              { type: "string", value: "1" },
-              { type: "string", value: "2" },
-            ]}
-          />
-        </Bluefish>
-        <Bluefish id="bluefish-elmtupletest" width={1000} height={200}>
-          <ElmTuple
-            tupleIndex="0"
-            tupleData={{ type: "string", value: "1" }}
-            objectId="fooooo"
-          />
-        </Bluefish> */}
-        {/* <Bluefish id="bluefish-globalframetest" width={1000} height={200}>
-          <GlobalFrame
-            id={`globalFrame`}
-            variables={[
-              {
-                variable: "x",
-                value: "1",
-              },
-              {
-                variable: "y",
-                value: "2",
-              },
-              {
-                variable: "z",
-                value: "3",
-              },
-            ]}
-          />
-        </Bluefish> */}
-        {/* <Bluefish id="bluefish5" width={500} height={500}>
-          <Rect
-            id="rect1"
-            x={x()}
-            y={0}
-            width={100}
-            height={150}
-            fill="steelblue"
-          />
-          <Rect id="rect2" width={50} height={50} fill="lightgreen" />
-          <Align
-            id="align"
-            alignment={verticalAlignment() as AlignmentVertical}
-          >
-            <Ref id="ref1" refId="rect1" />
-            <Ref id="ref2" refId="rect2" />
-          </Align>
-          <Align
-            id="align.5"
-            alignment={horizontalAlignment() as AlignmentHorizontal}
-          >
-            <Ref id="ref1" refId="rect1" />
-            <Ref id="ref2" refId="rect2" />
-          </Align>
-          <Align id="align2" alignment={alignment() as Alignment2D}>
-            <Ref id="ref3" refId="rect2" />
-            <Rect id="rect3" width={20} height={30} fill="magenta" />
-          </Align>
-        </Bluefish> */}
-        {/* <Bluefish id="bluefish" width={1000} height={200}>
-          <Rect
-            id="rect"
-            x={x()}
-            y={45}
-            width={100}
-            height={150}
-            fill="steelblue"
-          />
-        </Bluefish>
-        <Bluefish id="bluefish2" width={500} height={500}>
-          <Align
-            id="align"
-            alignment={alignment() as Alignment2D}
-            x={x()}
-            y={0}
-          >
-            <Rect id="rect1" width={100} height={150} fill="steelblue" />
-            <Rect id="rect2" width={50} height={50} fill="lightgreen" />
-          </Align>
-        </Bluefish> */}
-        {/* <Bluefish id="bluefish3" width={500} height={200}>
-          <Rect
-            id="rect1"
-            x={x()}
-            y={0}
-            width={100}
-            height={150}
-            fill="steelblue"
-          />
-          <Rect id="rect2" width={50} height={50} fill="lightgreen" /> */}
-        {/* NOTE: this update to x is ignored b/c the ref resolution already sets the position of Align */}
-        {/* <Align id="align" x={0} alignment={alignment() as Alignment2D}>
-            <Ref id="ref1" refId="rect1" />
-            <Ref id="ref2" refId="rect2" />
-          </Align>
-        </Bluefish> */}
-        {/* <Bluefish id="bluefish4" width={500} height={500}>
-          <Rect
-            id="rect1"
-            x={x()}
-            y={0}
-            width={100}
-            height={150}
-            fill="steelblue"
-          />
-          <Rect id="rect2" width={50} height={50} fill="lightgreen" />
-          <Align id="align" alignment={alignment() as Alignment2D}>
-            <Ref id="ref1" refId="rect1" />
-            <Ref id="ref2" refId="rect2" />
-          </Align>
-          <Align id="align2" alignment={alignment() as Alignment2D}>
-            <Ref id="ref3" refId="rect2" />
-            <Rect id="rect3" width={20} height={30} fill="magenta" />
-          </Align>
-        </Bluefish>
-        <Bluefish id="bluefish4.5" width={500} height={500}>
-          <Align
-            id="align"
-            x={x()}
-            y={0}
-            alignment={alignment() as Alignment2D}
-          >
-            <Rect id="rect1" width={100} height={150} fill="steelblue" />
-            <Rect id="rect2" width={50} height={50} fill="lightgreen" />
-          </Align>
-          <Align id="align2" alignment={alignment() as Alignment2D}>
-            <Ref id="ref3" refId="rect2" />
-            <Rect id="rect3" width={20} height={30} fill="magenta" />
-          </Align>
-        </Bluefish> */}
       </div>
     </>
   );
