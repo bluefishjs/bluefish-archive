@@ -123,8 +123,10 @@ export function Bluefish(props: BluefishProps) {
     transform: Transform;
     children: JSX.Element;
   }) => {
-    const width = () => paintProps.bbox.width! + props.padding! * 2;
-    const height = () => paintProps.bbox.height! + props.padding! * 2;
+    const width = () =>
+      props.width ?? paintProps.bbox.width! + props.padding! * 2;
+    const height = () =>
+      props.height ?? paintProps.bbox.height! + props.padding! * 2;
 
     return (
       <svg
