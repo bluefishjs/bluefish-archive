@@ -9,6 +9,8 @@ import Group from "../group";
 import Ref from "../ref";
 import Text from "../text";
 import Rect from "../rect";
+import { Row } from "../row";
+import { Col } from "../col";
 
 const meta: Meta = {
   title: "Example/Planets",
@@ -17,7 +19,7 @@ const meta: Meta = {
 export default meta;
 type Story = StoryObj;
 
-export const Planets: Story = {
+export const PlanetsAlignDistribute: Story = {
   render: () => {
     return (
       <Bluefish id="bluefish-planets" padding={20}>
@@ -73,6 +75,63 @@ export const Planets: Story = {
             <Ref refId="label" />
             <Ref refId="mercury" />
           </Distribute>
+          <Background id="background">
+            <Ref refId="mercury" />
+            <Ref refId="venus" />
+            <Ref refId="earth" />
+            <Ref refId="mars" />
+          </Background>
+          <Arrow id="arrow">
+            <Ref refId="label" />
+            <Ref refId="mercury" />
+          </Arrow>
+        </Group>
+      </Bluefish>
+    );
+  },
+};
+
+export const PlanetsRowCol: Story = {
+  render: () => {
+    return (
+      <Bluefish id="bluefish-planets" padding={20}>
+        <Group x={10} y={10}>
+          <Row x={0} y={0} spacing={50}>
+            <Circle
+              id="mercury"
+              r={15}
+              fill={"#EBE3CF"}
+              stroke-width={3}
+              stroke={"black"}
+            />
+            <Circle
+              id="venus"
+              r={36}
+              fill={"#DC933C"}
+              stroke-width={3}
+              stroke={"black"}
+            />
+            <Circle
+              id="earth"
+              r={38}
+              fill={"#179DD7"}
+              stroke-width={3}
+              stroke={"black"}
+            />
+            <Circle
+              id="mars"
+              r={21}
+              fill={"#F1CF8E"}
+              stroke-width={3}
+              stroke={"black"}
+            />
+          </Row>
+          <Col spacing={60}>
+            <Text id="label" vertical-anchor="start" width={500}>
+              Mercury
+            </Text>
+            <Ref refId="mercury" />
+          </Col>
           <Background id="background">
             <Ref refId="mercury" />
             <Ref refId="venus" />
