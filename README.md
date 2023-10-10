@@ -1,14 +1,9 @@
-## Usage
-
-Those templates dependencies are maintained via [pnpm](https://pnpm.io) via `pnpm up -Lri`.
-
-This is the reason you see a `pnpm-lock.yaml`. That being said, any package manager will work. This file can be safely be removed once you clone a template.
-
-```bash
-$ pnpm install
-```
-
-### Learn more on the [Solid Website](https://solidjs.com) and come chat with us on our [Discord](https://discord.com/invite/solidjs)
+<div align="center" style="display:flex;flex-direction:column;">
+  <a href="https://bluefishjs.org/">
+    <img src="https://user-images.githubusercontent.com/21694516/201784429-63718d1c-8f1b-4077-88db-9deaafdb925b.png" alt="Bluefish" width="20%">
+  </a>
+  <h3>Create beautiful, customizable visualizations in SolidJS.</h3>
+</div>
 
 ## Available Scripts
 
