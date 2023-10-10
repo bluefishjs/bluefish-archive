@@ -57,13 +57,6 @@ export const Text = withBluefish((props: TextProps) => {
   const { wordsByLines, startDy, transform } = useText(props);
 
   const layout = () => {
-    console.log(
-      "layout",
-      props.children,
-      wordsByLines(),
-      startDy(),
-      transform()
-    );
     const bbox = computeBoundingBox(
       mergeProps(props, {
         get wordsByLines() {

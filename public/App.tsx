@@ -26,6 +26,7 @@ import { PaperScope, Path, Point, Size } from "paper/dist/paper-core";
 import { Space } from "../examples/topology/space";
 import { Neighborhood } from "../examples/topology/neighborhood";
 import { Image } from "../examples/topology/image";
+import { Col } from "../src/col";
 
 const arr = Array.from({ length: 1000 }, (_, i) => i + 1);
 
@@ -131,53 +132,21 @@ const App: Component = () => {
       </select>
       <div>
         <Bluefish width={500} height={500}>
-          <Group x={0} y={0}>
-            <Text id="pizza dough" font-size="18pt">
-              Pizza dough
-            </Text>
-            <Text id="flour">2 cup flour</Text>
-            <Text id="salt">2 t. salt</Text>
-            <Align alignment="right">
-              <Ref refId="pizza dough" />
-              <Ref refId="flour" />
-            </Align>
-            <Distribute direction="vertical" spacing={10}>
-              <Ref refId="pizza dough" />
-              <Ref refId="flour" />
-            </Distribute>
-            <Align alignment="right">
-              <Ref refId="flour" />
-              <Ref refId="salt" />
-            </Align>
-            <Distribute direction="vertical" spacing={0}>
-              <Ref refId="flour" />
-              <Ref refId="salt" />
-            </Distribute>
-            <Text id="water">1 cup water</Text>
-            <Text id="olive oil">2 T olive oil</Text>
-            <Text id="yeast">2 t. yeast</Text>
-            <Text id="honey">2 t. honey</Text>
-            <Align alignment="right">
-              <Ref refId="salt" />
-              <Ref refId="water" />
-            </Align>
-            <Distribute direction="vertical" spacing={10}>
-              <Ref refId="salt" />
-              <Ref refId="water" />
-            </Distribute>
-            <Align alignment="right">
-              <Ref refId="water" />
-              <Ref refId="olive oil" />
-              <Ref refId="yeast" />
-              <Ref refId="honey" />
-            </Align>
-            <Distribute direction="vertical" spacing={0}>
-              <Ref refId="water" />
-              <Ref refId="olive oil" />
-              <Ref refId="yeast" />
-              <Ref refId="honey" />
-            </Distribute>
-          </Group>
+          <Col x={0} y={0} alignment="right" spacing={10}>
+            <Text font-size="18pt">Pizza dough</Text>
+            <Col alignment="right" spacing={20}>
+              <Col alignment="right" spacing={0}>
+                <Text id="flour">2 cup flour</Text>
+                <Text id="salt">2 t. salt</Text>
+              </Col>
+              <Col alignment="right" spacing={0}>
+                <Text id="water">1 cup water</Text>
+                <Text id="olive oil">2 T olive oil</Text>
+                <Text id="yeast">2 t. yeast</Text>
+                <Text id="honey">2 t. honey</Text>
+              </Col>
+            </Col>
+          </Col>
         </Bluefish>
         <br />
         {/* <Bluefish width={500} height={500}>

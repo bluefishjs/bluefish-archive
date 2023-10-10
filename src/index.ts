@@ -7,8 +7,23 @@ export type {
   AlignmentVertical,
 } from "./align";
 
+export { Arrow } from "./arrow";
+export type { ArrowProps } from "./arrow";
+
+export { Background } from "./background";
+export type { BackgroundProps } from "./background";
+
+export { Blob } from "./blob";
+export type { BlobProps } from "./blob";
+
 export { Bluefish } from "./bluefish";
 export type { BluefishProps } from "./bluefish";
+
+export { Circle } from "./circle";
+export type { CircleProps } from "./circle";
+
+export { Col } from "./col";
+export type { ColProps } from "./col";
 
 export { Distribute } from "./distribute";
 export type { DistributeProps } from "./distribute";
@@ -19,14 +34,17 @@ export type { GroupProps } from "./group";
 export { Layout } from "./layout";
 export type { LayoutProps } from "./layout";
 
-export { Ref } from "./ref";
-export type { RefProps } from "./ref";
-
 export { Rect } from "./rect";
 export type { RectProps } from "./rect";
 
+export { Ref } from "./ref";
+export type { RefProps } from "./ref";
+
+export { Row } from "./row";
+export type { RowProps } from "./row";
+
 export { Text } from "./text";
-export type { TextProps } from "./text";
+export type { TextProps } from "./text/types";
 
 export { withBluefish } from "./withBluefish";
 
