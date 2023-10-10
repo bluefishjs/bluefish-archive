@@ -1,4 +1,4 @@
-import { Scenegraph } from "./scenegraph";
+import { Scenegraph } from "../scenegraph";
 
 export type Tree = { [key: string]: { parent: string | null } };
 

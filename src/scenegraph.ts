@@ -1,21 +1,13 @@
 import { SetStoreFunction, createStore, produce } from "solid-js/store";
-import { getLCAChainSuffixes } from "./lcaUtil";
+import { getLCAChainSuffixes } from "./util/lca";
 import _ from "lodash";
-import { maybeAdd, maybeAddAll, maybeDiv, maybeSub } from "./maybeUtil";
+import { maybeAdd, maybeAddAll, maybeDiv, maybeSub } from "./util/maybe";
 import { createContext, useContext } from "solid-js";
+import { BBox } from "./util/bbox";
 
 export type Id = string;
 
-export type BBox = {
-  left?: number;
-  top?: number;
-  right?: number;
-  bottom?: number;
-  centerX?: number;
-  centerY?: number;
-  width?: number;
-  height?: number;
-};
+export type { BBox };
 
 export type BBoxOwners = { [key in keyof BBox]?: Id };
 

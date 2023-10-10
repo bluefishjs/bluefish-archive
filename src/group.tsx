@@ -8,7 +8,7 @@ import {
   maybeMin,
   maybeSub,
   minOfMaybes,
-} from "./maybeUtil";
+} from "./util/maybe";
 import { startsWith } from "lodash";
 import withBluefish from "./withBluefish";
 

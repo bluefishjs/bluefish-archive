@@ -3,7 +3,7 @@ import Layout from "./layout";
 import { BBox, ChildNode, Id, Transform, useScenegraph } from "./scenegraph";
 import { JSX } from "solid-js/jsx-runtime";
 import { ParentProps } from "solid-js";
-import { maybeMax } from "./maybeUtil";
+import { maybeMax } from "./util/maybe";
 import withBluefish from "./withBluefish";
 
 // export type DistributeProps = SpaceVerticalProps | SpaceHorizontalProps;

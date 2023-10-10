@@ -1,6 +1,7 @@
 import { Ref } from "solid-js";
 import { JSX } from "solid-js/jsx-runtime";
 import { Id } from "../scenegraph";
+import { Delimiter } from "./splitAtDelimiters";
 
 type SVGTSpanProps = JSX.TSpanSVGAttributes<SVGTSpanElement>;
 type SVGTextProps = JSX.TextSVGAttributes<SVGTextElement>;
@@ -44,6 +45,8 @@ type OwnProps = {
   width?: number;
   /** String (or number coercible to one) to be styled and positioned. */
   children?: string | number;
+
+  delimiters?: Delimiter[];
 };
 
 export type TextProps = OwnProps &

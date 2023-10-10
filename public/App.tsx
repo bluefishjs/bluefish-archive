@@ -23,6 +23,9 @@ import { Plot } from "../src/plot/plot";
 import { Dot } from "../src/plot/dot";
 import { Blob } from "../src/blob";
 import { PaperScope, Path, Point, Size } from "paper/dist/paper-core";
+import { Space } from "../examples/topology/space";
+import { Neighborhood } from "../examples/topology/neighborhood";
+import { Image } from "../examples/topology/image";
 
 const arr = Array.from({ length: 1000 }, (_, i) => i + 1);
 
@@ -127,86 +130,130 @@ const App: Component = () => {
         <option value="right">right</option>
       </select>
       <div>
-        <Bluefish width={500} height={500} padding={20} debug>
-          <Background
-            id="background"
-            x={10}
-            y={10}
-            padding={20}
-            background={() => (
-              <Blob
-                id="blob"
-                path={myPath}
-                stroke="black"
-                stroke-width={3}
-                fill="lightgreen"
-              />
-            )}
-          >
-            <Text id="x" font-size={"20px"} vertical-anchor="start">
-              x
+        <Bluefish width={500} height={500}>
+          <Group x={0} y={0}>
+            <Text id="pizza dough" font-size="18pt">
+              Pizza dough
             </Text>
-            <Background
-              id="background2"
-              background={() => (
-                <Blob
-                  id="blob2"
-                  path={myPath2}
-                  stroke="black"
-                  stroke-width={3}
-                  fill={"palegreen"}
-                />
-              )}
-            >
-              <Text vertical-anchor="start">Borel sets</Text>
-            </Background>
-            <Align id="align" alignment="centerY">
-              <Ref refId="x" />
-              <Ref refId="blob2" />
+            <Text id="flour">2 cup flour</Text>
+            <Text id="salt">2 t. salt</Text>
+            <Align alignment="right">
+              <Ref refId="pizza dough" />
+              <Ref refId="flour" />
             </Align>
-            <Distribute id="distribute" direction="horizontal" spacing={50}>
-              <Ref id="ref-background2" refId="background2" />
-              <Ref id="ref-x" refId="x" />
+            <Distribute direction="vertical" spacing={10}>
+              <Ref refId="pizza dough" />
+              <Ref refId="flour" />
             </Distribute>
-          </Background>
-          <Text id="text" vertical-anchor="start" width={65}>
-            {"f^{-1}(N) lives here!"}
-          </Text>
-          <Align alignment="centerX">
-            <Ref refId="text" />
-            <Ref refId="background" />
-          </Align>
-          <Distribute direction="vertical" spacing={20}>
-            <Ref refId="background" />
-            <Ref refId="text" />
-          </Distribute>
-          <Arrow flip>
-            <Ref refId="text" />
-            <Ref refId="x" />
-          </Arrow>
+            <Align alignment="right">
+              <Ref refId="flour" />
+              <Ref refId="salt" />
+            </Align>
+            <Distribute direction="vertical" spacing={0}>
+              <Ref refId="flour" />
+              <Ref refId="salt" />
+            </Distribute>
+            <Text id="water">1 cup water</Text>
+            <Text id="olive oil">2 T olive oil</Text>
+            <Text id="yeast">2 t. yeast</Text>
+            <Text id="honey">2 t. honey</Text>
+            <Align alignment="right">
+              <Ref refId="salt" />
+              <Ref refId="water" />
+            </Align>
+            <Distribute direction="vertical" spacing={10}>
+              <Ref refId="salt" />
+              <Ref refId="water" />
+            </Distribute>
+            <Align alignment="right">
+              <Ref refId="water" />
+              <Ref refId="olive oil" />
+              <Ref refId="yeast" />
+              <Ref refId="honey" />
+            </Align>
+            <Distribute direction="vertical" spacing={0}>
+              <Ref refId="water" />
+              <Ref refId="olive oil" />
+              <Ref refId="yeast" />
+              <Ref refId="honey" />
+            </Distribute>
+          </Group>
         </Bluefish>
-        {/* {wordArr().length}
-        <Bluefish id="visx-text" width={1000} height={500}>
-          <Text
-            id="text"
-            font-family="Alegreya Sans, sans-serif"
-            font-weight={700}
-            font-size="14"
-            vertical-anchor="start"
-            width={500}
-          >
-            {words()}
-          </Text>
+        <br />
+        {/* <Bluefish width={500} height={500}>
+          <Group x={0} y={0}>
+            <Rect
+              id="rect1"
+              // x={50}
+              // y={100}
+              width={100}
+              height={100}
+              fill="red"
+            />
+            <Rect id="rect2" width={100} height={100} fill="blue" />
+            <Row>
+
+            </Row>
+            <Align id={"align"} x={50} alignment={alignment()}>
+              <Ref id="refr1" refId="rect1" />
+              <Ref id="refr2" refId="rect2" />
+            </Align>
+            <Distribute id={"distribute"} direction="vertical" spacing={50}>
+              <Ref id="refalign" refId="align" />
+              <Ref id="ref-rect2" refId="rect2" />
+            </Distribute>
+          </Group>
         </Bluefish> */}
-        {/* <Txt
-          font-family="Alegreya Sans, sans-serif"
-          font-weight={700}
-          font-size="14"
-          vertical-anchor="start"
-          width={500}
-        >
-          {words()}
-        </Txt> */}
+        {/* <Row>
+  <Space name="X" label="X">
+    <Neighborhood name="U" label="U">
+      <Point name="x" label="x">
+    </Neighborhood>
+  </Space>
+  <Space name="Y" label="Y">
+    <Neighborhood name="V" label="V">
+      <Neighborhood name="f(U)" label="f(U)">
+        <Point name="f(x)" label="f(x)">
+      </Neighborhood>
+    </Neighborhood>
+  </Space>
+</Row>
+<Arrow name="f" label="f">
+  <Ref refId="U" />
+  <Ref refId="f(U)" />
+</Arrow> */}
+        <Bluefish width={1000} height={500}>
+          <Group x={0} y={0}>
+            <Space id="X">
+              <Neighborhood id="U">
+                <Text id="x" vertical-anchor="start">
+                  x
+                </Text>
+              </Neighborhood>
+            </Space>
+            <Space id="Y">
+              <Neighborhood id="V">
+                <Image id="f(U)">
+                  <Text id="f(x)" vertical-anchor="start">
+                    f(x)
+                  </Text>
+                </Image>
+              </Neighborhood>
+            </Space>
+            <Align alignment="centerY">
+              <Ref refId="X" />
+              <Ref refId="Y" />
+            </Align>
+            <Distribute direction="horizontal" spacing={50}>
+              <Ref refId="X" />
+              <Ref refId="Y" />
+            </Distribute>
+            <Arrow padEnd={25}>
+              <Ref refId="U" />
+              <Ref refId="f(U)" />
+            </Arrow>
+          </Group>
+        </Bluefish>
         <br />
         <Bluefish width={300} height={100}>
           <Group x={0} y={0}>

@@ -8,7 +8,7 @@ import {
 } from "solid-js";
 import { Layout } from "./layout";
 import _, { get, startsWith } from "lodash";
-import { maybe, maybeAdd, maybeMax, maybeMin, maybeSub } from "./maybeUtil";
+import { maybe, maybeAdd, maybeMax, maybeMin, maybeSub } from "./util/maybe";
 import { BBox, Id, Transform, useScenegraph, ChildNode } from "./scenegraph";
 import withBluefish from "./withBluefish";
 import { ArrowOptions, getBoxToBoxArrow } from "perfect-arrows";

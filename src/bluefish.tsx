@@ -1,5 +1,5 @@
 import Layout from "./layout";
-import { maxOfMaybes, maybeAdd, maybeSub, minOfMaybes } from "./maybeUtil";
+import { maxOfMaybes, maybeAdd, maybeSub, minOfMaybes } from "./util/maybe";
 import {
   ScenegraphContext,
   ScenegraphNode,

@@ -1,9 +1,10 @@
 import { JSX, ParentProps, untrack } from "solid-js";
 import { Layout } from "./layout";
 import _, { get, startsWith } from "lodash";
-import { maybe, maybeAdd, maybeMax, maybeMin, maybeSub } from "./maybeUtil";
-import { BBox, ChildNode, Id, Transform, useScenegraph } from "./scenegraph";
+import { maybe, maybeAdd, maybeMax, maybeMin, maybeSub } from "./util/maybe";
+import { ChildNode, Id, Transform, useScenegraph } from "./scenegraph";
 import withBluefish from "./withBluefish";
+import { BBox } from "./util/bbox";
 
 export type Alignment2D =
   | "topLeft"
@@ -107,22 +108,6 @@ export const Align = withBluefish((props: AlignProps) => {
       debugger;
     }
 
-    // console.log("align", id);
-    // TODO: this is currently side-effectful and cannot be removed. I think this is because the ref
-    // bbox is not updated until it is read, and this update does not seem propagate until the
-    // next read.
-    // we either need to change how we maintain ref invariants, or we just need to call getBBox
-    // before invoking layout
-    // childIds.forEach(getBBox);
-
-    // for (const childId of childIds) {
-    //   // runLayout
-    //   const node = getNode(scenegraph, childId);
-    //   if (node.runLayout) {
-    //     untrack(() => node.runLayout());
-    //   }
-    // }
-
     const verticalAlignments = childNodes
       .map((m) => /* m.guidePrimary ?? */ props.alignment)
       .map((alignment) => maybe(alignment, verticalAlignment));
@@ -157,17 +142,6 @@ export const Align = withBluefish((props: AlignProps) => {
     // TODO: we should probably make it so that the default value depends on the x & y props
     const verticalValue =
       verticalValueArr.length === 0 ? 0 : (verticalValueArr[0][1] as number);
-    // let verticalValue: number;
-    // if (verticalValueArr.length === 0) {
-    //   // get the first alignment, and use the first bbox to set the default value based on the y
-    //   // prop
-    //   const firstAlignment = alignments[0];
-    //   const firstBBox = getBBox(childIds[0]);
-
-    // } else {
-    //   verticalValue = verticalValueArr[0][1] as number;
-    // }
-    // TODO: we maybe have the invariant that value is always defined when the placeable is owned...
 
     const horizontalValueArr = horizontalPlaceables
       .filter(([placeable, _]) => placeable!.owned.x)
@@ -223,37 +197,16 @@ export const Align = withBluefish((props: AlignProps) => {
       }
     }
 
-    // TODO: this part seems like it might cause a loop...
-    const bboxes = {
-      left: childNodes.map((childNode) => childNode.bbox.left),
-      top: childNodes.map((childNode) => childNode.bbox.top),
-      width: childNodes.map((childNode) => childNode.bbox.width),
-      height: childNodes.map((childNode) => childNode.bbox.height),
-    };
-
-    const left = maybeMin(bboxes.left);
-
-    const right = maybeMax(
-      bboxes.left.map((left, i) => maybeAdd(left, bboxes.width[i]))
-    );
-
-    const top = maybeMin(bboxes.top);
-
-    const bottom = maybeMax(
-      bboxes.top.map((top, i) => maybeAdd(top, bboxes.height[i]))
-    );
-
-    const width = maybeSub(right, left);
-    const height = maybeSub(bottom, top);
+    const bbox = BBox.from(childNodes.map((childNode) => childNode.bbox));
 
     return {
       transform: {
         translate: {
-          x: maybeSub(props.x, left),
-          y: maybeSub(props.y, top),
+          x: maybeSub(props.x, bbox.left),
+          y: maybeSub(props.y, bbox.top),
         },
       },
-      bbox: { left, top, right, bottom, width, height },
+      bbox,
     };
   };
 

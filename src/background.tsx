@@ -3,7 +3,7 @@ import Layout from "./layout";
 import { BBox, ChildNode, Id, Transform, useScenegraph } from "./scenegraph";
 import { JSX } from "solid-js/jsx-runtime";
 import { ParentProps, Show, mergeProps } from "solid-js";
-import { maybeAdd, maybeMax, maybeMin, maybeSub } from "./maybeUtil";
+import { maybeAdd, maybeMax, maybeMin, maybeSub } from "./util/maybe";
 import withBluefish from "./withBluefish";
 import Rect from "./rect";
 
@@ -69,7 +69,7 @@ export const Background = withBluefish((props: BackgroundProps) => {
           maybeAdd(childNode.bbox.left, childNode.bbox.width)
         );
 
-      const right = rights.length === 0 ? 0 : maybeMax(rights) ?? 0;
+      const right = rights.length === 0 ? undefined : maybeMax(rights);
 
       const widths = rest.map((childNode) => childNode.bbox.width);
 
@@ -95,7 +95,7 @@ export const Background = withBluefish((props: BackgroundProps) => {
           maybeAdd(childNode.bbox.top, childNode.bbox.height)
         );
 
-      const bottom = bottoms.length === 0 ? 0 : maybeMax(bottoms) ?? 0;
+      const bottom = bottoms.length === 0 ? undefined : maybeMax(bottoms);
 
       const heights = rest.map((childNode) => childNode.bbox.height);
 
