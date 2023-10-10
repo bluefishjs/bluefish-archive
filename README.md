@@ -35,4 +35,6 @@ Runs storybook
 
 ## Deployment
 
-You can deploy the `dist` folder to any static host provider (netlify, surge, now, etc.)
+1. Bump the version number
+2. Commit changes.
+3. Run `pnpm build && pnpm publish`.
