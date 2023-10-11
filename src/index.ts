@@ -1,11 +1,5 @@
 export { Align } from "./align";
-export type {
-  AlignProps,
-  Alignment1D,
-  Alignment2D,
-  AlignmentHorizontal,
-  AlignmentVertical,
-} from "./align";
+export type { AlignProps, Alignment1D, Alignment2D, AlignmentHorizontal, AlignmentVertical } from "./align";
 
 export { Arrow } from "./arrow";
 export type { ArrowProps } from "./arrow";
@@ -66,3 +60,5 @@ export type {
   ScenegraphContextType,
   LayoutFn,
 } from "./scenegraph";
+
+export * as Hyperscript from "./hyperscript";
