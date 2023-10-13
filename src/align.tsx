@@ -4,7 +4,7 @@ import _, { get, startsWith } from "lodash";
 import { maybe, maybeAdd, maybeMax, maybeMin, maybeSub } from "./util/maybe";
 import { ChildNode, Id, Transform, useScenegraph } from "./scenegraph";
 import withBluefish from "./withBluefish";
-import { BBox } from "./util/bbox";
+import * as BBox from "./util/bbox";
 
 export type Alignment2D =
   | "topLeft"
@@ -211,7 +211,7 @@ export const Align = withBluefish((props: AlignProps) => {
   };
 
   const paint = (paintProps: {
-    bbox: BBox;
+    bbox: BBox.BBox;
     transform: Transform;
     children: JSX.Element;
   }) => {

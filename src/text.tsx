@@ -57,19 +57,19 @@ export const Text = withBluefish((props: TextProps) => {
   const { wordsByLines, startDy, transform } = useText(props);
 
   const layout = () => {
-    const bbox = computeBoundingBox(
-      mergeProps(props, {
-        get wordsByLines() {
-          return wordsByLines();
-        },
-        get startDy() {
-          return startDy();
-        },
-        get transform() {
-          return transform();
-        },
-      })
-    );
+    const mergedProps = mergeProps(props, {
+      get wordsByLines() {
+        return wordsByLines();
+      },
+      get startDy() {
+        return startDy();
+      },
+      get transform() {
+        return transform();
+      },
+    });
+
+    const bbox = computeBoundingBox(mergedProps);
 
     return {
       bbox: {

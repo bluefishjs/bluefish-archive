@@ -50,7 +50,7 @@ const App: Component = () => {
     width: 200,
     height: 100,
   };
-  let myPath = new Path.Rectangle(
+  const myPath = new Path.Rectangle(
     new Point(dims.x, dims.y),
     new Size(dims.width, dims.height)
   );
@@ -73,7 +73,7 @@ const App: Component = () => {
     width: 100,
     height: 50,
   };
-  let myPath2 = new Path.Rectangle(
+  const myPath2 = new Path.Rectangle(
     new Point(dims2.x, dims2.y),
     new Size(dims2.width, dims2.height)
   );

@@ -33,7 +33,8 @@ export default function useText(props: TextProps): {
     props
   );
 
-  const isXOrYNotValid = !isXOrYInValid(props.x) || !isXOrYInValid(props.y);
+  const isXOrYNotValid = () =>
+    !isXOrYInValid(props.x) || !isXOrYInValid(props.y);
 
   const words = createMemo(() =>
     props.children == null
@@ -55,7 +56,7 @@ export default function useText(props: TextProps): {
   }));
 
   const wordsByLines = createMemo(() => {
-    if (isXOrYNotValid) {
+    if (isXOrYNotValid()) {
       return [];
     }
 
@@ -94,7 +95,7 @@ export default function useText(props: TextProps): {
   });
 
   const startDy = () => {
-    const startDyStr = isXOrYNotValid
+    const startDyStr = isXOrYNotValid()
       ? ""
       : props["vertical-anchor"] === "start"
       ? reduceCSSCalc(`calc(${props["cap-height"]})`)
@@ -113,7 +114,7 @@ export default function useText(props: TextProps): {
 
   const transform = () => {
     const transforms: string[] = [];
-    if (isXOrYNotValid) {
+    if (isXOrYNotValid()) {
       return "";
     }
 

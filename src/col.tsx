@@ -11,16 +11,16 @@ export type ColProps = ParentProps<
 
 export const Col = withBluefish((props: ColProps) => {
   const layout = (childNodes: ChildNode[]) => {
-    return stackLayout(
-      mergeProps(
-        {
-          direction: "vertical" as const,
-          alignment: "centerX" as const,
-          spacing: 10,
-        },
-        props
-      )
-    )(childNodes);
+    const stackProps = mergeProps(
+      {
+        direction: "vertical" as const,
+        alignment: "centerX" as const,
+        spacing: 10,
+      },
+      props
+    );
+
+    return stackLayout(stackProps)(childNodes);
   };
 
   const paint = (paintProps: {

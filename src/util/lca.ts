@@ -1,5 +1,3 @@
-import { Scenegraph } from "../scenegraph";
-
 export type Tree = { [key: string]: { parent: string | null } };
 
 export const getAncestorChain = (scenegraph: Tree, id: string): string[] => {

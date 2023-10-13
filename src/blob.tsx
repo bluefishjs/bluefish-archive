@@ -14,7 +14,7 @@ export const Blob = withBluefish((props: BlobProps) => {
   const [_, pathOptions] = splitProps(props, ["id", "path"]);
 
   const blobPath = () => {
-    let blobPath = props.path.clone();
+    const blobPath = props.path.clone();
     blobPath.closed = true;
     // apply smoothing twice to make the curves a bit less sharp
     blobPath.smooth({ type: "continuous" });

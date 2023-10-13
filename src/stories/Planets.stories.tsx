@@ -8,7 +8,6 @@ import Distribute from "../distribute";
 import Group from "../group";
 import Ref from "../ref";
 import Text from "../text";
-import Rect from "../rect";
 import { Row } from "../row";
 import { Col } from "../col";
 

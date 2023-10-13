@@ -7,7 +7,7 @@ import {
 } from "./align";
 import { ChildNode, Id, LayoutFn } from "./scenegraph";
 import { maybe, maybeMax, maybeSub } from "./util/maybe";
-import { BBox } from "./util/bbox";
+import * as BBox from "./util/bbox";
 
 export type StackArgs = {
   id: Id;
