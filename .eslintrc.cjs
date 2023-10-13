@@ -25,5 +25,15 @@ module.exports = {
     sourceType: "module",
   },
   plugins: ["@typescript-eslint", "solid"],
-  rules: {},
+  rules: {
+    "no-debugger": "off",
+    "@typescript-eslint/no-unused-vars": [
+      "warn",
+      {
+        varsIgnorePattern: "^_",
+        argsIgnorePattern: "^_",
+      },
+    ],
+    "@typescript-eslint/no-explicit-any": "warn",
+  },
 };
