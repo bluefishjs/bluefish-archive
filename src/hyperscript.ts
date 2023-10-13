@@ -17,10 +17,18 @@ import { Row as RowJSX } from "./row";
 import { Text as TextJSX } from "./text";
 import { withBluefish as withBluefishJSX } from "./withBluefish";
 
-export function component<P>(fn: Component<P>): (props: P, children: JSX.Element[]) => JSX.Element;
-export function component<P>(fn: Component<P>): (props: P, ...children: JSX.Element[]) => JSX.Element;
-export function component<P>(fn: Component<P>): (children: JSX.Element[]) => JSX.Element;
-export function component<P>(fn: Component<P>): (...children: JSX.Element[]) => JSX.Element;
+export function component<P>(
+  fn: Component<P>
+): (props: P, children: JSX.Element[]) => JSX.Element;
+export function component<P>(
+  fn: Component<P>
+): (props: P, ...children: JSX.Element[]) => JSX.Element;
+export function component<P>(
+  fn: Component<P>
+): (children: JSX.Element[]) => JSX.Element;
+export function component<P>(
+  fn: Component<P>
+): (...children: JSX.Element[]) => JSX.Element;
 export function component<P>(fn: Component<P>) {
   return (...args: any[]) => {
     return h(fn, ...args);
