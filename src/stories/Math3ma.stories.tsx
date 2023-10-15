@@ -11,6 +11,8 @@ import Text from "../text";
 import Rect from "../rect";
 import { Blob } from "../blob";
 import { PaperScope, Path, Point, Size } from "paper/dist/paper-core";
+import { Col } from "../col";
+import { Row } from "../row";
 
 const meta: Meta = {
   title: "Example/Math3ma",
@@ -87,43 +89,31 @@ export const Math3ma: Story = {
             />
           )}
         >
-          <Text id="x" font-size={"20px"} vertical-anchor="start">
-            x
-          </Text>
-          <Background
-            id="background2"
-            background={() => (
-              <Blob
-                id="blob2"
-                path={myPath2}
-                stroke="black"
-                stroke-width={3}
-                fill={"palegreen"}
-              />
-            )}
-          >
-            <Text vertical-anchor="start">Borel sets</Text>
-          </Background>
-          <Align id="align" alignment="centerY">
-            <Ref refId="x" />
-            <Ref refId="blob2" />
-          </Align>
-          <Distribute id="distribute" direction="horizontal" spacing={50}>
-            <Ref id="ref-background2" refId="background2" />
-            <Ref id="ref-x" refId="x" />
-          </Distribute>
+          <Row spacing={50}>
+            <Background
+              background={() => (
+                <Blob
+                  id="blob2"
+                  path={myPath2}
+                  stroke="black"
+                  stroke-width={3}
+                  fill={"palegreen"}
+                />
+              )}
+            >
+              <Text vertical-anchor="start">Borel sets</Text>
+            </Background>
+            <Text id="x" font-size={"20px"} vertical-anchor="start">
+              x
+            </Text>
+          </Row>
         </Background>
-        <Text id="text" vertical-anchor="start" width={65}>
-          {"f^{-1}(N) lives here!"}
-        </Text>
-        <Align alignment="centerX">
-          <Ref refId="text" />
+        <Col spacing={20}>
           <Ref refId="background" />
-        </Align>
-        <Distribute direction="vertical" spacing={20}>
-          <Ref refId="background" />
-          <Ref refId="text" />
-        </Distribute>
+          <Text id="text" vertical-anchor="start" width={65}>
+            {"f^{-1}(N) lives here!"}
+          </Text>
+        </Col>
         <Arrow flip>
           <Ref refId="text" />
           <Ref refId="x" />

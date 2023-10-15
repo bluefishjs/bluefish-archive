@@ -10,6 +10,7 @@ import Ref from "../ref";
 import Text from "../text";
 import { Row } from "../row";
 import { Col } from "../col";
+import Rect from "../rect";
 
 const meta: Meta = {
   title: "Example/Planets",
@@ -22,7 +23,7 @@ export const PlanetsAlignDistribute: Story = {
   render: () => {
     return (
       <Bluefish id="bluefish-planets" padding={20}>
-        <Group x={10} y={10}>
+        <Group x={0} y={0}>
           <Circle
             id="mercury"
             r={15}
@@ -94,8 +95,8 @@ export const PlanetsRowCol: Story = {
   render: () => {
     return (
       <Bluefish id="bluefish-planets" padding={20}>
-        <Group x={10} y={10}>
-          <Row x={0} y={0} spacing={50}>
+        <Group x={0} y={0}>
+          <Row spacing={50}>
             <Circle
               id="mercury"
               r={15}
@@ -131,13 +132,13 @@ export const PlanetsRowCol: Story = {
             </Text>
             <Ref refId="mercury" />
           </Col>
-          <Background id="background">
+          <Background>
             <Ref refId="mercury" />
             <Ref refId="venus" />
             <Ref refId="earth" />
             <Ref refId="mars" />
           </Background>
-          <Arrow id="arrow">
+          <Arrow>
             <Ref refId="label" />
             <Ref refId="mercury" />
           </Arrow>

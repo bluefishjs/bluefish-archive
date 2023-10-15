@@ -18,6 +18,13 @@ export type Transform = {
   };
 };
 
+export type RequiredTransform = {
+  translate: {
+    x: number;
+    y: number;
+  };
+};
+
 export type TransformOwners = {
   translate: {
     x?: Id;
@@ -115,12 +122,13 @@ export const createScenegraph = (): ScenegraphContextType => {
   // TODO: doesn't support ref of ref
   const resolveRef = (
     id: Id,
-    accumulatedTransform: Transform = {
+    mode: "read" | "write" | "check",
+    accumulatedTransform: RequiredTransform = {
       translate: { x: 0, y: 0 },
     }
   ): {
     id: Id;
-    transform: Transform;
+    transform: RequiredTransform;
   } => {
     const node = scenegraph[id];
 
@@ -140,6 +148,14 @@ export const createScenegraph = (): ScenegraphContextType => {
 
     if (refNode.type === "ref") {
       throw new Error("Ref of ref not supported");
+    }
+
+    if (mode === "check") {
+      // skip materialization
+      return {
+        id: node.refId,
+        transform: accumulatedTransform,
+      };
     }
 
     // To resolve a reference we have to do two things:
@@ -167,24 +183,19 @@ the align node.
       node.refId
     );
 
-    // debugger;
-
-    // TODO: this will break if node.refId is a ref b/c then it doesn't have a transform
     if (
-      _.every(
-        [/* node.refId, */ ...refIdSuffix],
-        (id) =>
-          (scenegraph[id] as ScenegraphNode & { type: "node" }).transform
-            .translate.x !== undefined
+      // if mode is read and the ref node's left is undefined, then we don't want to materialize
+      // transforms b/c we can't resolve the ref node's left anyway
+      !(
+        mode === "read" &&
+        (refNode as ScenegraphNode & { type: "node" }).bbox.left === undefined
       )
     ) {
-      // the x value is defined on the refId side
       // default all undefined transforms to 0 on the id side
       for (const idSf of idSuffix) {
         setScenegraph(
           idSf,
           produce((n: ScenegraphNode) => {
-            // debugger;
             const node = n as ScenegraphNode & { type: "node" };
             if (node.transform.translate.x === undefined) {
               node.transform.translate.x = 0;
@@ -192,37 +203,38 @@ the align node.
             }
           })
         );
+
+        accumulatedTransform.translate.x -= (
+          scenegraph[idSf] as ScenegraphNode & { type: "node" }
+        ).transform.translate.x!;
       }
 
-      // NOTE: this creates a read dependency on both suffix chains' transforms
-      for (const id of [...refIdSuffix /* , node.refId */]) {
-        accumulatedTransform.translate.x = maybeAdd(
-          accumulatedTransform.translate.x,
-          (scenegraph[id] as ScenegraphNode & { type: "node" }).transform
-            .translate.x
+      for (const refIdSf of refIdSuffix) {
+        setScenegraph(
+          refIdSf,
+          produce((n: ScenegraphNode) => {
+            const node = n as ScenegraphNode & { type: "node" };
+            if (node.transform.translate.x === undefined) {
+              node.transform.translate.x = 0;
+              node.transformOwners.translate.x = id;
+            }
+          })
         );
-      }
 
-      for (const id of idSuffix) {
-        accumulatedTransform.translate.x = maybeSub(
-          accumulatedTransform.translate.x,
-          (scenegraph[id] as ScenegraphNode & { type: "node" }).transform
-            .translate.x
-        );
+        accumulatedTransform.translate.x += (
+          scenegraph[refIdSf] as ScenegraphNode & { type: "node" }
+        ).transform.translate.x!;
       }
-    } else {
-      accumulatedTransform.translate.x = undefined;
     }
 
     if (
-      _.every(
-        [/* node.refId, */ ...refIdSuffix],
-        (id) =>
-          (scenegraph[id] as ScenegraphNode & { type: "node" }).transform
-            .translate.y !== undefined
+      // if mode is read and the ref node's top is undefined, then we don't want to materialize
+      // transforms b/c we can't resolve the ref node's top anyway
+      !(
+        mode === "read" &&
+        (refNode as ScenegraphNode & { type: "node" }).bbox.top === undefined
       )
     ) {
-      // the y value is defined on the refId side
       // default all undefined transforms to 0 on the id side
       for (const idSf of idSuffix) {
         setScenegraph(
@@ -235,35 +247,34 @@ the align node.
             }
           })
         );
+
+        accumulatedTransform.translate.y -= (
+          scenegraph[idSf] as ScenegraphNode & { type: "node" }
+        ).transform.translate.y!;
       }
 
-      // NOTE: this creates a read dependency on both suffix chains' transforms
-      for (const id of [...refIdSuffix /* , node.refId */]) {
-        accumulatedTransform.translate.y = maybeAdd(
-          accumulatedTransform.translate.y,
-          (scenegraph[id] as ScenegraphNode & { type: "node" }).transform
-            .translate.y
+      for (const refIdSf of refIdSuffix) {
+        setScenegraph(
+          refIdSf,
+          produce((n: ScenegraphNode) => {
+            const node = n as ScenegraphNode & { type: "node" };
+            if (node.transform.translate.y === undefined) {
+              node.transform.translate.y = 0;
+              node.transformOwners.translate.y = id;
+            }
+          })
         );
-      }
 
-      for (const id of idSuffix) {
-        accumulatedTransform.translate.y = maybeSub(
-          accumulatedTransform.translate.y,
-          (scenegraph[id] as ScenegraphNode & { type: "node" }).transform
-            .translate.y
-        );
+        accumulatedTransform.translate.y += (
+          scenegraph[refIdSf] as ScenegraphNode & { type: "node" }
+        ).transform.translate.y!;
       }
-    } else {
-      accumulatedTransform.translate.y = undefined;
     }
-
-    return resolveRef(node.refId, accumulatedTransform);
+    return resolveRef(node.refId, mode, accumulatedTransform);
   };
 
   const getBBox = (id: string): BBox => {
-    // debugger;
-    const { id: resolvedId, transform } = resolveRef(id);
-    // const resolvedId = id;
+    const { id: resolvedId, transform } = resolveRef(id, "read");
     const node = scenegraph[resolvedId] as ScenegraphNode & { type: "node" }; // guaranteed by resolveRef
 
     return {
@@ -422,7 +433,10 @@ the align node.
   };
 
   const setBBox = (owner: Id, id: Id, bbox: BBox) => {
-    const { id: resolvedId, transform: accumulatedTransform } = resolveRef(id);
+    const { id: resolvedId, transform: accumulatedTransform } = resolveRef(
+      id,
+      "write"
+    );
 
     // if any of the bbox values are NaN (undefined is ok), console.error and skip
     for (const key of Object.keys(bbox) as Array<keyof BBox>) {
@@ -528,7 +542,7 @@ the align node.
     axis: "x" | "y" | "width" | "height" // along this axis
   ): boolean => {
     // debugger;
-    const { id: resolvedId } = resolveRef(check);
+    const { id: resolvedId } = resolveRef(check, "check");
     const node = scenegraph[resolvedId] as ScenegraphNode & { type: "node" }; // guaranteed by resolveRef
 
     if (axis === "x") {
@@ -661,7 +675,10 @@ export type ScenegraphContextType = {
   scenegraph: Scenegraph;
   createNode: (id: Id, parentId: Id | null) => void;
   createRef: (id: Id, refId: Id, parentId: Id) => void;
-  resolveRef: (id: Id) => { id: Id; transform: Transform };
+  resolveRef: (
+    id: Id,
+    mode: "read" | "write" | "check"
+  ) => { id: Id; transform: Transform };
   mergeBBoxAndTransform: (
     owner: Id,
     id: Id,
