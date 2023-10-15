@@ -3,6 +3,7 @@ import { Rect } from "../rect";
 import { Bluefish } from "../bluefish";
 
 const meta: Meta<typeof Rect> = {
+  title: "Component/Rect",
   component: Rect,
 };
 
