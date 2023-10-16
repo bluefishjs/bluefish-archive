@@ -15,9 +15,9 @@ export type DistributeProps = ParentProps<{
 }>;
 
 export const Distribute = withBluefish((props: DistributeProps) => {
-  const layout = (childIds: ChildNode[]) => {
+  const layout = (childNodes: ChildNode[]) => {
     // debugger;
-    childIds = Array.from(childIds);
+    childNodes = Array.from(childNodes);
 
     if (props.id.endsWith("DEBUG")) {
       debugger;
@@ -33,7 +33,7 @@ export const Distribute = withBluefish((props: DistributeProps) => {
         // assign additional space to items that don't have an extent
         // filter to only items whose heights are owned by other
         let unassignedHeight = height;
-        for (const childId of childIds) {
+        for (const childId of childNodes) {
           if (!childId.owned.height) {
             continue;
           }
@@ -41,7 +41,7 @@ export const Distribute = withBluefish((props: DistributeProps) => {
           unassignedHeight -= childId.bbox.height!;
         }
 
-        const unassignedChildren = childIds.filter(
+        const unassignedChildren = childNodes.filter(
           (childId) => !childId.owned.height
         );
 
@@ -53,56 +53,60 @@ export const Distribute = withBluefish((props: DistributeProps) => {
       } else if (props.spacing !== undefined) {
         spacing = props.spacing;
         // we expect all heights to be owned by other
-        for (const childId of childIds) {
-          if (!childId.owned.height) {
+        for (const childNode of childNodes) {
+          if (!childNode.owned.height) {
             // throw new Error(`${childId}'s height is undefined`);
-            console.error(`Distribute: ${childId}'s height is undefined`);
+            console.error(
+              `Distribute: ${childNode.name}'s height is undefined`
+            );
             return { bbox: {}, transform: { translate: {} } };
           }
         }
 
         height =
-          _.sumBy(childIds, (childId) => childId.bbox.height!) +
-          spacing * (childIds.length - 1);
+          _.sumBy(childNodes, (childId) => childId.bbox.height!) +
+          spacing * (childNodes.length - 1);
       } else if (props.total !== undefined) {
         height = props.total;
         // we expect all heights to be owned by other
-        for (const childId of childIds) {
-          if (!childId.owned.height) {
+        for (const childNode of childNodes) {
+          if (!childNode.owned.height) {
             // throw new Error(`${childId}'s height is undefined`);
-            console.error(`Distribute: ${childId}'s height is undefined`);
+            console.error(
+              `Distribute: ${childNode.name}'s height is undefined`
+            );
             return { bbox: {}, transform: { translate: {} } };
           }
         }
 
         const occupiedHeight = _.sumBy(
-          childIds,
+          childNodes,
           (childId) => childId.bbox.height!
         );
 
-        spacing = (props.total - occupiedHeight) / (childIds.length - 1);
+        spacing = (props.total - occupiedHeight) / (childNodes.length - 1);
       } else {
         // TODO: make this error message better
         throw new Error("invalid options");
       }
 
-      const fixedElement = childIds.findIndex((childId) => childId.owned.y);
+      const fixedElement = childNodes.findIndex((childId) => childId.owned.y);
 
       // use spacing and height to evenly distribute elements while ensuring that the fixed element
       // is fixed
       const startingY =
         fixedElement === -1
           ? 0
-          : childIds[fixedElement].bbox.top! -
+          : childNodes[fixedElement].bbox.top! -
             spacing * fixedElement -
             _.sumBy(
-              childIds.slice(0, fixedElement),
+              childNodes.slice(0, fixedElement),
               (childId) => childId.bbox.height!
             );
 
       // subtract off spacing and the sizes of the first fixedElement elements
       let y = startingY;
-      for (const childId of childIds) {
+      for (const childId of childNodes) {
         if (!childId.owned.y) {
           childId.bbox.top = y;
         }
@@ -113,7 +117,7 @@ export const Distribute = withBluefish((props: DistributeProps) => {
       return {
         bbox: {
           top: startingY,
-          width: maybeMax(childIds.map((childId) => childId.bbox.width)),
+          width: maybeMax(childNodes.map((childId) => childId.bbox.width)),
           height,
         },
         transform: {
@@ -130,7 +134,7 @@ export const Distribute = withBluefish((props: DistributeProps) => {
         // assign additional space to items that don't have an extent
         // filter to only items whose widths are owned by other
         let unassignedWidth = width;
-        for (const childId of childIds) {
+        for (const childId of childNodes) {
           if (!childId.owned.width) {
             continue;
           }
@@ -138,7 +142,7 @@ export const Distribute = withBluefish((props: DistributeProps) => {
           unassignedWidth -= childId.bbox.width!;
         }
 
-        const unassignedChildren = childIds.filter(
+        const unassignedChildren = childNodes.filter(
           (childId) => !childId.owned.width
         );
 
@@ -150,55 +154,55 @@ export const Distribute = withBluefish((props: DistributeProps) => {
       } else if (props.spacing !== undefined) {
         spacing = props.spacing;
         // we expect all widths to be owned by other
-        for (const childId of childIds) {
-          if (!childId.owned.width) {
+        for (const childNode of childNodes) {
+          if (!childNode.owned.width) {
             // throw new Error(`${childId}'s width is undefined`);
-            console.error(`Distribute: ${childId}'s width is undefined`);
+            console.error(`Distribute: ${childNode.name}'s width is undefined`);
             return { bbox: {}, transform: { translate: {} } };
           }
         }
 
         width =
-          _.sumBy(childIds, (childId) => childId.bbox.width!) +
-          spacing * (childIds.length - 1);
+          _.sumBy(childNodes, (childId) => childId.bbox.width!) +
+          spacing * (childNodes.length - 1);
       } else if (props.total !== undefined) {
         width = props.total;
         // we expect all widths to be owned by other
-        for (const childId of childIds) {
-          if (!childId.owned.width) {
+        for (const childNode of childNodes) {
+          if (!childNode.owned.width) {
             // throw new Error(`${childId}'s width is undefined`);
-            console.error(`Distribute: ${childId}'s width is undefined`);
+            console.error(`Distribute: ${childNode.name}'s width is undefined`);
             return { bbox: {}, transform: { translate: {} } };
           }
         }
 
         const occupiedWidth = _.sumBy(
-          childIds,
+          childNodes,
           (childId) => childId.bbox.width!
         );
 
-        spacing = (props.total - occupiedWidth) / (childIds.length - 1);
+        spacing = (props.total - occupiedWidth) / (childNodes.length - 1);
       } else {
         throw new Error("Invalid options for space");
       }
 
-      const fixedElement = childIds.findIndex((childId) => childId.owned.x);
+      const fixedElement = childNodes.findIndex((childId) => childId.owned.x);
 
       // use spacing and width to evenly distribute elements while ensuring that the fixed element
       // is fixed
       const startingX =
         fixedElement === -1
           ? 0
-          : childIds[fixedElement].bbox.left! -
+          : childNodes[fixedElement].bbox.left! -
             spacing * fixedElement -
             _.sumBy(
-              childIds.slice(0, fixedElement),
+              childNodes.slice(0, fixedElement),
               (childId) => childId.bbox.width!
             );
 
       // subtract off spacing and the sizes of the first fixedElement elements
       let x = startingX;
-      for (const childId of childIds) {
+      for (const childId of childNodes) {
         if (!childId.owned.x) {
           childId.bbox.left = x;
         }
@@ -209,7 +213,7 @@ export const Distribute = withBluefish((props: DistributeProps) => {
       return {
         bbox: {
           left: startingX,
-          height: maybeMax(childIds.map((childId) => childId.bbox.height)),
+          height: maybeMax(childNodes.map((childId) => childId.bbox.height)),
           width,
         },
         transform: {
