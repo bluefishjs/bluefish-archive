@@ -24,36 +24,36 @@ export const Group = withBluefish((props: GroupProps) => {
   // this is to ensure that if some child of the group doesn't know all its dimensions, then we
   // ignore that.
   // COMBAK: I'm not sure this is the correct behavior in general...
-  const layout = (childIds: ChildNode[]) => {
-    childIds = Array.from(childIds);
-
+  const layout = (childNodes: ChildNode[]) => {
     if (props.id.endsWith("DEBUG")) {
       debugger;
     }
 
+    for (const childNode of childNodes) {
+      if (!childNode.owned.x) {
+        childNode.bbox.left = 0;
+      }
+
+      if (!childNode.owned.y) {
+        childNode.bbox.top = 0;
+      }
+    }
+
     const bboxes = {
-      left: childIds.map((childId) => childId.bbox.left),
-      top: childIds.map((childId) => childId.bbox.top),
-      width: childIds.map((childId) => childId.bbox.width),
-      height: childIds.map((childId) => childId.bbox.height),
+      left: childNodes.map((childNode) => childNode.bbox.left),
+      top: childNodes.map((childNode) => childNode.bbox.top),
+      width: childNodes.map((childNode) => childNode.bbox.width),
+      height: childNodes.map((childNode) => childNode.bbox.height),
     };
 
-    // const left = maybeMin(bboxes.left);
     const left = minOfMaybes(bboxes.left) ?? 0;
 
-    // const right = maybeMax(
-    //   bboxes.left.map((left, i) => maybeAdd(left, bboxes.width[i]))
-    // );
     const right = maxOfMaybes(
       bboxes.left.map((left, i) => maybeAdd(left, bboxes.width[i]))
     );
 
-    // const top = maybeMin(bboxes.top);
     const top = minOfMaybes(bboxes.top) ?? 0;
 
-    // const bottom = maybeMax(
-    //   bboxes.top.map((top, i) => maybeAdd(top, bboxes.height[i]))
-    // );
     const bottom = maxOfMaybes(
       bboxes.top.map((top, i) => maybeAdd(top, bboxes.height[i]))
     );
