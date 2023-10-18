@@ -22,6 +22,7 @@ import {
   LayoutFn,
   Id,
 } from "./scenegraph";
+import { IdContext } from "./withBluefish";
 
 export type LayoutProps = ParentProps<{
   id: Id;
@@ -54,19 +55,21 @@ export const Layout: Component<LayoutProps> = (props) => {
   // h/t Erik Demaine
   const jsx = (
     <ParentIDContext.Provider value={props.id}>
-      <Dynamic
-        component={props.paint}
-        bbox={scenegraph[props.id]?.bbox ?? {}}
-        transform={{
-          translate: {
-            x: scenegraph[props.id]?.transform?.translate?.x ?? 0,
-            y: scenegraph[props.id]?.transform?.translate?.y ?? 0,
-          },
-        }}
-        customData={scenegraph[props.id]?.customData}
-      >
-        {props.children}
-      </Dynamic>
+      <IdContext.Provider value={() => undefined}>
+        <Dynamic
+          component={props.paint}
+          bbox={scenegraph[props.id]?.bbox ?? {}}
+          transform={{
+            translate: {
+              x: scenegraph[props.id]?.transform?.translate?.x ?? 0,
+              y: scenegraph[props.id]?.transform?.translate?.y ?? 0,
+            },
+          }}
+          customData={scenegraph[props.id]?.customData}
+        >
+          {props.children}
+        </Dynamic>
+      </IdContext.Provider>
     </ParentIDContext.Provider>
   );
 
