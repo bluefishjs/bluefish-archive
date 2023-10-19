@@ -20,6 +20,7 @@ export type ArrowProps = ParentProps<
     y?: number;
     start?: boolean;
     "stroke-width"?: number;
+    stroke?: string;
   } & ArrowOptions
 >;
 
@@ -35,6 +36,7 @@ export const Arrow = withBluefish((props: ArrowProps) => {
       flip: false,
       straights: true,
       "stroke-width": 3,
+      stroke: "black",
     },
     props
   );
@@ -138,7 +140,7 @@ export const Arrow = withBluefish((props: ArrowProps) => {
           <path
             d={`M${paintProps.customData.sx},${paintProps.customData.sy} Q${paintProps.customData.cx},${paintProps.customData.cy} ${paintProps.customData.ex},${paintProps.customData.ey}`}
             fill="none"
-            stroke="black"
+            stroke={props.stroke}
             stroke-width={props["stroke-width"]}
           />
           <polygon
@@ -146,6 +148,7 @@ export const Arrow = withBluefish((props: ArrowProps) => {
             transform={`translate(${paintProps.customData.ex},${
               paintProps.customData.ey
             }) rotate(${endAngleAsDegrees()})`}
+            fill={props.stroke}
           />
           {paintProps.children}
         </g>
