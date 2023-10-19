@@ -98,15 +98,17 @@ export const JetpackCompose: Story = {
       <Bluefish id="jetpack-compose" width={1000} height={600} padding={20}>
         <Col spacing={30}>
           <Row spacing={100} id="resolution">
-            {displayedResolutions.map((resolution) =>
-              resolution.selected === true ? (
-                <SelectedResolution resolutionName={resolution.name} />
-              ) : (
-                <ComposeText fontSize="20" fill="#717171">
-                  {resolution.name}
-                </ComposeText>
-              )
-            )}
+            <For each={displayedResolutions}>
+              {(resolution) =>
+                resolution.selected === true ? (
+                  <SelectedResolution resolutionName={resolution.name} />
+                ) : (
+                  <ComposeText fontSize="20" fill="#717171">
+                    {resolution.name}
+                  </ComposeText>
+                )
+              }
+            </For>
           </Row>
           <Group x={0} id="main-content">
             <Gradient
