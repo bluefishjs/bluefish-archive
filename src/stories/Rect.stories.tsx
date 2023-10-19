@@ -19,7 +19,7 @@ export const FirstStory: Story = {
     y: 30,
   },
   render: (props) => (
-    <Bluefish width={500} height={500}>
+    <Bluefish width={500} height={500} positioning="absolute">
       <Rect {...props} />
     </Bluefish>
   ),
@@ -34,7 +34,7 @@ export const SecondStory: Story = {
     y: 30,
   },
   render: (props) => (
-    <Bluefish width={500} height={500}>
+    <Bluefish width={500} height={500} positioning="absolute">
       <Rect {...props} />
     </Bluefish>
   ),

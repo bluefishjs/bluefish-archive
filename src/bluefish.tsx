@@ -18,6 +18,7 @@ export type BluefishProps = ParentProps<{
   padding?: number;
   id?: string;
   debug?: boolean;
+  positioning?: "absolute" | "relative";
 }>;
 
 declare global {
@@ -30,6 +31,7 @@ export function Bluefish(props: BluefishProps) {
   props = mergeProps(
     {
       padding: 10,
+      positioning: "relative",
     },
     props
   );
@@ -127,9 +129,15 @@ export function Bluefish(props: BluefishProps) {
         width={width()}
         height={height()}
         viewBox={`${
-          -props.padding! + (paintProps.transform.translate.x ?? 0)
+          -props.padding! +
+          (props.positioning === "absolute"
+            ? 0
+            : paintProps.transform.translate.x ?? 0)
         } ${
-          -props.padding! + (paintProps.transform.translate.y ?? 0)
+          -props.padding! +
+          (props.positioning === "absolute"
+            ? 0
+            : paintProps.transform.translate.y ?? 0)
         } ${width()} ${height()}`}
       >
         {props.children}
