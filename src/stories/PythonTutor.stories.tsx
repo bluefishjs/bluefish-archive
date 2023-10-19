@@ -1,3 +1,5 @@
+// Examples created based on Python Tutor: https://pythontutor.com/
+
 import type { Meta, StoryObj } from "storybook-solidjs";
 import { Bluefish } from "../bluefish";
 import { Align } from "../align";
@@ -58,7 +60,7 @@ const PythonTutor = withBluefish((props: PythonTutorProps) => {
         {(stackSlot, slackSlotIndex) =>
           typeof stackSlot.value !== "string" &&
           typeof stackSlot.value !== "number" ? (
-            <Arrow bow={0} stretch={0} flip stroke="#1A5683">
+            <Arrow bow={0} stretch={0} flip stroke="#1A5683" start>
               <Ref
                 refId={`valueName_stackSlot${slackSlotIndex()}_globalFrame-${
                   props.id

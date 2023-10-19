@@ -135,6 +135,7 @@ export const Arrow = withBluefish((props: ArrowProps) => {
               cx={paintProps.customData.sx}
               cy={paintProps.customData.sy}
               r={4}
+              fill={props.stroke}
             />
           </Show>
           <path
