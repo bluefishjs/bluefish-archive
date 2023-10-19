@@ -134,7 +134,7 @@ export const Arrow = withBluefish((props: ArrowProps) => {
             <circle
               cx={paintProps.customData.sx}
               cy={paintProps.customData.sy}
-              r={4}
+              r={(4 / 3) * props["stroke-width"]!}
               fill={props.stroke}
             />
           </Show>
