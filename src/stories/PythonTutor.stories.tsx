@@ -60,7 +60,7 @@ const PythonTutor = withBluefish((props: PythonTutorProps) => {
         {(stackSlot, slackSlotIndex) =>
           typeof stackSlot.value !== "string" &&
           typeof stackSlot.value !== "number" ? (
-            <Arrow bow={0} stretch={0} flip stroke="#1A5683" start>
+            <Arrow bow={0} stretch={0} flip stroke="#1A5683" padStart={0} start>
               <Ref
                 refId={`valueName_stackSlot${slackSlotIndex()}_globalFrame-${
                   props.id

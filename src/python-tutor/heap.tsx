@@ -100,7 +100,13 @@ export const Heap = withBluefish((props: HeapProps) => {
                 )}`;
                 if (fromId !== undefined && toId !== undefined) {
                   return (
-                    <Arrow bow={0} padEnd={25} stroke="#1A5683" start>
+                    <Arrow
+                      bow={0}
+                      padEnd={25}
+                      stroke="#1A5683"
+                      start
+                      padStart={0}
+                    >
                       <Ref refId={fromId} />
                       <Ref refId={toId} />
                     </Arrow>
