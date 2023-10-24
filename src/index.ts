@@ -22,8 +22,8 @@ export type { BluefishProps } from "./bluefish";
 export { Circle } from "./circle";
 export type { CircleProps } from "./circle";
 
-export { Col } from "./col";
-export type { ColProps } from "./col";
+export { VStack } from "./vstack";
+export type { VStackProps } from "./vstack";
 
 export { Distribute } from "./distribute";
 export type { DistributeProps } from "./distribute";

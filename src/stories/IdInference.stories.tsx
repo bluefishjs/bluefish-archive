@@ -5,7 +5,7 @@ import Rect from "../rect";
 import Ref from "../ref";
 import withBluefish from "../withBluefish";
 import { HStack } from "../hstack";
-import { Col } from "../col";
+import { VStack } from "../vstack";
 
 const meta: Meta = {
   title: "Feat/Id Inference",
@@ -28,10 +28,10 @@ export const App: Story = {
             <Rect width={200} height={20} fill="blue" x={0} />
             <CustomComponent id="custom" />
           </HStack>
-          <Col>
+          <VStack>
             <Ref refId="custom" />
             <Rect width={100} height={20} fill="magenta" />
-          </Col>
+          </VStack>
         </Group>
       </Bluefish>
     );

@@ -11,7 +11,7 @@ import Text from "../text";
 import Rect from "../rect";
 import { Blob } from "../blob";
 import { PaperScope, Path, Point, Size } from "paper/dist/paper-core";
-import { Col } from "../col";
+import { VStack } from "../vstack";
 import { HStack } from "../hstack";
 
 const meta: Meta = {
@@ -108,12 +108,12 @@ export const Math3ma: Story = {
             </Text>
           </HStack>
         </Background>
-        <Col spacing={20}>
+        <VStack spacing={20}>
           <Ref refId="background" />
           <Text id="text" vertical-anchor="start" width={65}>
             {"f^{-1}(N) lives here!"}
           </Text>
-        </Col>
+        </VStack>
         <Arrow flip>
           <Ref refId="text" />
           <Ref refId="x" />

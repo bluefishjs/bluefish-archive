@@ -9,7 +9,7 @@ import Group from "../group";
 import Ref from "../ref";
 import Text from "../text";
 import { HStack } from "../hstack";
-import { Col } from "../col";
+import { VStack } from "../vstack";
 import Rect from "../rect";
 
 const meta: Meta = {
@@ -123,12 +123,12 @@ export const PlanetsRowCol: Story = {
             stroke={"black"}
           />
         </HStack>
-        <Col spacing={60}>
+        <VStack spacing={60}>
           <Text id="label" vertical-anchor="start" width={500}>
             Mercury
           </Text>
           <Ref refId="mercury" />
-        </Col>
+        </VStack>
         <Background>
           <Ref refId="mercury" />
           <Ref refId="venus" />
