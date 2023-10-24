@@ -13,7 +13,7 @@ import { Group as GroupJSX } from "./group";
 import { Layout as LayoutJSX } from "./layout";
 import { Rect as RectJSX } from "./rect";
 import { Ref as RefJSX } from "./ref";
-import { Row as RowJSX } from "./row";
+import { HStack as HStackJSX } from "./hstack";
 import { Text as TextJSX } from "./text";
 import { withBluefish as withBluefishJSX } from "./withBluefish";
 
@@ -47,7 +47,7 @@ export const Group = component(GroupJSX);
 export const Layout = component(LayoutJSX);
 export const Rect = component(RectJSX);
 export const Ref = component(RefJSX);
-export const Row = component(RowJSX);
+export const HStack = component(HStackJSX);
 export const Text = component(TextJSX);
 export function withBluefish(WrappedComponent: Component) {
   return component(withBluefishJSX(WrappedComponent));

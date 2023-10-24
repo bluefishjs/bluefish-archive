@@ -7,7 +7,7 @@ import { Rect } from "../rect";
 import { Ref } from "../ref";
 import { Text } from "../text";
 import { Col } from "../col";
-import { Row } from "../row";
+import { HStack } from "../hstack";
 import { Arrow } from "../arrow";
 import { Align } from "../align";
 
@@ -95,11 +95,11 @@ const Tree = withBluefish((props: TreeProps) => {
         <>
           <Col spacing={50} alignment="centerX">
             <Ref refId={data.nodeId} />
-            <Row id={subtreeRowId} alignment="centerY" spacing={50}>
+            <HStack id={subtreeRowId} alignment="centerY" spacing={50}>
               <For each={data.subtrees}>
                 {(child, i) => <Tree id={subtreeIds[i()]} data={child} />}
               </For>
-            </Row>
+            </HStack>
           </Col>
           <For each={data.subtrees}>
             {(child, i) => (

@@ -1,5 +1,11 @@
 export { Align } from "./align";
-export type { AlignProps, Alignment1D, Alignment2D, AlignmentHorizontal, AlignmentVertical } from "./align";
+export type {
+  AlignProps,
+  Alignment1D,
+  Alignment2D,
+  AlignmentHorizontal,
+  AlignmentVertical,
+} from "./align";
 
 export { Arrow } from "./arrow";
 export type { ArrowProps } from "./arrow";
@@ -34,8 +40,8 @@ export type { RectProps } from "./rect";
 export { Ref } from "./ref";
 export type { RefProps } from "./ref";
 
-export { Row } from "./row";
-export type { RowProps } from "./row";
+export { HStack } from "./hstack";
+export type { HStackProps } from "./hstack";
 
 export { Text } from "./text";
 export type { TextProps } from "./text/types";

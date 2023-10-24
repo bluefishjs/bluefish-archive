@@ -8,7 +8,7 @@ import Distribute from "../distribute";
 import Group from "../group";
 import Ref from "../ref";
 import Text from "../text";
-import { Row } from "../row";
+import { HStack } from "../hstack";
 import { Col } from "../col";
 import Rect from "../rect";
 
@@ -93,7 +93,7 @@ export const PlanetsRowCol: Story = {
   render: () => {
     return (
       <Bluefish id="bluefish-planets" padding={20}>
-        <Row spacing={50}>
+        <HStack spacing={50}>
           <Circle
             id="mercury"
             r={15}
@@ -122,7 +122,7 @@ export const PlanetsRowCol: Story = {
             stroke-width={3}
             stroke={"black"}
           />
-        </Row>
+        </HStack>
         <Col spacing={60}>
           <Text id="label" vertical-anchor="start" width={500}>
             Mercury
@@ -149,7 +149,7 @@ export const PlanetsTutorial: Story = {
     return (
       <Bluefish padding={20}>
         <Background id="planets" padding={20}>
-          <Row spacing={50}>
+          <HStack spacing={50}>
             <Circle
               id="mercury"
               r={15}
@@ -178,7 +178,7 @@ export const PlanetsTutorial: Story = {
               stroke-width={3}
               stroke={"black"}
             />
-          </Row>
+          </HStack>
         </Background>
         <Align alignment="centerX">
           <Text id="label">Mercury</Text>

@@ -12,7 +12,7 @@ import Rect from "../rect";
 import { Blob } from "../blob";
 import { PaperScope, Path, Point, Size } from "paper/dist/paper-core";
 import { Col } from "../col";
-import { Row } from "../row";
+import { HStack } from "../hstack";
 
 const meta: Meta = {
   title: "Example/Math3ma",
@@ -89,7 +89,7 @@ export const Math3ma: Story = {
             />
           )}
         >
-          <Row spacing={50}>
+          <HStack spacing={50}>
             <Background
               background={() => (
                 <Blob
@@ -106,7 +106,7 @@ export const Math3ma: Story = {
             <Text id="x" font-size={"20px"} vertical-anchor="start">
               x
             </Text>
-          </Row>
+          </HStack>
         </Background>
         <Col spacing={20}>
           <Ref refId="background" />

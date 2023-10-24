@@ -10,7 +10,7 @@ import Text from "../text";
 import { For, ParentProps, mergeProps } from "solid-js";
 import Gradient from "../gradient";
 import Bluefish from "../bluefish";
-import { Background, Col, Row } from "..";
+import { Background, Col, HStack } from "..";
 import { Meta, StoryObj } from "storybook-solidjs";
 
 const meta: Meta = {
@@ -97,7 +97,7 @@ export const JetpackCompose: Story = {
     return (
       <Bluefish id="jetpack-compose" width={1000} height={600} padding={20}>
         <Col spacing={30}>
-          <Row spacing={100} id="resolution">
+          <HStack spacing={100} id="resolution">
             <For each={displayedResolutions}>
               {(resolution) =>
                 resolution.selected === true ? (
@@ -109,7 +109,7 @@ export const JetpackCompose: Story = {
                 )
               }
             </For>
-          </Row>
+          </HStack>
           <Group x={0} id="main-content">
             <Gradient
               id="sleepBarGradient"
@@ -138,13 +138,13 @@ export const JetpackCompose: Story = {
               )}
               id={"hours"}
             >
-              <Row spacing={60}>
+              <HStack spacing={60}>
                 <For each={hours}>
                   {(hour, ind) => (
                     <ComposeText id={`hour-${hour}`}>{hour}</ComposeText>
                   )}
                 </For>
-              </Row>
+              </HStack>
             </Background>
 
             <Col spacing={20} alignment="right" id={"sleepBarContainer"}>
