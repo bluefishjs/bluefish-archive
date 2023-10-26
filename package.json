@@ -20,12 +20,14 @@
     "build": "vite build",
     "serve": "vite preview",
     "storybook": "storybook dev -p 6006",
+    "storybook-docs": "storybook dev --docs",
     "build-storybook": "storybook build",
     "test-storybook": "test-storybook",
     "chromatic": "pnpm dlx chromatic --project-token=chpt_3acaaa8c4de82c4"
   },
   "license": "MIT",
   "devDependencies": {
+    "@storybook/addon-docs": "^7.5.1",
     "@storybook/addon-essentials": "^7.4.4",
     "@storybook/addon-interactions": "^7.4.4",
     "@storybook/addon-links": "^7.4.4",
