@@ -8,7 +8,7 @@ import { createUniqueId } from "solid-js";
 import { Id } from "../../src/scenegraph";
 
 export type StackSlotProps = {
-  id?: Id;
+  name?: Id;
   variable: string;
   value: string;
 };
@@ -19,7 +19,7 @@ export function StackSlot(props: StackSlotProps) {
   const fontFamily = "verdana, arial, helvetica, sans-serif";
 
   return (
-    <Group name={props.id ?? `group${id}`}>
+    <Group name={props.name ?? `group${id}`}>
       <Rect name={`box${id}`} y={0} height={40} width={40} fill={"#e2ebf6"} />
       <Text
         name={`name${id}`}

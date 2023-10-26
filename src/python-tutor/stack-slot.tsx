@@ -7,20 +7,20 @@ import Text from "../../src/text";
 import { createUniqueId } from "solid-js";
 import { Id } from "../../src/scenegraph";
 import { Pointer } from "./types";
+import withBluefish from "../withBluefish";
 
 export type StackSlotProps = {
-  id?: Id;
+  name?: Id;
   variable: string;
   value: string | Pointer;
 };
 
-export function StackSlot(props: StackSlotProps) {
-  const id = props.id ?? `stackSlot_${createUniqueId()}`;
-
+export const StackSlot = withBluefish((props: StackSlotProps) => {
+  const id = props.name;
   const fontFamily = "verdana, arial, helvetica, sans-serif";
 
   return (
-    <Group name={id}>
+    <Group>
       <Rect name={`box_${id}`} y={0} height={40} width={40} fill={"#e2ebf6"} />
       <Text name={`name_${id}`} font-size={"24px"} font-family={fontFamily}>
         {props.variable}
@@ -78,4 +78,4 @@ export function StackSlot(props: StackSlotProps) {
       )}
     </Group>
   );
-}
+});

@@ -37,7 +37,7 @@ export const HeapObject = withBluefish((props: ObjectProps) => {
         <For each={props.objectValues}>
           {(elementData, index) => (
             <ElmTuple
-              id={`elm_${index()}_${id()}`}
+              name={`elm_${index()}_${id()}`}
               tupleIndex={`${index()}`}
               tupleData={elementData}
               objectId={id()}

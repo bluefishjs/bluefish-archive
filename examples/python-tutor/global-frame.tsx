@@ -9,7 +9,7 @@ import Distribute from "../../src/distribute";
 import Text from "../../src/text";
 
 export type GlobalFrameProps = {
-  id?: Id;
+  name?: Id;
   variables: { variable: string; value: string }[];
 };
 
@@ -20,7 +20,7 @@ export function GlobalFrame(props: GlobalFrameProps) {
   const fontFamily = "Andale mono, monospace";
 
   return (
-    <Group x={0} y={0} name={props.id ?? `group${id}`}>
+    <Group x={0} y={0} name={props.name ?? `group${id}`}>
       {/* Global Frame and relevant text */}
       <Rect name={`frame${id}`} height={300} width={200} fill={"#e2ebf6"} />
       <Rect name={`frameBorder${id}`} height={300} width={5} fill={"#a6b3b6"} />
@@ -46,7 +46,7 @@ export function GlobalFrame(props: GlobalFrameProps) {
         <For each={props.variables}>
           {(variable: any, i) => (
             <StackSlot
-              id={`stackSlot${id}-${i()}`}
+              name={`stackSlot${id}-${i()}`}
               variable={variable.variable}
               value={variable.value}
             />

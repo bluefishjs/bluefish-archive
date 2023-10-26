@@ -40,7 +40,7 @@ const PythonTutor = withBluefish((props: PythonTutorProps) => {
 
   return (
     <Group name={props.name}>
-      <GlobalFrame id={`globalFrame-${props.name}`} variables={props.stack} />
+      <GlobalFrame name={`globalFrame-${props.name}`} variables={props.stack} />
       <Heap
         name={`heap-${props.name}`}
         heap={props.heap}

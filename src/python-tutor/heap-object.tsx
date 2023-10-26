@@ -10,7 +10,7 @@ import withBluefish from "../../src/withBluefish";
 import { Value } from "./types";
 
 export type ObjectProps = {
-  id: Id;
+  name: Id;
   objectType: string;
   objectValues: {
     type: string;
@@ -19,7 +19,7 @@ export type ObjectProps = {
 };
 
 export const HeapObject = withBluefish((props: ObjectProps) => {
-  const id = () => props.id;
+  const id = () => props.name;
 
   const fontFamily = "verdana, arial, helvetica, sans-serif";
 
@@ -39,7 +39,7 @@ export const HeapObject = withBluefish((props: ObjectProps) => {
         <For each={props.objectValues}>
           {(elementData, index) => (
             <ElmTuple
-              id={`elm_${index()}_${id()}`}
+              name={`elm_${index()}_${id()}`}
               tupleIndex={`${index()}`}
               tupleData={elementData}
               objectId={id()}

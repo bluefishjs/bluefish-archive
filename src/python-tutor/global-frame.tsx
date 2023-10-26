@@ -10,18 +10,18 @@ import Text from "../../src/text";
 import { Value } from "./types";
 
 export type GlobalFrameProps = {
-  id?: Id;
+  name?: Id;
   variables: { variable: string; value: Value }[];
 };
 
 export function GlobalFrame(props: GlobalFrameProps) {
-  const id = props.id ?? createUniqueId();
+  const id = props.name ?? createUniqueId();
 
   // Font declaration
   const fontFamily = "Andale mono, monospace";
 
   return (
-    <Group x={0} y={0} name={props.id ?? `group_${id}`}>
+    <Group x={0} y={0} name={props.name ?? `group_${id}`}>
       {/* Global Frame and relevant text */}
       <Rect name={`frame${id}`} height={300} width={200} fill={"#e2ebf6"} />
       <Rect name={`frameBorder${id}`} height={300} width={5} fill={"#a6b3b6"} />
@@ -46,7 +46,7 @@ export function GlobalFrame(props: GlobalFrameProps) {
         <For each={props.variables}>
           {(variable: any, i) => (
             <StackSlot
-              id={`stackSlot${i()}_${id}`}
+              name={`stackSlot${i()}_${id}`}
               variable={variable.variable}
               value={variable.value}
             />

@@ -29,7 +29,7 @@ export const Heap = withBluefish((props: HeapProps) => {
   });
 
   return (
-    <Group name={props.name}>
+    <Group>
       <For each={props.heapArrangement}>
         {(row, index) => (
           <Group name={`row${index()}~${props.name}`}>

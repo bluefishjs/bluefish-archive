@@ -9,7 +9,7 @@ import Text from "../../src/text";
 export type ElmTupleProps = {
   x?: number;
   y?: number;
-  id?: Id;
+  name?: Id;
   tupleIndex: string;
   tupleData: { type: string; value: string };
   objectId: string;
@@ -21,7 +21,7 @@ export function ElmTuple(props: ElmTupleProps) {
 
   return (
     <Group
-      name={props.id ?? `elm_${props.tupleIndex}_${props.objectId}`}
+      name={props.name ?? `elm_${props.tupleIndex}_${props.objectId}`}
       x={props.x}
       y={props.y}
     >
