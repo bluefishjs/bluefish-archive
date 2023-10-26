@@ -88,10 +88,23 @@ export const Text = withBluefish((props: TextProps) => {
   };
 
   const paint = (paintProps: { bbox: BBox; transform: Transform }) => {
+    const horizontalAnchorOffset = () => {
+      if (props["text-anchor"] === "start") {
+        return 0;
+      } else if (props["text-anchor"] === "middle") {
+        return paintProps.bbox.width! / 2;
+      } else if (props["text-anchor"] === "end") {
+        return paintProps.bbox.width;
+      }
+    };
+
     return (
       <g
         ref={props.innerRef}
-        transform={`translate(${paintProps.transform.translate.x}, ${paintProps.transform.translate.y})`}
+        transform={`translate(${
+          (paintProps.transform.translate.x ?? 0) +
+          (horizontalAnchorOffset() ?? 0)
+        }, ${paintProps.transform.translate.y})`}
         style={SVG_STYLE}
       >
         {wordsByLines().length > 0 ? (

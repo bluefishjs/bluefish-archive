@@ -27,6 +27,7 @@ import { Space } from "../examples/topology/space";
 import { Neighborhood } from "../examples/topology/neighborhood";
 import { Image } from "../examples/topology/image";
 import { Col } from "../src/col";
+import { Row } from "../src";
 
 const arr = Array.from({ length: 1000 }, (_, i) => i + 1);
 
@@ -91,7 +92,7 @@ const App: Component = () => {
 
   return (
     <>
-      <Bluefish id="root" debug>
+      {/* <Bluefish id="root" debug>
         <Group id="group" y={10}>
           <Rect width={200} height={20} id="top-rect" fill="blue" x={0} />
           <Distribute id="distribute" direction="vertical" spacing={20}>
@@ -103,7 +104,7 @@ const App: Component = () => {
             <Ref id="ref-top-rect" refId="top-rect" />
           </Align>
         </Group>
-      </Bluefish>
+      </Bluefish> */}
       <input
         type="range"
         min={0}
@@ -144,7 +145,75 @@ const App: Component = () => {
         <option value="right">right</option>
       </select>
       <div>
-        <Bluefish width={500} height={500}>
+        <Bluefish>
+          <Col alignment="right" spacing={20}>
+            <Col id="pizza-dough" alignment="right">
+              <Text font-size="18pt">Pizza Dough</Text>
+              <Col alignment="right" spacing={40}>
+                <Col alignment="right" spacing={2} id="dough1">
+                  <Text font-family="Inter">2 cup flour</Text>
+                  <Text font-family="Inter">2 t. salt</Text>
+                </Col>
+                <Col alignment="right" spacing={2} id="dough2">
+                  <Text font-family="Inter">1 cup water</Text>
+                  <Text font-family="Inter">2 T olive oil</Text>
+                  <Text font-family="Inter">2 t. yeast</Text>
+                  <Text font-family="Inter">2 t. honey</Text>
+                </Col>
+              </Col>
+            </Col>
+            <Col alignment="right">
+              <Text font-size="18pt">Tomato Sauce</Text>
+              <Col alignment="right" id="tomato-sauce">
+                <Col alignment="right" spacing={2} id="sauce1">
+                  <Text font-family="sans-serif" width={150} text-anchor="end">
+                    28 oz. can of whole peeled tomatoes
+                  </Text>
+                </Col>
+                <Col alignment="right" spacing={2} id="sauce2">
+                  <Text font-family="Inter">1/2 t. salt</Text>
+                  <Text font-family="Inter">3 T. olive oil</Text>
+                  <Text font-family="Inter">1 clove garlic, sliced</Text>
+                </Col>
+              </Col>
+            </Col>
+          </Col>
+          <Row spacing={100}>
+            <Ref refId="pizza-dough" />
+            <Rect id="test" width={50} height={50} fill="magenta" />
+            <Text width={150} text-anchor="middle" id="roll-dough">
+              Roll dough into a ball, place in lightly oiled bowl, cover and let
+              rise until doubled in size
+            </Text>
+          </Row>
+          <Arrow>
+            <Ref refId="dough1" />
+            <Ref refId="test" />
+          </Arrow>
+          <Arrow>
+            <Ref refId="dough2" />
+            <Ref refId="test" />
+          </Arrow>
+          <Arrow>
+            <Ref refId="test" />
+            <Ref refId="roll-dough" />
+          </Arrow>
+          <Row spacing={100}>
+            <Ref refId="tomato-sauce" />
+            <Text id="combine" width={150} text-anchor="middle">
+              Combine
+            </Text>
+          </Row>
+          <Arrow>
+            <Ref refId="sauce1" />
+            <Ref refId="combine" />
+          </Arrow>
+          <Arrow>
+            <Ref refId="sauce2" />
+            <Ref refId="combine" />
+          </Arrow>
+        </Bluefish>
+        {/* <Bluefish width={500} height={500}>
           <Col x={0} y={0} alignment="right" spacing={10}>
             <Text font-size="18pt">Pizza dough</Text>
             <Col alignment="right" spacing={20}>
@@ -160,7 +229,7 @@ const App: Component = () => {
               </Col>
             </Col>
           </Col>
-        </Bluefish>
+        </Bluefish> */}
         <br />
         {/* <Bluefish width={500} height={500}>
           <Group x={0} y={0}>
