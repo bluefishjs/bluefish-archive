@@ -31,7 +31,7 @@ export function Bluefish(props: BluefishProps) {
   props = mergeProps(
     {
       padding: 10,
-      positioning: "relative",
+      positioning: "relative" as const,
     },
     props
   );
