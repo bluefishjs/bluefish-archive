@@ -22,19 +22,19 @@ export function ElmTuple(props: ElmTupleProps) {
 
   return (
     <Group
-      id={props.id ?? `elm_${props.tupleIndex}_${props.objectId}`}
+      name={props.id ?? `elm_${props.tupleIndex}_${props.objectId}`}
       x={props.x}
       y={props.y}
     >
       <Rect
-        id={`elmBox_${props.tupleIndex}_${props.objectId}`}
+        name={`elmBox_${props.tupleIndex}_${props.objectId}`}
         height={60}
         width={70}
         fill={"#ffffc6"}
         stroke={"grey"}
       />
       <Text
-        id={`elmLabel_${props.tupleIndex}_${props.objectId}`}
+        name={`elmLabel_${props.tupleIndex}_${props.objectId}`}
         font-family={fontFamily}
         font-size={"16px"}
         fill={"gray"}
@@ -44,7 +44,7 @@ export function ElmTuple(props: ElmTupleProps) {
 
       {props.tupleData.type === "string" ? (
         <Text
-          id={`elmVal_${props.tupleIndex}_${props.objectId}`}
+          name={`elmVal_${props.tupleIndex}_${props.objectId}`}
           font-size={"24px"}
           font-family={fontFamily}
           fill={"black"}
@@ -52,17 +52,20 @@ export function ElmTuple(props: ElmTupleProps) {
           {props.tupleData.value as string}
         </Text>
       ) : (
-        <Text id={`elmVal_${props.tupleIndex}_${props.objectId}`} fill={"none"}>
+        <Text
+          name={`elmVal_${props.tupleIndex}_${props.objectId}`}
+          fill={"none"}
+        >
           {""}
         </Text>
       )}
       <Align alignment="center">
-        <Ref refId={`elmVal_${props.tupleIndex}_${props.objectId}`} />
-        <Ref refId={`elmBox_${props.tupleIndex}_${props.objectId}`} />
+        <Ref select={`elmVal_${props.tupleIndex}_${props.objectId}`} />
+        <Ref select={`elmBox_${props.tupleIndex}_${props.objectId}`} />
       </Align>
       <Align alignment="topLeft">
-        <Ref refId={`elmLabel_${props.tupleIndex}_${props.objectId}`} />
-        <Ref refId={`elmBox_${props.tupleIndex}_${props.objectId}`} />
+        <Ref select={`elmLabel_${props.tupleIndex}_${props.objectId}`} />
+        <Ref select={`elmBox_${props.tupleIndex}_${props.objectId}`} />
       </Align>
     </Group>
   );

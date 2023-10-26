@@ -26,16 +26,16 @@ export const HeapObject = withBluefish((props: ObjectProps) => {
   const objectRef = `objectRef${id()}`;
 
   return (
-    <Group id={id()}>
+    <Group name={id()}>
       <Text
-        id={`objectTypeRef${id()}`}
+        name={`objectTypeRef${id()}`}
         font-family={fontFamily}
         font-size={"16px"}
         fill={"grey"}
       >
         {props.objectType}
       </Text>
-      <Group id={objectRef}>
+      <Group name={objectRef}>
         <For each={props.objectValues}>
           {(elementData, index) => (
             <ElmTuple
@@ -48,22 +48,22 @@ export const HeapObject = withBluefish((props: ObjectProps) => {
         </For>
         <Align alignment="centerY">
           <For each={props.objectValues}>
-            {(elementData, index) => <Ref refId={`elm_${index()}_${id()}`} />}
+            {(elementData, index) => <Ref select={`elm_${index()}_${id()}`} />}
           </For>
         </Align>
         <Distribute direction="horizontal" spacing={0}>
           <For each={props.objectValues}>
-            {(elementData, index) => <Ref refId={`elm_${index()}_${id()}`} />}
+            {(elementData, index) => <Ref select={`elm_${index()}_${id()}`} />}
           </For>
         </Distribute>
       </Group>
       <Distribute direction={"vertical"} spacing={10}>
-        <Ref refId={`objectTypeRef${id()}`} />
-        <Ref refId={objectRef} />
+        <Ref select={`objectTypeRef${id()}`} />
+        <Ref select={objectRef} />
       </Distribute>
       <Align alignment={"left"}>
-        <Ref refId={`objectTypeRef${id()}`} />
-        <Ref refId={objectRef} />
+        <Ref select={`objectTypeRef${id()}`} />
+        <Ref select={objectRef} />
       </Align>
     </Group>
   );

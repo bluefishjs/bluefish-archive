@@ -10,22 +10,22 @@ import { Address, HeapObject as HeapObjectType, formatValue } from "./types";
 import Ref from "../../src/ref";
 
 export type HeapProps = {
-  id: Id;
+  name: Id;
   heap: HeapObjectType[];
   heapArrangement: (Address | null)[][];
 };
 
 export const Heap = withBluefish((props: HeapProps) => {
   return (
-    <Group id={props.id}>
+    <Group name={props.name}>
       <For each={props.heapArrangement}>
         {(row, index) => (
-          <Group id={`row${index()}~${props.id}`}>
+          <Group name={`row${index()}~${props.name}`}>
             <For each={row}>
               {(obj, objIndex) =>
                 obj === null ? (
                   <Rect
-                    id={`row${index()}_col${objIndex()}`}
+                    name={`row${index()}_col${objIndex()}`}
                     height={60}
                     width={140}
                     fill={"none"}
@@ -33,7 +33,7 @@ export const Heap = withBluefish((props: HeapProps) => {
                   />
                 ) : (
                   <HeapObject
-                    id={`row${index()}_col${objIndex()}`}
+                    name={`row${index()}_col${objIndex()}`}
                     objectType={props.heap[obj].type}
                     // TODO: this is just a hack to get things to work for now...
                     objectValues={props.heap[obj].values.map((value) => ({
@@ -47,14 +47,14 @@ export const Heap = withBluefish((props: HeapProps) => {
             <Distribute direction="horizontal" spacing={50}>
               <For each={row}>
                 {(obj, objIndex) => (
-                  <Ref refId={`row${index()}_col${objIndex()}`} />
+                  <Ref select={`row${index()}_col${objIndex()}`} />
                 )}
               </For>
             </Distribute>
             <Align alignment="bottom">
               <For each={row}>
                 {(obj, objIndex) => (
-                  <Ref refId={`row${index()}_col${objIndex()}`} />
+                  <Ref select={`row${index()}_col${objIndex()}`} />
                 )}
               </For>
             </Align>
@@ -63,12 +63,12 @@ export const Heap = withBluefish((props: HeapProps) => {
       </For>
       <Distribute direction="vertical" spacing={75}>
         <For each={props.heapArrangement}>
-          {(row, index) => <Ref refId={`row${index()}~${props.id}`} />}
+          {(row, index) => <Ref select={`row${index()}~${props.name}`} />}
         </For>
       </Distribute>
       <Align alignment="left">
         <For each={props.heapArrangement}>
-          {(row, index) => <Ref refId={`row${index()}~${props.id}`} />}
+          {(row, index) => <Ref select={`row${index()}~${props.name}`} />}
         </For>
       </Align>
     </Group>

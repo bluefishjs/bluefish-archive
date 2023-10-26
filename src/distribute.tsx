@@ -8,7 +8,7 @@ import withBluefish from "./withBluefish";
 
 // export type DistributeProps = SpaceVerticalProps | SpaceHorizontalProps;
 export type DistributeProps = ParentProps<{
-  id: Id;
+  name: Id;
   direction: "vertical" | "horizontal";
   total?: number;
   spacing?: number;
@@ -19,7 +19,7 @@ export const Distribute = withBluefish((props: DistributeProps) => {
     // debugger;
     childNodes = Array.from(childNodes);
 
-    if (props.id.endsWith("DEBUG")) {
+    if (props.name.endsWith("DEBUG")) {
       debugger;
     }
 
@@ -242,7 +242,7 @@ export const Distribute = withBluefish((props: DistributeProps) => {
   };
 
   return (
-    <Layout id={props.id} layout={layout} paint={paint}>
+    <Layout name={props.name} layout={layout} paint={paint}>
       {props.children}
     </Layout>
   );

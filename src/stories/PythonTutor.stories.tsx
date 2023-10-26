@@ -39,20 +39,20 @@ const PythonTutor = withBluefish((props: PythonTutorProps) => {
   });
 
   return (
-    <Group id={props.id}>
-      <GlobalFrame id={`globalFrame-${props.id}`} variables={props.stack} />
+    <Group name={props.name}>
+      <GlobalFrame id={`globalFrame-${props.name}`} variables={props.stack} />
       <Heap
-        id={`heap-${props.id}`}
+        name={`heap-${props.name}`}
         heap={props.heap}
         heapArrangement={props.heapArrangement}
       />
       <Distribute direction="horizontal" spacing={60}>
-        <Ref refId={`globalFrame-${props.id}`} />
-        <Ref refId={`heap-${props.id}`} />
+        <Ref select={`globalFrame-${props.name}`} />
+        <Ref select={`heap-${props.name}`} />
       </Distribute>
       <Align alignment="top">
-        <Ref refId={`globalFrame-${props.id}`} />
-        <Ref refId={`heap-${props.id}`} />
+        <Ref select={`globalFrame-${props.name}`} />
+        <Ref select={`heap-${props.name}`} />
       </Align>
 
       {/* Make arrows from stack slots to heap objects */}
@@ -62,12 +62,12 @@ const PythonTutor = withBluefish((props: PythonTutorProps) => {
           typeof stackSlot.value !== "number" ? (
             <Arrow bow={0} stretch={0} flip stroke="#1A5683" padStart={0} start>
               <Ref
-                refId={`valueName_stackSlot${slackSlotIndex()}_globalFrame-${
-                  props.id
+                select={`valueName_stackSlot${slackSlotIndex()}_globalFrame-${
+                  props.name
                 }`}
               />
               <Ref
-                refId={`elm_0_${objectIdToComponentId.get(
+                select={`elm_0_${objectIdToComponentId.get(
                   stackSlot.value.value
                 )}`}
               />

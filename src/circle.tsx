@@ -5,7 +5,7 @@ import { splitProps } from "solid-js";
 import withBluefish from "./withBluefish";
 
 export type CircleProps = JSX.CircleSVGAttributes<SVGCircleElement> & {
-  id: Id;
+  name: Id;
   cx?: number;
   cy?: number;
   r: number;
@@ -30,7 +30,7 @@ export const Circle = withBluefish((props: CircleProps) => {
   };
 
   const paint = (paintProps: { bbox: BBox; transform: Transform }) => {
-    const [_, rest] = splitProps(props, ["id", "cx", "cy", "r"]);
+    const [_, rest] = splitProps(props, ["name", "cx", "cy", "r"]);
 
     const r = () => (paintProps.bbox.width ?? 0) / 2;
 
@@ -52,7 +52,7 @@ export const Circle = withBluefish((props: CircleProps) => {
     );
   };
 
-  return <Layout id={props.id} layout={layout} paint={paint} />;
+  return <Layout name={props.name} layout={layout} paint={paint} />;
 });
 
 export default Circle;

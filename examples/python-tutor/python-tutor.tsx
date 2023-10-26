@@ -16,20 +16,20 @@ export type PythonTutorProps = WithBluefishProps<{
 
 export const PythonTutor = withBluefish((props: PythonTutorProps) => {
   return (
-    <Group id={props.id}>
-      <GlobalFrame id={`globalFrame~${props.id}`} variables={props.stack} />
+    <Group name={props.name}>
+      <GlobalFrame id={`globalFrame~${props.name}`} variables={props.stack} />
       <Heap
-        id={`heap~${props.id}`}
+        name={`heap~${props.name}`}
         heap={props.heap}
         heapArrangement={props.heapArrangement}
       />
       <Distribute direction="horizontal" spacing={60}>
-        <Ref refId={`globalFrame~${props.id}`} />
-        <Ref refId={`heap~${props.id}`} />
+        <Ref select={`globalFrame~${props.name}`} />
+        <Ref select={`heap~${props.name}`} />
       </Distribute>
       <Align alignment="top">
-        <Ref refId={`globalFrame~${props.id}`} />
-        <Ref refId={`heap~${props.id}`} />
+        <Ref select={`globalFrame~${props.name}`} />
+        <Ref select={`heap~${props.name}`} />
       </Align>
     </Group>
   );

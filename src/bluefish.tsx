@@ -148,7 +148,7 @@ export function Bluefish(props: BluefishProps) {
   return (
     <>
       <ScenegraphContext.Provider value={scenegraphContext}>
-        <Layout id={id} layout={layout} paint={paint}>
+        <Layout name={id} layout={layout} paint={paint}>
           <ParentIDContext.Provider value={id}>
             {props.children}
           </ParentIDContext.Provider>

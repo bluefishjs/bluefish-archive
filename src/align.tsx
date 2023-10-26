@@ -93,7 +93,7 @@ export const splitAlignment = (
 };
 
 export type AlignProps = ParentProps<{
-  id: Id;
+  name: Id;
   x?: number;
   y?: number;
   alignment?: Alignment2D | Alignment1D;
@@ -104,7 +104,7 @@ export const Align = withBluefish((props: AlignProps) => {
   const layout = (childNodes: ChildNode[]) => {
     childNodes = Array.from(childNodes);
 
-    if (props.id.endsWith("DEBUG")) {
+    if (props.name.endsWith("DEBUG")) {
       debugger;
     }
 
@@ -227,7 +227,7 @@ export const Align = withBluefish((props: AlignProps) => {
   };
 
   return (
-    <Layout id={props.id} layout={layout} paint={paint}>
+    <Layout name={props.name} layout={layout} paint={paint}>
       {props.children}
     </Layout>
   );

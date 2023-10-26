@@ -6,12 +6,12 @@ import { BBox, Id, Transform } from "./scenegraph";
 import { splitProps } from "solid-js";
 
 export type BlobProps = {
-  id: Id;
+  name: Id;
   path: InstanceType<typeof paper.Path>;
 } & Omit<JSX.PathSVGAttributes<SVGPathElement>, "d">;
 
 export const Blob = withBluefish((props: BlobProps) => {
-  const [_, pathOptions] = splitProps(props, ["id", "path"]);
+  const [_, pathOptions] = splitProps(props, ["name", "path"]);
 
   const blobPath = () => {
     const blobPath = props.path.clone();
@@ -52,7 +52,7 @@ export const Blob = withBluefish((props: BlobProps) => {
     );
   };
 
-  return <Layout id={props.id} layout={layout} paint={paint}></Layout>;
+  return <Layout name={props.name} layout={layout} paint={paint}></Layout>;
 });
 
 // http://sketch.paperjs.org/#V/0.12.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

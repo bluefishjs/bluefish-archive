@@ -92,15 +92,15 @@ const App: Component = () => {
   return (
     <>
       <Bluefish id="root" debug>
-        <Group id="group" y={10}>
-          <Rect width={200} height={20} id="top-rect" fill="blue" x={0} />
-          <Distribute id="distribute" direction="vertical" spacing={20}>
-            <Rect width={100} height={20} id="rect-1" />
-            <Rect width={50} height={20} id="rect-2" />
+        <Group name="group" y={10}>
+          <Rect width={200} height={20} name="top-rect" fill="blue" x={0} />
+          <Distribute name="distribute" direction="vertical" spacing={20}>
+            <Rect width={100} height={20} name="rect-1" />
+            <Rect width={50} height={20} name="rect-2" />
           </Distribute>
-          <Align id="align" alignment="right">
-            <Ref id="ref-rect-1" refId="rect-1" />
-            <Ref id="ref-top-rect" refId="top-rect" />
+          <Align name="align" alignment="right">
+            <Ref name="ref-rect-1" select="rect-1" />
+            <Ref name="ref-top-rect" select="top-rect" />
           </Align>
         </Group>
       </Bluefish>
@@ -149,14 +149,14 @@ const App: Component = () => {
             <Text font-size="18pt">Pizza dough</Text>
             <Col alignment="right" spacing={20}>
               <Col alignment="right" spacing={0}>
-                <Text id="flour">2 cup flour</Text>
-                <Text id="salt">2 t. salt</Text>
+                <Text name="flour">2 cup flour</Text>
+                <Text name="salt">2 t. salt</Text>
               </Col>
               <Col alignment="right" spacing={0}>
-                <Text id="water">1 cup water</Text>
-                <Text id="olive oil">2 T olive oil</Text>
-                <Text id="yeast">2 t. yeast</Text>
-                <Text id="honey">2 t. honey</Text>
+                <Text name="water">1 cup water</Text>
+                <Text name="olive oil">2 T olive oil</Text>
+                <Text name="yeast">2 t. yeast</Text>
+                <Text name="honey">2 t. honey</Text>
               </Col>
             </Col>
           </Col>
@@ -206,33 +206,33 @@ const App: Component = () => {
 </Arrow> */}
         <Bluefish width={1000} height={500}>
           <Group x={0} y={0}>
-            <Space id="X">
-              <Neighborhood id="U">
-                <Text id="x" vertical-anchor="start">
+            <Space name="X">
+              <Neighborhood name="U">
+                <Text name="x" vertical-anchor="start">
                   x
                 </Text>
               </Neighborhood>
             </Space>
-            <Space id="Y">
-              <Neighborhood id="V">
-                <Image id="f(U)">
-                  <Text id="f(x)" vertical-anchor="start">
+            <Space name="Y">
+              <Neighborhood name="V">
+                <Image name="f(U)">
+                  <Text name="f(x)" vertical-anchor="start">
                     f(x)
                   </Text>
                 </Image>
               </Neighborhood>
             </Space>
             <Align alignment="centerY">
-              <Ref refId="X" />
-              <Ref refId="Y" />
+              <Ref select="X" />
+              <Ref select="Y" />
             </Align>
             <Distribute direction="horizontal" spacing={50}>
-              <Ref refId="X" />
-              <Ref refId="Y" />
+              <Ref select="X" />
+              <Ref select="Y" />
             </Distribute>
             <Arrow padEnd={25}>
-              <Ref refId="U" />
-              <Ref refId="f(U)" />
+              <Ref select="U" />
+              <Ref select="f(U)" />
             </Arrow>
           </Group>
         </Bluefish>
@@ -240,44 +240,44 @@ const App: Component = () => {
         <Bluefish width={300} height={100}>
           <Group x={0} y={0}>
             <Circle
-              id="circle1"
+              name="circle1"
               r={15}
               fill={"#0E2954"}
               stroke-width={2}
               stroke={"#272829"}
             />
             <Circle
-              id="circle2"
+              name="circle2"
               r={15}
               fill={"#0E2954"}
               stroke-width={2}
               stroke={"#272829"}
             />
             <Align alignment="centerY">
-              <Ref refId="circle1" />
-              <Ref refId="circle2" />
+              <Ref select="circle1" />
+              <Ref select="circle2" />
             </Align>
             <Distribute direction="horizontal" spacing={50}>
-              <Ref refId="circle1" />
-              <Ref refId="circle2" />
+              <Ref select="circle1" />
+              <Ref select="circle2" />
             </Distribute>
-            <Background id="background" padding={20}>
-              <Ref refId="circle1" />
-              <Ref refId="circle2" />
+            <Background name="background" padding={20}>
+              <Ref select="circle1" />
+              <Ref select="circle2" />
             </Background>
             {/* <Text id="text">Mercury</Text> */}
-            <Rect id="text" width={20} height={10} fill="magenta" />
+            <Rect name="text" width={20} height={10} fill="magenta" />
             <Distribute direction="vertical" spacing={20}>
-              <Ref refId="background" />
-              <Ref refId="text" />
+              <Ref select="background" />
+              <Ref select="text" />
             </Distribute>
             <Align alignment="centerX">
-              <Ref refId="text" />
-              <Ref refId="background" />
+              <Ref select="text" />
+              <Ref select="background" />
             </Align>
             <Arrow padEnd={10} stroke-width={2}>
-              <Ref refId="text" />
-              <Ref refId="circle2" />
+              <Ref select="text" />
+              <Ref select="circle2" />
             </Arrow>
           </Group>
         </Bluefish>

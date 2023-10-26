@@ -40,7 +40,7 @@ export const Row = withBluefish((props: RowProps) => {
   };
 
   return (
-    <Layout id={props.id} layout={layout} paint={paint}>
+    <Layout name={props.name} layout={layout} paint={paint}>
       {props.children}
     </Layout>
   );
