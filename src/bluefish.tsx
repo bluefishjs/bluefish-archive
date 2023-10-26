@@ -18,6 +18,7 @@ export type BluefishProps = ParentProps<{
   padding?: number;
   id?: string;
   debug?: boolean;
+  positioning?: "absolute" | "relative";
 }>;
 
 declare global {
@@ -30,6 +31,7 @@ export function Bluefish(props: BluefishProps) {
   props = mergeProps(
     {
       padding: 10,
+      positioning: "relative",
     },
     props
   );
@@ -68,53 +70,47 @@ export function Bluefish(props: BluefishProps) {
   if (scenegraph[id] === undefined) {
     createNode(id, null);
   }
-
-  const layout = (childIds: ChildNode[]) => {
-    childIds = Array.from(childIds);
-
-    // get the bbox of the children
-    const bboxes = {
-      left: childIds.map((childId) => childId.bbox.left),
-      top: childIds.map((childId) => childId.bbox.top),
-      width: childIds.map((childId) => childId.bbox.width),
-      height: childIds.map((childId) => childId.bbox.height),
-    };
-
-    for (const childId of childIds) {
-      if (!childId.owned.x) {
-        childId.bbox.left = 0;
+  const layout = (childNodes: ChildNode[]) => {
+    for (const childNode of childNodes) {
+      if (!childNode.owned.x) {
+        childNode.bbox.left = 0;
       }
 
-      if (!childId.owned.y) {
-        childId.bbox.top = 0;
+      if (!childNode.owned.y) {
+        childNode.bbox.top = 0;
       }
     }
 
-    // find our bounding box
+    const bboxes = {
+      left: childNodes.map((childNode) => childNode.bbox.left),
+      top: childNodes.map((childNode) => childNode.bbox.top),
+      width: childNodes.map((childNode) => childNode.bbox.width),
+      height: childNodes.map((childNode) => childNode.bbox.height),
+    };
+
     const left = minOfMaybes(bboxes.left) ?? 0;
-    const top = minOfMaybes(bboxes.top) ?? 0;
+
     const right = maxOfMaybes(
       bboxes.left.map((left, i) => maybeAdd(left, bboxes.width[i]))
     );
+
+    const top = minOfMaybes(bboxes.top) ?? 0;
+
     const bottom = maxOfMaybes(
       bboxes.top.map((top, i) => maybeAdd(top, bboxes.height[i]))
     );
+
     const width = maybeSub(right, left);
     const height = maybeSub(bottom, top);
 
     return {
-      bbox: {
-        left: left ?? 0,
-        top: top ?? 0,
-        width: width ?? props.width,
-        height: height ?? props.height,
-      },
       transform: {
         translate: {
-          x: 0,
-          y: 0,
+          x: left,
+          y: top,
         },
       },
+      bbox: { left, top, right, bottom, width, height },
     };
   };
 
@@ -132,7 +128,17 @@ export function Bluefish(props: BluefishProps) {
       <svg
         width={width()}
         height={height()}
-        viewBox={`${-props.padding!} ${-props.padding!} ${width()} ${height()}`}
+        viewBox={`${
+          -props.padding! +
+          (props.positioning === "absolute"
+            ? 0
+            : paintProps.transform.translate.x ?? 0)
+        } ${
+          -props.padding! +
+          (props.positioning === "absolute"
+            ? 0
+            : paintProps.transform.translate.y ?? 0)
+        } ${width()} ${height()}`}
       >
         {props.children}
       </svg>

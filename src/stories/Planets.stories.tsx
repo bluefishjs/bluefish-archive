@@ -23,7 +23,77 @@ export const PlanetsAlignDistribute: Story = {
   render: () => {
     return (
       <Bluefish id="bluefish-planets" padding={20}>
-        <Group x={0} y={0}>
+        <Circle
+          id="mercury"
+          r={15}
+          fill={"#EBE3CF"}
+          stroke-width={3}
+          stroke={"black"}
+        />
+        <Circle
+          id="venus"
+          r={36}
+          fill={"#DC933C"}
+          stroke-width={3}
+          stroke={"black"}
+        />
+        <Circle
+          id="earth"
+          r={38}
+          fill={"#179DD7"}
+          stroke-width={3}
+          stroke={"black"}
+        />
+        <Circle
+          id="mars"
+          r={21}
+          fill={"#F1CF8E"}
+          stroke-width={3}
+          stroke={"black"}
+        />
+        <Align alignment="centerY">
+          <Ref refId="mercury" />
+          <Ref refId="venus" />
+          <Ref refId="earth" />
+          <Ref refId="mars" />
+        </Align>
+        <Distribute direction="horizontal" spacing={50}>
+          <Ref refId="mercury" />
+          <Ref refId="venus" />
+          <Ref refId="earth" />
+          <Ref refId="mars" />
+        </Distribute>
+        <Text id="label" vertical-anchor="start" width={500}>
+          Mercury
+        </Text>
+        <Align alignment="centerX">
+          <Ref refId="label" />
+          <Ref refId="mercury" />
+        </Align>
+        <Distribute direction="vertical" spacing={60}>
+          <Ref refId="label" />
+          <Ref refId="mercury" />
+        </Distribute>
+        <Background id="background">
+          <Ref refId="mercury" />
+          <Ref refId="venus" />
+          <Ref refId="earth" />
+          <Ref refId="mars" />
+        </Background>
+        <Arrow id="arrow">
+          <Ref refId="label" />
+          <Ref refId="mercury" />
+        </Arrow>
+      </Bluefish>
+    );
+  },
+};
+
+export const PlanetsRowCol: Story = {
+  render: () => {
+    return (
+      <Bluefish id="bluefish-planets" padding={20}>
+        <Row spacing={50}>
           <Circle
             id="mercury"
             r={15}
@@ -52,50 +122,33 @@ export const PlanetsAlignDistribute: Story = {
             stroke-width={3}
             stroke={"black"}
           />
-          <Align alignment="centerY">
-            <Ref refId="mercury" />
-            <Ref refId="venus" />
-            <Ref refId="earth" />
-            <Ref refId="mars" />
-          </Align>
-          <Distribute direction="horizontal" spacing={50}>
-            <Ref refId="mercury" />
-            <Ref refId="venus" />
-            <Ref refId="earth" />
-            <Ref refId="mars" />
-          </Distribute>
+        </Row>
+        <Col spacing={60}>
           <Text id="label" vertical-anchor="start" width={500}>
             Mercury
           </Text>
-          <Align alignment="centerX">
-            <Ref refId="label" />
-            <Ref refId="mercury" />
-          </Align>
-          <Distribute direction="vertical" spacing={60}>
-            <Ref refId="label" />
-            <Ref refId="mercury" />
-          </Distribute>
-          <Background id="background">
-            <Ref refId="mercury" />
-            <Ref refId="venus" />
-            <Ref refId="earth" />
-            <Ref refId="mars" />
-          </Background>
-          <Arrow id="arrow">
-            <Ref refId="label" />
-            <Ref refId="mercury" />
-          </Arrow>
-        </Group>
+          <Ref refId="mercury" />
+        </Col>
+        <Background>
+          <Ref refId="mercury" />
+          <Ref refId="venus" />
+          <Ref refId="earth" />
+          <Ref refId="mars" />
+        </Background>
+        <Arrow>
+          <Ref refId="label" />
+          <Ref refId="mercury" />
+        </Arrow>
       </Bluefish>
     );
   },
 };
 
-export const PlanetsRowCol: Story = {
+export const PlanetsTutorial: Story = {
   render: () => {
     return (
-      <Bluefish id="bluefish-planets" padding={20}>
-        <Group x={0} y={0}>
+      <Bluefish padding={20}>
+        <Background id="planets" padding={20}>
           <Row spacing={50}>
             <Circle
               id="mercury"
@@ -126,78 +179,19 @@ export const PlanetsRowCol: Story = {
               stroke={"black"}
             />
           </Row>
-          <Col spacing={60}>
-            <Text id="label" vertical-anchor="start" width={500}>
-              Mercury
-            </Text>
-            <Ref refId="mercury" />
-          </Col>
-          <Background>
-            <Ref refId="mercury" />
-            <Ref refId="venus" />
-            <Ref refId="earth" />
-            <Ref refId="mars" />
-          </Background>
-          <Arrow>
-            <Ref refId="label" />
-            <Ref refId="mercury" />
-          </Arrow>
-        </Group>
-      </Bluefish>
-    );
-  },
-};
-
-export const PlanetsTutorial: Story = {
-  render: () => {
-    return (
-      <Bluefish padding={20}>
-        <Group>
-          <Background id="planets" padding={20}>
-            <Row spacing={50}>
-              <Circle
-                id="mercury"
-                r={15}
-                fill={"#EBE3CF"}
-                stroke-width={3}
-                stroke={"black"}
-              />
-              <Circle
-                id="venus"
-                r={36}
-                fill={"#DC933C"}
-                stroke-width={3}
-                stroke={"black"}
-              />
-              <Circle
-                id="earth"
-                r={38}
-                fill={"#179DD7"}
-                stroke-width={3}
-                stroke={"black"}
-              />
-              <Circle
-                id="mars"
-                r={21}
-                fill={"#F1CF8E"}
-                stroke-width={3}
-                stroke={"black"}
-              />
-            </Row>
-          </Background>
-          <Align alignment="centerX">
-            <Text id="label">Mercury</Text>
-            <Ref refId="mercury" />
-          </Align>
-          <Distribute direction="vertical" spacing={20}>
-            <Ref refId="label" />
-            <Ref refId="planets" />
-          </Distribute>
-          <Arrow>
-            <Ref refId="label" />
-            <Ref refId="mercury" />
-          </Arrow>
-        </Group>
+        </Background>
+        <Align alignment="centerX">
+          <Text id="label">Mercury</Text>
+          <Ref refId="mercury" />
+        </Align>
+        <Distribute direction="vertical" spacing={20}>
+          <Ref refId="label" />
+          <Ref refId="planets" />
+        </Distribute>
+        <Arrow>
+          <Ref refId="label" />
+          <Ref refId="mercury" />
+        </Arrow>
       </Bluefish>
     );
   },

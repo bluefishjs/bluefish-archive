@@ -30,7 +30,7 @@ const Node = withBluefish((props: NodeProps) => {
   const nodeOutlineId = `${props.id}_outline`;
 
   return (
-    <Group id={props.id}>
+    <Group>
       <Rect
         id={nodeOutlineId}
         width={50}
@@ -88,7 +88,7 @@ const Tree = withBluefish((props: TreeProps) => {
   );
 
   return (
-    <Group id={props.id}>
+    <Group>
       <Node id={data.nodeId} nodeValue={data.nodeValue} />
 
       {data.subtrees?.length ? (
