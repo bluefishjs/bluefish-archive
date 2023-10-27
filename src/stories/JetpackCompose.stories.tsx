@@ -10,7 +10,7 @@ import Text from "../text";
 import { For, ParentProps, mergeProps } from "solid-js";
 import Gradient from "../gradient";
 import Bluefish from "../bluefish";
-import { Background, VStack, HStack } from "..";
+import { Background, StackV, StackH } from "..";
 import { Meta, StoryObj } from "storybook-solidjs";
 
 const meta: Meta = {
@@ -96,8 +96,8 @@ export const JetpackCompose: Story = {
   render: () => {
     return (
       <Bluefish id="jetpack-compose" width={1000} height={600} padding={20}>
-        <VStack spacing={30}>
-          <HStack spacing={100} id="resolution">
+        <StackV spacing={30}>
+          <StackH spacing={100} id="resolution">
             <For each={displayedResolutions}>
               {(resolution) =>
                 resolution.selected === true ? (
@@ -109,7 +109,7 @@ export const JetpackCompose: Story = {
                 )
               }
             </For>
-          </HStack>
+          </StackH>
           <Group x={0} id="main-content">
             <Gradient
               id="sleepBarGradient"
@@ -138,16 +138,16 @@ export const JetpackCompose: Story = {
               )}
               id={"hours"}
             >
-              <HStack spacing={60}>
+              <StackH spacing={60}>
                 <For each={hours}>
                   {(hour, ind) => (
                     <ComposeText id={`hour-${hour}`}>{hour}</ComposeText>
                   )}
                 </For>
-              </HStack>
+              </StackH>
             </Background>
 
-            <VStack spacing={20} alignment="right" id={"sleepBarContainer"}>
+            <StackV spacing={20} alignment="right" id={"sleepBarContainer"}>
               <Ref refId="hours" />
               <For each={dayToSleepBars}>
                 {(dayToSleepBar, ind) => (
@@ -160,7 +160,7 @@ export const JetpackCompose: Story = {
                   />
                 )}
               </For>
-            </VStack>
+            </StackV>
 
             <Align alignment="left" id="days">
               <For each={dayToSleepBars}>
@@ -186,7 +186,7 @@ export const JetpackCompose: Story = {
               )}
             </For>
           </Group>
-        </VStack>
+        </StackV>
       </Bluefish>
     );
   },

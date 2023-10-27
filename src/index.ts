@@ -22,8 +22,8 @@ export type { BluefishProps } from "./bluefish";
 export { Circle } from "./circle";
 export type { CircleProps } from "./circle";
 
-export { VStack } from "./vstack";
-export type { VStackProps } from "./vstack";
+export { StackV } from "./stackv";
+export type { StackVProps } from "./stackv";
 
 export { Distribute } from "./distribute";
 export type { DistributeProps } from "./distribute";
@@ -40,8 +40,8 @@ export type { RectProps } from "./rect";
 export { Ref } from "./ref";
 export type { RefProps } from "./ref";
 
-export { HStack } from "./hstack";
-export type { HStackProps } from "./hstack";
+export { StackH } from "./stackh";
+export type { StackHProps } from "./stackh";
 
 export { Text } from "./text";
 export type { TextProps } from "./text/types";

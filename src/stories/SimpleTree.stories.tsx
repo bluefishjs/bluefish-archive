@@ -6,8 +6,8 @@ import { Group } from "../group";
 import { Rect } from "../rect";
 import { Ref } from "../ref";
 import { Text } from "../text";
-import { VStack } from "../vstack";
-import { HStack } from "../hstack";
+import { StackV } from "../stackv";
+import { StackH } from "../stackh";
 import { Arrow } from "../arrow";
 import { Align } from "../align";
 
@@ -93,14 +93,14 @@ const Tree = withBluefish((props: TreeProps) => {
 
       {data.subtrees?.length ? (
         <>
-          <VStack spacing={50} alignment="centerX">
+          <StackV spacing={50} alignment="centerX">
             <Ref refId={data.nodeId} />
-            <HStack id={subtreeRowId} alignment="centerY" spacing={50}>
+            <StackH id={subtreeRowId} alignment="centerY" spacing={50}>
               <For each={data.subtrees}>
                 {(child, i) => <Tree id={subtreeIds[i()]} data={child} />}
               </For>
-            </HStack>
-          </VStack>
+            </StackH>
+          </StackV>
           <For each={data.subtrees}>
             {(child, i) => (
               <Arrow bow={0} stretch={0.1} flip>

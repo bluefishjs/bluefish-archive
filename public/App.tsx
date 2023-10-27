@@ -26,7 +26,7 @@ import { PaperScope, Path, Point, Size } from "paper/dist/paper-core";
 import { Space } from "../examples/topology/space";
 import { Neighborhood } from "../examples/topology/neighborhood";
 import { Image } from "../examples/topology/image";
-import { VStack } from "../src/vstack";
+import { StackV } from "../src/stackv";
 
 const arr = Array.from({ length: 1000 }, (_, i) => i + 1);
 
@@ -145,21 +145,21 @@ const App: Component = () => {
       </select>
       <div>
         <Bluefish width={500} height={500}>
-          <VStack x={0} y={0} alignment="right" spacing={10}>
+          <StackV x={0} y={0} alignment="right" spacing={10}>
             <Text font-size="18pt">Pizza dough</Text>
-            <VStack alignment="right" spacing={20}>
-              <VStack alignment="right" spacing={0}>
+            <StackV alignment="right" spacing={20}>
+              <StackV alignment="right" spacing={0}>
                 <Text id="flour">2 cup flour</Text>
                 <Text id="salt">2 t. salt</Text>
-              </VStack>
-              <VStack alignment="right" spacing={0}>
+              </StackV>
+              <StackV alignment="right" spacing={0}>
                 <Text id="water">1 cup water</Text>
                 <Text id="olive oil">2 T olive oil</Text>
                 <Text id="yeast">2 t. yeast</Text>
                 <Text id="honey">2 t. honey</Text>
-              </VStack>
-            </VStack>
-          </VStack>
+              </StackV>
+            </StackV>
+          </StackV>
         </Bluefish>
         <br />
         {/* <Bluefish width={500} height={500}>

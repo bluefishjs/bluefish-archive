@@ -1,16 +1,16 @@
 import type { Meta, StoryObj } from "storybook-solidjs";
-import { HStack } from "../../hstack";
+import { StackH } from "../../stackh";
 import { Bluefish } from "../../bluefish";
 import Rect from "../../rect";
 
 /**
- * Bluefish's `HStack` component places its children into one horizontal stack, through defining either the spacing between each item or total width (not yet working?) that the hstack should occupy.
+ * Bluefish's `StackH` component places its children into one horizontal stack, through defining either the spacing between each item or total width (not yet working?) that the hstack should occupy.
  *
  * Options for alignment of the children are: `top`, `centerY`, and `bottom`.
  */
-const meta: Meta<typeof HStack> = {
-  title: "Components/HStack",
-  component: HStack,
+const meta: Meta<typeof StackH> = {
+  title: "Components/StackH",
+  component: StackH,
   tags: ["autodocs"],
   argTypes: {
     alignment: { control: "radio", options: ["top", "centerY", "bottom"] },
@@ -18,7 +18,7 @@ const meta: Meta<typeof HStack> = {
 };
 
 export default meta;
-type Story = StoryObj<typeof HStack>;
+type Story = StoryObj<typeof StackH>;
 
 export const DefinedSpacing: Story = {
   args: {
@@ -28,11 +28,11 @@ export const DefinedSpacing: Story = {
   render: (props) => {
     return (
       <Bluefish>
-        <HStack {...props}>
+        <StackH {...props}>
           <Rect width={30} height={30} />
           <Rect width={20} height={20} />
           <Rect width={50} height={50} />
-        </HStack>
+        </StackH>
       </Bluefish>
     );
   },

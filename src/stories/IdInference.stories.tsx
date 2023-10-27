@@ -4,8 +4,8 @@ import Group from "../group";
 import Rect from "../rect";
 import Ref from "../ref";
 import withBluefish from "../withBluefish";
-import { HStack } from "../hstack";
-import { VStack } from "../vstack";
+import { StackH } from "../stackh";
+import { StackV } from "../stackv";
 
 const meta: Meta = {
   title: "Feat/Id Inference",
@@ -24,14 +24,14 @@ export const App: Story = {
     return (
       <Bluefish>
         <Group x={0} y={0}>
-          <HStack>
+          <StackH>
             <Rect width={200} height={20} fill="blue" x={0} />
             <CustomComponent id="custom" />
-          </HStack>
-          <VStack>
+          </StackH>
+          <StackV>
             <Ref refId="custom" />
             <Rect width={100} height={20} fill="magenta" />
-          </VStack>
+          </StackV>
         </Group>
       </Bluefish>
     );

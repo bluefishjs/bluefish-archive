@@ -1,16 +1,16 @@
 import type { Meta, StoryObj } from "storybook-solidjs";
-import { VStack } from "../../vstack";
+import { StackV } from "../../stackv";
 import { Bluefish } from "../../bluefish";
 import Rect from "../../rect";
 
 /**
- * Bluefish's `VStack` component places its children into one vertical stack, through defining either the spacing between each item or total height that the vstack should occupy.
+ * Bluefish's `StackV` component places its children into one vertical stack, through defining either the spacing between each item or total height that the vstack should occupy.
  *
  * Options for alignment of the children are: `left`, `centerX`, and `right`.
  */
-const meta: Meta<typeof VStack> = {
-  title: "Components/VStack",
-  component: VStack,
+const meta: Meta<typeof StackV> = {
+  title: "Components/StackV",
+  component: StackV,
   tags: ["autodocs"],
   argTypes: {
     alignment: { control: "radio", options: ["left", "centerX", "right"] },
@@ -18,7 +18,7 @@ const meta: Meta<typeof VStack> = {
 };
 
 export default meta;
-type Story = StoryObj<typeof VStack>;
+type Story = StoryObj<typeof StackV>;
 
 export const DefinedSpacing: Story = {
   args: {
@@ -28,11 +28,11 @@ export const DefinedSpacing: Story = {
   render: (props) => {
     return (
       <Bluefish>
-        <VStack {...props}>
+        <StackV {...props}>
           <Rect width={30} height={30} />
           <Rect width={20} height={20} />
           <Rect width={50} height={50} />
-        </VStack>
+        </StackV>
       </Bluefish>
     );
   },
