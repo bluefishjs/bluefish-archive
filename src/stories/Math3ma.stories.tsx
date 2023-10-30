@@ -75,13 +75,13 @@ export const Math3ma: Story = {
     return (
       <Bluefish width={500} height={500} padding={20}>
         <Background
-          id="background"
+          name="background"
           x={10}
           y={10}
           padding={20}
           background={() => (
             <Blob
-              id="blob"
+              name="blob"
               path={myPath}
               stroke="black"
               stroke-width={3}
@@ -93,7 +93,7 @@ export const Math3ma: Story = {
             <Background
               background={() => (
                 <Blob
-                  id="blob2"
+                  name="blob2"
                   path={myPath2}
                   stroke="black"
                   stroke-width={3}
@@ -103,20 +103,20 @@ export const Math3ma: Story = {
             >
               <Text vertical-anchor="start">Borel sets</Text>
             </Background>
-            <Text id="x" font-size={"20px"} vertical-anchor="start">
+            <Text name="x" font-size={"20px"} vertical-anchor="start">
               x
             </Text>
           </StackH>
         </Background>
         <StackV spacing={20}>
-          <Ref refId="background" />
-          <Text id="text" vertical-anchor="start" width={65}>
+          <Ref select="background" />
+          <Text name="text" vertical-anchor="start" width={65}>
             {"f^{-1}(N) lives here!"}
           </Text>
         </StackV>
         <Arrow flip>
-          <Ref refId="text" />
-          <Ref refId="x" />
+          <Ref select="text" />
+          <Ref select="x" />
         </Arrow>
       </Bluefish>
     );

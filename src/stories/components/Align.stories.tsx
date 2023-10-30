@@ -56,20 +56,20 @@ export const AlignComponent: Story = {
       <Bluefish>
         <Distribute direction="horizontal" spacing={50}>
           <Group>
-            <Align id="verticalAlign" alignment={props.alignment1}>
+            <Align name="verticalAlign" alignment={props.alignment1}>
               <Rect x={20} width={30} height={30} fill={"red"} />
               <Rect x={70} width={50} height={50} fill={"blue"} />
               <Rect x={160} width={80} height={80} fill={"green"} />
             </Align>
           </Group>
           <Group>
-            <Align id="horizontalAlign" alignment={props.alignment2}>
+            <Align name="horizontalAlign" alignment={props.alignment2}>
               <Rect y={20} width={30} height={30} fill={"red"} />
               <Rect y={60} width={50} height={50} fill={"blue"} />
             </Align>
           </Group>
           <Group>
-            <Align id="otherAlign" alignment={props.alignment3}>
+            <Align name="otherAlign" alignment={props.alignment3}>
               <Rect width={50} height={50} fill={"blue"} />
               <Rect width={30} height={30} fill={"red"} />
             </Align>

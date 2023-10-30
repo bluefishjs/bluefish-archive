@@ -3,7 +3,7 @@ import withBluefish from "./withBluefish";
 type ColorOffset = { offset: number; color: string };
 
 type GradientProps = {
-  id: string;
+  name: string;
   colorOffsets: ColorOffset[];
   x1?: number;
   x2?: number;
@@ -15,7 +15,7 @@ export const Gradient = withBluefish((props: GradientProps) => {
   return (
     <g>
       <linearGradient
-        id={props.id}
+        id={props.name}
         x1={props.x1}
         x2={props.x2}
         y1={props.y1}

@@ -3,18 +3,18 @@ import { StackArgs, stackLayout } from "./stackLayout";
 import withBluefish from "./withBluefish";
 import Layout from "./layout";
 import { BBox, Transform, ChildNode } from "./scenegraph";
-import { AlignmentHorizontal } from "./align";
+import { AlignmentVertical } from "./align";
 
-export type StackVProps = ParentProps<
-  Omit<StackArgs, "direction"> & { alignment?: AlignmentHorizontal }
+export type HStackProps = ParentProps<
+  Omit<StackArgs, "direction"> & { alignment?: AlignmentVertical }
 >;
 
-export const StackV = withBluefish((props: StackVProps) => {
+export const HStack = withBluefish((props: HStackProps) => {
   const layout = (childNodes: ChildNode[]) => {
     const stackProps = mergeProps(
       {
-        direction: "vertical" as const,
-        alignment: "centerX" as const,
+        direction: "horizontal" as const,
+        alignment: "centerY" as const,
         spacing: 10,
       },
       props

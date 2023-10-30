@@ -8,7 +8,7 @@ import withBluefish from "./withBluefish";
 import Rect from "./rect";
 
 export type BackgroundProps = ParentProps<{
-  id: Id;
+  name: Id;
   x?: number;
   y?: number;
   background?: () => JSX.Element;
@@ -27,7 +27,7 @@ export const Background = withBluefish((props: BackgroundProps) => {
     // debugger;
     childIds = Array.from(childIds);
 
-    if (props.id.endsWith("DEBUG")) {
+    if (props.name.endsWith("DEBUG")) {
       debugger;
     }
 
@@ -146,7 +146,7 @@ export const Background = withBluefish((props: BackgroundProps) => {
   };
 
   return (
-    <Layout id={props.id} layout={layout} paint={paint}>
+    <Layout name={props.name} layout={layout} paint={paint}>
       <Show
         when={props.background}
         fallback={<Rect stroke="black" fill="none" stroke-width="3" />}

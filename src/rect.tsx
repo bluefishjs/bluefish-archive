@@ -5,7 +5,7 @@ import { splitProps } from "solid-js";
 import withBluefish from "./withBluefish";
 
 export type RectProps = JSX.RectSVGAttributes<SVGRectElement> & {
-  id: Id;
+  name: Id;
   x?: number;
   y?: number;
   width?: number;
@@ -31,7 +31,7 @@ export const Rect = withBluefish((props: RectProps) => {
   };
 
   const paint = (paintProps: { bbox: BBox; transform: Transform }) => {
-    const [_, rest] = splitProps(props, ["id", "x", "y", "width", "height"]);
+    const [_, rest] = splitProps(props, ["name", "x", "y", "width", "height"]);
 
     return (
       <rect
@@ -46,7 +46,7 @@ export const Rect = withBluefish((props: RectProps) => {
     );
   };
 
-  return <Layout id={props.id} layout={layout} paint={paint} />;
+  return <Layout name={props.name} layout={layout} paint={paint} />;
 });
 
 export default Rect;
