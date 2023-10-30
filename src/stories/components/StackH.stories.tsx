@@ -4,7 +4,7 @@ import { Bluefish } from "../../bluefish";
 import Rect from "../../rect";
 
 /**
- * Bluefish's `StackH` component places its children into one horizontal stack, through defining either the spacing between each item or total width (not yet working?) that the hstack should occupy.
+ * Bluefish's `StackH` component places its children into one horizontal stack, through defining either the spacing between each item or total width (not yet working?) that the horizontal stack should occupy.
  *
  * Options for alignment of the children are: `top`, `centerY`, and `bottom`.
  */
