@@ -59,7 +59,8 @@
     "lodash": "^4.17.21",
     "paper": "^0.12.17",
     "perfect-arrows": "^0.3.7",
-    "reduce-css-calc": "^2.1.8"
+    "reduce-css-calc": "^2.1.8",
+    "smiles-drawer": "^2.1.7"
   },
   "peerDependencies": {
     "solid-js": "^1.7.7"
