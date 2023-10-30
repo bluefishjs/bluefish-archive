@@ -174,13 +174,6 @@ const Molecule = withBluefish((props: MoleculeProps) => {
     svgWrapper.drawingHeight = svgWrapper.maxY - svgWrapper.minY;
   }
 
-  function getLocationVertexWithId(vertexId: any, vertices: any) {
-    const vertex = vertices.filter((v: any) => {
-      return v.id === vertexId;
-    });
-    return vertex[0];
-  }
-
   function findOffsetsToFitDiagram(vertices: any) {
     let xOffsets: any[] = [];
     let yOffsets: any[] = [];
@@ -220,44 +213,6 @@ const Molecule = withBluefish((props: MoleculeProps) => {
     });
 
     return [{ edges: ringEdges, vertices: ringVertices }, usedEdges];
-  }
-
-  // function to separate list of edges, vertices, rings for rendering
-  function separateEdgesVerticesRings(edges: any, vertices: any, rings: any) {
-    let sepRings: any[] = [];
-    let sepEdges: any[] = [];
-    let sepVertices: any[] = [];
-
-    let usedVertices: any[] = [];
-    let usedEdges: any[] = [];
-
-    for (let i = 0; i < rings.length; i++) {
-      let ringElm = rings[i];
-
-      let ringVertexIds = ringElm.members.map((v: any) => {
-        return `vertex-${v}`;
-      });
-
-      let [ringObject, edgeUsed] = findEdgesVerticesOfRing(
-        ringVertexIds,
-        edges,
-        vertices
-      );
-      sepRings.push({ ...ringObject, id: ringElm.id });
-
-      usedVertices = usedVertices.concat(ringVertexIds);
-      usedEdges = usedEdges.concat(edgeUsed);
-    }
-
-    sepVertices = vertices.filter((v: any) => {
-      return !usedVertices.includes(v.id);
-    });
-
-    sepEdges = edges.filter((e: any) => {
-      return !usedEdges.includes(e.id);
-    });
-
-    return [sepEdges, sepVertices, sepRings];
   }
 
   console.log("these are the vertices: ", atoms);

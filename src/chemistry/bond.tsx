@@ -140,8 +140,6 @@ export const Bond = withBluefish((props: BondProps) => {
         endY,
         props.ringCenterY
       );
-      console.log("inputs to helper", startY, endY, props.ringCenterY);
-      console.log("bond direction: ", doubleBondDirection);
 
       const sx2 =
         doubleBondDirection === "above"
@@ -193,8 +191,6 @@ export const Bond = withBluefish((props: BondProps) => {
         ex2: ex2,
         ey2: ey2,
       };
-
-      console.log(props.ringCenterX, props.ringCenterY);
     }
 
     return {
