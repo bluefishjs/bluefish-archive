@@ -4,7 +4,7 @@ import { Bluefish } from "../../bluefish";
 import Rect from "../../rect";
 
 /**
- * Bluefish's `StackV` component places its children into one vertical stack, through defining either the spacing between each item or total height that the vstack should occupy.
+ * Bluefish's `StackV` component places its children into one vertical stack, through defining either the spacing between each item or total height that the vertical stack should occupy.
  *
  * Options for alignment of the children are: `left`, `centerX`, and `right`.
  */
