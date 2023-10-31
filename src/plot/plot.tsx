@@ -6,7 +6,7 @@ import Group from "../group";
 export type Scale = any;
 
 export type PlotProps = ParentProps<{
-  id: Id;
+  name: Id;
   width?: number;
   height?: number;
   x?: Scale;

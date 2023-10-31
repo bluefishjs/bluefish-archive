@@ -14,12 +14,12 @@ import withBluefish from "./withBluefish";
 // "modified," we'll instead modify the refId's bbox.
 
 export type RefProps = {
-  id: Id;
-  refId: Id;
+  name: Id;
+  select: Id;
 };
 
 export const Ref = withBluefish((props: RefProps) => {
-  const { id, refId } = props;
+  const { name, select } = props;
 
   const parentId = useContext(ParentIDContext);
   const { createRef, getBBox } = UNSAFE_useScenegraph();
@@ -27,7 +27,7 @@ export const Ref = withBluefish((props: RefProps) => {
   if (parentId === null) {
     throw new Error("Ref must be a child of a Layout");
   }
-  createRef(id, refId, parentId);
+  createRef(name, select, parentId);
 
   // touch the refId's bbox to ensure ref is resolved immediately
   // createEffect(() => {

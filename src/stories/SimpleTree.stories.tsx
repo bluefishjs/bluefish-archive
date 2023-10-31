@@ -26,13 +26,13 @@ type NodeProps = WithBluefishProps<{
 
 const Node = withBluefish((props: NodeProps) => {
   props = mergeProps({ nodeValue: "?", id: createUniqueId() }, props);
-  const nodeValueId = `${props.id}_value`;
-  const nodeOutlineId = `${props.id}_outline`;
+  const nodeValueId = `${props.name}_value`;
+  const nodeOutlineId = `${props.name}_outline`;
 
   return (
     <Group>
       <Rect
-        id={nodeOutlineId}
+        name={nodeOutlineId}
         width={50}
         height={65}
         rx={5}
@@ -40,16 +40,16 @@ const Node = withBluefish((props: NodeProps) => {
         stroke={"black"}
         opacity={0.5}
       />
-      <Text id={nodeValueId} font-size="24px">
+      <Text name={nodeValueId} font-size="24px">
         {props.nodeValue}
       </Text>
       <Align alignment="centerY">
-        <Ref refId={nodeValueId} />
-        <Ref refId={nodeOutlineId} />
+        <Ref select={nodeValueId} />
+        <Ref select={nodeOutlineId} />
       </Align>
       <Align alignment="centerX">
-        <Ref refId={nodeValueId} />
-        <Ref refId={nodeOutlineId} />
+        <Ref select={nodeValueId} />
+        <Ref select={nodeOutlineId} />
       </Align>
     </Group>
   );
@@ -89,23 +89,23 @@ const Tree = withBluefish((props: TreeProps) => {
 
   return (
     <Group>
-      <Node id={data.nodeId} nodeValue={data.nodeValue} />
+      <Node name={data.nodeId} nodeValue={data.nodeValue} />
 
       {data.subtrees?.length ? (
         <>
           <StackV spacing={50} alignment="centerX">
-            <Ref refId={data.nodeId} />
-            <StackH id={subtreeRowId} alignment="centerY" spacing={50}>
+            <Ref select={data.nodeId} />
+            <StackH name={subtreeRowId} alignment="centerY" spacing={50}>
               <For each={data.subtrees}>
-                {(child, i) => <Tree id={subtreeIds[i()]} data={child} />}
+                {(child, i) => <Tree name={subtreeIds[i()]} data={child} />}
               </For>
             </StackH>
           </StackV>
           <For each={data.subtrees}>
             {(child, i) => (
               <Arrow bow={0} stretch={0.1} flip>
-                <Ref refId={data.nodeId} />
-                <Ref refId={child.nodeId} />
+                <Ref select={data.nodeId} />
+                <Ref select={child.nodeId} />
               </Arrow>
             )}
           </For>

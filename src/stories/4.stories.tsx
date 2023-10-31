@@ -18,15 +18,15 @@ export const App: Story = {
   render: () => {
     return (
       <Bluefish id="root" debug>
-        <Group id="group" y={10}>
-          <Rect width={200} height={20} id="top-rect" fill="blue" x={0} />
-          <Distribute id="distribute" direction="vertical" spacing={20}>
-            <Rect width={100} height={20} id="rect-1" />
-            <Rect width={50} height={20} id="rect-2" />
+        <Group name="group" y={10}>
+          <Rect width={200} height={20} name="top-rect" fill="blue" x={0} />
+          <Distribute name="distribute" direction="vertical" spacing={20}>
+            <Rect width={100} height={20} name="rect-1" />
+            <Rect width={50} height={20} name="rect-2" />
           </Distribute>
-          <Align id="align" alignment="right">
-            <Ref id="ref-rect-1" refId="rect-1" />
-            <Ref id="ref-top-rect" refId="top-rect" />
+          <Align name="align" alignment="right">
+            <Ref name="ref-rect-1" select="rect-1" />
+            <Ref name="ref-top-rect" select="top-rect" />
           </Align>
         </Group>
       </Bluefish>

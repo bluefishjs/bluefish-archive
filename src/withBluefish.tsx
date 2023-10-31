@@ -10,7 +10,7 @@ import {
 import { Id } from "./scenegraph";
 
 export type WithBluefishProps<T = object> = T & {
-  id: Id;
+  name: Id;
 };
 
 export const IdContext = createContext<Accessor<Id | undefined>>(
@@ -20,16 +20,16 @@ export const IdContext = createContext<Accessor<Id | undefined>>(
 export function withBluefish<ComponentProps>(
   WrappedComponent: Component<WithBluefishProps<ComponentProps>>
 ) {
-  return function (props: Omit<ComponentProps, "id"> & { id?: Id }) {
+  return function (props: Omit<ComponentProps, "name"> & { name?: Id }) {
     const contextId = useContext(IdContext);
     const genId = createUniqueId();
-    const id = () => props.id ?? contextId() ?? genId;
+    const id = () => props.name ?? contextId() ?? genId;
 
     return (
       <IdContext.Provider value={id}>
         <WrappedComponent
           {...(props as WithBluefishProps<ComponentProps>)}
-          id={id()}
+          name={id()}
         />
       </IdContext.Provider>
     );
