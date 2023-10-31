@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "storybook-solidjs";
 import { Background } from "../../background";
 import { Bluefish } from "../../bluefish";
 import { Text } from "../../text";
-import { Row } from "../../row";
+import { StackH } from "../../stackh";
 import Rect from "../../rect";
 
 /**
