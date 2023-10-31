@@ -228,6 +228,7 @@ export const Bond = withBluefish((props: BondProps) => {
               fill="none"
               stroke={props.stroke}
               stroke-width={props["stroke-width"]}
+              stroke-linecap="round"
             />
           </Show>
 
@@ -238,12 +239,14 @@ export const Bond = withBluefish((props: BondProps) => {
               fill="none"
               stroke={props.stroke}
               stroke-width={props["stroke-width"]}
+              stroke-linecap="round"
             />
             <path
               d={`M${paintProps.customData.sx2},${paintProps.customData.sy2} Q${paintProps.customData.cx2},${paintProps.customData.cy2} ${paintProps.customData.ex2},${paintProps.customData.ey2}`}
               fill="none"
               stroke={props.stroke}
               stroke-width={props["stroke-width"]}
+              stroke-linecap="round"
             />
           </Show>
 

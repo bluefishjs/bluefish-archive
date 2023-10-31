@@ -80,21 +80,40 @@ export const Atom = withBluefish((props: AtomProps) => {
 
     return (
       <>
-        <circle
-          {...rest}
-          cx={
-            (paintProps.bbox.left ?? 0) +
-            r() +
-            (paintProps.transform.translate.x ?? 0)
-          }
-          cy={
-            (paintProps.bbox.top ?? 0) +
-            r() +
-            (paintProps.transform.translate.y ?? 0)
-          }
-          r={r()}
-          fill={atomContent.length === 0 ? "none" : "white"}
-        />
+        {/* if atom content length is greater than 1, then render a rectangle instead */}
+        {atomContent.length > 1 ? (
+          <rect
+            x={
+              (paintProps.bbox.left ?? 0) -
+              r() +
+              (paintProps.transform.translate.x ?? 0)
+            }
+            y={
+              (paintProps.bbox.top ?? 0) +
+              (paintProps.transform.translate.y ?? 0)
+            }
+            width={(paintProps.bbox.width ?? 0) * atomContent.length}
+            height={paintProps.bbox.height ?? 0}
+            fill={"white"}
+            rx={r() / 2}
+          />
+        ) : (
+          <circle
+            {...rest}
+            cx={
+              (paintProps.bbox.left ?? 0) +
+              r() +
+              (paintProps.transform.translate.x ?? 0)
+            }
+            cy={
+              (paintProps.bbox.top ?? 0) +
+              r() +
+              (paintProps.transform.translate.y ?? 0)
+            }
+            r={r()}
+            fill={atomContent.length === 0 ? "none" : "white"}
+          />
+        )}
         <text
           x={
             (paintProps.bbox.left ?? 0) +
@@ -108,7 +127,7 @@ export const Atom = withBluefish((props: AtomProps) => {
           }
           font-size={"24px"}
           text-anchor={"middle"}
-          dominant-baseline={"central"}
+          dominant-baseline="central"
         >
           {atomContent}
         </text>
