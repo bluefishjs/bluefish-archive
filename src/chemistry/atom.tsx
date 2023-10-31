@@ -74,7 +74,7 @@ export const Atom = withBluefish((props: AtomProps) => {
   };
 
   const paint = (paintProps: { bbox: BBox; transform: Transform }) => {
-    const [_, rest] = splitProps(props, ["id", "cx", "cy", "r"]);
+    const [_, rest] = splitProps(props, ["name", "cx", "cy", "r"]);
 
     const r = () => (paintProps.bbox.width ?? 0) / 2;
 
