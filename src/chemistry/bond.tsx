@@ -256,7 +256,7 @@ export const Bond = withBluefish((props: BondProps) => {
   };
 
   return (
-    <Layout id={props.id} layout={layout} paint={paint}>
+    <Layout name={props.id} layout={layout} paint={paint}>
       {props.children}
     </Layout>
   );

@@ -135,7 +135,7 @@ export const Atom = withBluefish((props: AtomProps) => {
     );
   };
 
-  return <Layout id={props.id} layout={layout} paint={paint} />;
+  return <Layout name={props.id} layout={layout} paint={paint} />;
 });
 
 export default Atom;

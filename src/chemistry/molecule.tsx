@@ -235,8 +235,8 @@ export const Molecule = withBluefish((props: MoleculeProps) => {
             ringCenterX={(e.ringCenterX + minXOffset + 10) * 1.2}
             ringCenterY={(e.ringCenterY + minYOffset + 10) * 1.2}
           >
-            <Ref refId={atomNames[e.sourceNum]} />
-            <Ref refId={atomNames[e.destNum]} />
+            <Ref select={atomNames[e.sourceNum]} />
+            <Ref select={atomNames[e.destNum]} />
           </Bond>
         )}
       </For>
