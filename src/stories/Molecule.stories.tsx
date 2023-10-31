@@ -1,9 +1,12 @@
+// Integrates with SmilesDrawer: https://pubs.acs.org/doi/10.1021/acs.jcim.7b00425
+// SmilesDrawer GitHub Repository: https://github.com/reymond-group/smilesDrawer
+// SmilesDrawer Interactive Playground: https://smilesdrawer.surge.sh/
+
 import type { Meta, StoryObj } from "storybook-solidjs";
 import { withBluefish, WithBluefishProps } from "../withBluefish";
 import Atom from "../chemistry/atom";
 import Bond from "../chemistry/bond";
 import { Bluefish } from "../bluefish";
-import { Row } from "../row";
 import Ref from "../ref";
 import Group from "../group";
 import SmilesDrawer from "smiles-drawer/app.js";
