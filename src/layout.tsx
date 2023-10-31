@@ -25,7 +25,7 @@ import {
 import { IdContext } from "./withBluefish";
 
 export type LayoutProps = ParentProps<{
-  id: Id;
+  name: Id;
   bbox?: Partial<BBox>;
   layout: LayoutFn;
   paint: (props: {
@@ -48,24 +48,24 @@ export const Layout: Component<LayoutProps> = (props) => {
     createChildRepr,
   } = UNSAFE_useScenegraph();
 
-  createNode(props.id, parentId);
+  createNode(props.name, parentId);
 
   // evaluate the child props before running the effect so that children's layout functions are
   // called before the parent's layout function
   // h/t Erik Demaine
   const jsx = (
-    <ParentIDContext.Provider value={props.id}>
+    <ParentIDContext.Provider value={props.name}>
       <IdContext.Provider value={() => undefined}>
         <Dynamic
           component={props.paint}
-          bbox={scenegraph[props.id]?.bbox ?? {}}
+          bbox={scenegraph[props.name]?.bbox ?? {}}
           transform={{
             translate: {
-              x: scenegraph[props.id]?.transform?.translate?.x ?? 0,
-              y: scenegraph[props.id]?.transform?.translate?.y ?? 0,
+              x: scenegraph[props.name]?.transform?.translate?.x ?? 0,
+              y: scenegraph[props.name]?.transform?.translate?.y ?? 0,
             },
           }}
-          customData={scenegraph[props.id]?.customData}
+          customData={scenegraph[props.name]?.customData}
         >
           {props.children}
         </Dynamic>
@@ -83,13 +83,13 @@ export const Layout: Component<LayoutProps> = (props) => {
     // }
     // debugger;
     const { bbox, transform, customData } = props.layout(
-      Array.from(scenegraph[props.id]?.children ?? []).map((childId: Id) =>
-        createChildRepr(props.id, childId)
+      Array.from(scenegraph[props.name]?.children ?? []).map((childId: Id) =>
+        createChildRepr(props.name, childId)
       )
     );
     // setBBox(props.id, bbox, props.id, transform);
-    mergeBBoxAndTransform(props.id, props.id, bbox, transform);
-    setCustomData(props.id, customData);
+    mergeBBoxAndTransform(props.name, props.name, bbox, transform);
+    setCustomData(props.name, customData);
     // console.log(
     //   "layout",
     //   props.id,

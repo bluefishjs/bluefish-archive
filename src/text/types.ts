@@ -50,7 +50,7 @@ type OwnProps = {
 };
 
 export type TextProps = OwnProps &
-  Omit<SVGTextProps, keyof OwnProps> & { id: Id };
+  Omit<SVGTextProps, keyof OwnProps> & { name: Id };
 
 export type compareFunction<T> = (prev: T | undefined, next: T) => boolean;
 

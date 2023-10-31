@@ -13,7 +13,7 @@ import { startsWith } from "lodash";
 import withBluefish from "./withBluefish";
 
 export type GroupProps = ParentProps<{
-  id: Id;
+  name: Id;
   x?: number;
   y?: number;
 }>;
@@ -25,7 +25,7 @@ export const Group = withBluefish((props: GroupProps) => {
   // ignore that.
   // COMBAK: I'm not sure this is the correct behavior in general...
   const layout = (childNodes: ChildNode[]) => {
-    if (props.id.endsWith("DEBUG")) {
+    if (props.name.endsWith("DEBUG")) {
       debugger;
     }
 
@@ -89,7 +89,7 @@ export const Group = withBluefish((props: GroupProps) => {
   };
 
   return (
-    <Layout id={props.id} layout={layout} paint={paint}>
+    <Layout name={props.name} layout={layout} paint={paint}>
       {props.children}
     </Layout>
   );

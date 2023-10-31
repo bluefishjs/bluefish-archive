@@ -38,7 +38,7 @@ export const ArrowComponent: Story = {
   render: (props) => {
     return (
       <Bluefish>
-        <Arrow id="arrow" {...props}>
+        <Arrow name="arrow" {...props}>
           <Rect x={20} y={30} width={20} height={20} fill={"steelblue"} />
           <Rect x={100} y={40} width={30} height={30} fill={"steelblue"} />
         </Arrow>
