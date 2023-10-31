@@ -1,11 +1,10 @@
-import { JSX, ParentProps, Show, from, mergeProps } from "solid-js";
+import { JSX, ParentProps, Show, mergeProps } from "solid-js";
 import { Layout } from "../layout";
 import _ from "lodash";
 import { maybeMax, maybeMin, maybeSub } from "../util/maybe";
 import { BBox, Id, Transform, ChildNode } from "../scenegraph";
 import withBluefish from "../withBluefish";
-import { ArrowOptions, getBoxToBoxArrow } from "perfect-arrows";
-import { start } from "repl";
+import { ArrowOptions } from "perfect-arrows";
 
 export type BondProps = ParentProps<
   {
