@@ -26,6 +26,9 @@ dependencies:
   reduce-css-calc:
     specifier: ^2.1.8
     version: 2.1.8
+  smiles-drawer:
+    specifier: ^2.1.7
+    version: 2.1.7
 
 devDependencies:
   '@storybook/addon-docs':
@@ -4522,6 +4525,10 @@ packages:
     resolution: {integrity: sha512-ERFaYl47zXNnre/V4jVSdB4EIy2S3x2+O4ryFGIYM+1DpxbwRHUA4M+JKaDQ4EXUB+s/LItPKPpEYGr/y/TqWA==}
     dev: true
 
+  /@storybook/postinstall@7.4.4:
+    resolution: {integrity: sha512-e4vjNjEzDhXia2fZAJOCI1sQbfKLsWZtJFkY4Z6D1KnALTaJMv16p3fhghEoPZfv6TTTK6F0lSUvPxv4V5ie1A==}
+    dev: true
+
   /@storybook/postinstall@7.5.1:
     resolution: {integrity: sha512-+LFUe2nNbmmLPKNt34RXSSC1r40yGGOoP/qlaPFwNOgQN2AZUrfqk6ZYnw6LjmcuHpQInZ4y4WDgbzg6QQL3+w==}
     dev: true
@@ -4585,6 +4592,16 @@ packages:
 
   /@storybook/preview@7.6.0-alpha.2:
     resolution: {integrity: sha512-aUqy1wSoErvyRNjIBslDlkNCBYur5RinxZCL52+P8RqTlIt8GQ0gzVGfUxgf31QWYslQp4zZ8K88BVtFkNCQfQ==}
+    dev: true
+
+  /@storybook/react-dom-shim@7.4.4(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-0FL/A+dMLJ6zp4nm6mAqfNJT01wxRHnZCENeye8+oxaEMgsZ/Q8Z9LRPaf3B01upwP9x48F9uZkC0htQ6a4kIA==}
+    peerDependencies:
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0
+      react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
+    dependencies:
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
     dev: true
 
   /@storybook/react-dom-shim@7.5.1(react-dom@18.2.0)(react@18.2.0):
@@ -5972,6 +5989,10 @@ packages:
     resolution: {integrity: sha512-bIomtDF5KGpdogkLd9VspvFzk9KfpyyGlS8YFVZl7TGPBHL5snIOnxeshwVgPteQ9b4Eydl+pVbIyE1DcvCWgQ==}
     engines: {node: '>=10'}
     dev: true
+
+  /chroma-js@2.4.2:
+    resolution: {integrity: sha512-U9eDw6+wt7V8z5NncY2jJfZa+hUH8XEj8FQHgFJTrUFnJfXYf4Ml4adI2vXZOjqRDpFWtYVWypDfZwnJ+HIR4A==}
+    dev: false
 
   /chromatic@7.2.0:
     resolution: {integrity: sha512-EbuvmsM6XAVFC4EQpqR2AT2PaXY4IS8qWxxg6N10AhpRulfX2b2AtW1hUc88cCosRyztd6esxkBdj3FSKR7zVw==}
@@ -10266,6 +10287,12 @@ packages:
     resolution: {integrity: sha512-ZA6oR3T/pEyuqwMgAKT0/hAv8oAXckzbkmR0UkUosQ+Mc4RxGoJkRmwHgHufaenlyAgE1Mxgpdcrf75y6XcnDg==}
     engines: {node: '>=14.16'}
     dev: true
+
+  /smiles-drawer@2.1.7:
+    resolution: {integrity: sha512-gApm5tsWrAYDkjbGYQb5OhwIyHvtM2kIO40DfATaOV0DPm0wA63yn4Ow7us27BT49lDdU9busCOPN9fpyonzaA==}
+    dependencies:
+      chroma-js: 2.4.2
+    dev: false
 
   /solid-devtools@0.27.3(solid-js@1.7.7)(vite@4.3.9):
     resolution: {integrity: sha512-cyIocZr6QuDCSWAqlfUdXg6vV986e5a/N8SwEPecMWlWS+PSTvYqMLzL8onFSPY5ZBeRRYR5PVN6nB4o5BIN9Q==}
