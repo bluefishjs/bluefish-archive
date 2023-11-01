@@ -211,7 +211,7 @@ export const Molecule = withBluefish((props: MoleculeProps) => {
         {(v, index) => (
           <Atom
             {...v}
-            id={atomNames[index()]}
+            name={atomNames[index()]}
             cx={(v.xLoc + minXOffset + 10) * 1.2}
             cy={(v.yLoc + minYOffset + 10) * 1.2}
             r={10}
@@ -230,7 +230,7 @@ export const Molecule = withBluefish((props: MoleculeProps) => {
             {...e}
             stroke="black"
             stroke-width={2}
-            id={bondNames[index()]}
+            name={bondNames[index()]}
             bondType={e.bondType}
             ringCenterX={(e.ringCenterX + minXOffset + 10) * 1.2}
             ringCenterY={(e.ringCenterY + minYOffset + 10) * 1.2}

@@ -42,7 +42,7 @@ const elementName: elementNameTypes = {
 
 export type AtomProps = JSX.CircleSVGAttributes<SVGCircleElement> & {
   content: string;
-  id: Id;
+  name: Id;
   isTerminal: boolean;
   bondCount: number;
   ariaHidden: boolean;
@@ -135,7 +135,7 @@ export const Atom = withBluefish((props: AtomProps) => {
     );
   };
 
-  return <Layout name={props.id} layout={layout} paint={paint} />;
+  return <Layout name={props.name} layout={layout} paint={paint} />;
 });
 
 export default Atom;

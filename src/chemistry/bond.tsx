@@ -8,7 +8,7 @@ import { ArrowOptions } from "perfect-arrows";
 
 export type BondProps = ParentProps<
   {
-    id: Id;
+    name: Id;
     bondType: string;
     ringCenterX?: number;
     ringCenterY?: number;
@@ -65,7 +65,7 @@ export const Bond = withBluefish((props: BondProps) => {
   const layout = (childIds: ChildNode[]) => {
     childIds = Array.from(childIds);
 
-    if (props.id.endsWith("DEBUG")) {
+    if (props.name.endsWith("DEBUG")) {
       debugger;
     }
 
@@ -256,7 +256,7 @@ export const Bond = withBluefish((props: BondProps) => {
   };
 
   return (
-    <Layout name={props.id} layout={layout} paint={paint}>
+    <Layout name={props.name} layout={layout} paint={paint}>
       {props.children}
     </Layout>
   );
