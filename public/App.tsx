@@ -21,6 +21,7 @@ import { Space } from "../examples/topology/space";
 import { Neighborhood } from "../examples/topology/neighborhood";
 import { Image } from "../examples/topology/image";
 import { StackV } from "../src/stackv";
+import { GraphLayered } from "../src/graphLayered";
 
 const arr = Array.from({ length: 1000 }, (_, i) => i + 1);
 
@@ -85,6 +86,81 @@ const App: Component = () => {
 
   return (
     <>
+      <Bluefish>
+        <GraphLayered
+          direction="left-right"
+          edges={[
+            { source: "a", target: "b" },
+            { source: "b", target: "f" },
+            { source: "c", target: "f" },
+            { source: "d", target: "e" },
+            { source: "e", target: "f" },
+          ]}
+        >
+          <Rect
+            name="a"
+            width={144}
+            height={100}
+            fill="LavenderBlush"
+            stroke="#aaa"
+          />
+          <Rect
+            name="b"
+            width={160}
+            height={100}
+            fill="PeachPuff"
+            stroke="#aaa"
+          />
+          <Rect
+            name="c"
+            width={108}
+            height={100}
+            fill="LightSkyBlue"
+            stroke="#aaa"
+          />
+          <Rect
+            name="d"
+            width={168}
+            height={100}
+            fill="PaleGreen"
+            stroke="#aaa"
+          />
+          <Rect
+            name="e"
+            width={144}
+            height={100}
+            fill="Cornsilk"
+            stroke="#aaa"
+          />
+          <Rect
+            name="f"
+            width={121}
+            height={100}
+            fill="MintCream"
+            stroke="#aaa"
+          />
+        </GraphLayered>
+        <Arrow>
+          <Ref select="a" />
+          <Ref select="b" />
+        </Arrow>
+        <Arrow>
+          <Ref select="b" />
+          <Ref select="f" />
+        </Arrow>
+        <Arrow>
+          <Ref select="c" />
+          <Ref select="f" />
+        </Arrow>
+        <Arrow>
+          <Ref select="d" />
+          <Ref select="e" />
+        </Arrow>
+        <Arrow>
+          <Ref select="e" />
+          <Ref select="f" />
+        </Arrow>
+      </Bluefish>
       <Bluefish id="root" debug>
         <Group name="group" y={10}>
           <Rect width={200} height={20} name="top-rect" fill="blue" x={0} />
