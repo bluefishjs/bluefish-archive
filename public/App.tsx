@@ -19,7 +19,7 @@ import { Blob } from "../src/blob";
 import { PaperScope, Path, Point, Size } from "paper/dist/paper-core";
 import { Space } from "../examples/topology/space";
 import { Neighborhood } from "../examples/topology/neighborhood";
-import { Image } from "../examples/topology/image";
+import { Image } from "../src/image";
 import { StackV } from "../src/stackv";
 
 const arr = Array.from({ length: 1000 }, (_, i) => i + 1);
@@ -85,6 +85,13 @@ const App: Component = () => {
 
   return (
     <>
+      <Bluefish>
+        <Image
+          href="https://i.pinimg.com/originals/f8/01/e4/f801e4c0be2ef6505f099093a15ae2d8.jpg"
+          width={100}
+          height={100}
+        />
+      </Bluefish>
       <Bluefish id="root" debug>
         <Group name="group" y={10}>
           <Rect width={200} height={20} name="top-rect" fill="blue" x={0} />
@@ -198,38 +205,6 @@ const App: Component = () => {
   <Ref refId="U" />
   <Ref refId="f(U)" />
 </Arrow> */}
-        <Bluefish width={1000} height={500}>
-          <Group x={0} y={0}>
-            <Space name="X">
-              <Neighborhood name="U">
-                <Text name="x" vertical-anchor="start">
-                  x
-                </Text>
-              </Neighborhood>
-            </Space>
-            <Space name="Y">
-              <Neighborhood name="V">
-                <Image name="f(U)">
-                  <Text name="f(x)" vertical-anchor="start">
-                    f(x)
-                  </Text>
-                </Image>
-              </Neighborhood>
-            </Space>
-            <Align alignment="centerY">
-              <Ref select="X" />
-              <Ref select="Y" />
-            </Align>
-            <Distribute direction="horizontal" spacing={50}>
-              <Ref select="X" />
-              <Ref select="Y" />
-            </Distribute>
-            <Arrow padEnd={25}>
-              <Ref select="U" />
-              <Ref select="f(U)" />
-            </Arrow>
-          </Group>
-        </Bluefish>
         <br />
         <Bluefish width={300} height={100}>
           <Group x={0} y={0}>
