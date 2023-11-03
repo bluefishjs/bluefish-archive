@@ -93,7 +93,6 @@ const App: Component = () => {
             { source: "a", target: "b" },
             { source: "b", target: "f" },
             { source: "c", target: "f" },
-            { source: "d", target: "e" },
             { source: "e", target: "f" },
           ]}
         >
