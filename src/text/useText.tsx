@@ -1,7 +1,7 @@
 import reduceCSSCalc from "reduce-css-calc";
 import { TextProps, WordsWithDims } from "./types";
 import getStringDims from "./getStringDims";
-import { Accessor, createMemo, mergeProps } from "solid-js";
+import { Accessor, children, createMemo, mergeProps } from "solid-js";
 
 function isNumber(val: unknown): val is number {
   return typeof val === "number";
@@ -36,11 +36,20 @@ export default function useText(props: TextProps): {
   const isXOrYNotValid = () =>
     !isXOrYInValid(props.x) || !isXOrYInValid(props.y);
 
-  const words = createMemo(() =>
-    props.children == null
+  const c = children(() => props.children);
+
+  const words = createMemo(() => {
+    const children = c();
+
+    return children == null
       ? []
-      : props.children.toString().split(/(?:(?!\u00A0+)\s+)/)
-  );
+      : Array.isArray(children)
+      ? children
+          .join("")
+          .toString()
+          .split(/(?:(?!\u00A0+)\s+)/)
+      : children.toString().split(/(?:(?!\u00A0+)\s+)/);
+  });
 
   const wordsWithDims = createMemo(() =>
     words().map((word) => ({

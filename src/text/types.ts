@@ -44,7 +44,7 @@ type OwnProps = {
   /** Maximum width to occupy (approximate as words are not split). */
   width?: number;
   /** String (or number coercible to one) to be styled and positioned. */
-  children?: string | number;
+  children?: string[] | string | number;
 
   delimiters?: Delimiter[];
 };
