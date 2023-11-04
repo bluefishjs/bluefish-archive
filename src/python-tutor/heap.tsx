@@ -65,10 +65,6 @@ export const Heap = withBluefish((props: HeapProps) => {
                 "type" in elmTupleValue &&
                 elmTupleValue.type === "pointer"
               ) {
-                // TODO: come back to this to get more precise starting point
-                // const fromId = `elmVal_${elmTupleIndex()}_${objectIdToComponentId.get(
-                //   address()
-                // )}`;
                 return (
                   <Arrow
                     bow={0}
