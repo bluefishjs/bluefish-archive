@@ -9,6 +9,9 @@ import { Id } from "../../src/scenegraph";
 import withBluefish from "../../src/withBluefish";
 import { HeapObject } from "./heap-object";
 import { Address, HeapObject as HeapObjectType, formatValue } from "./types";
+import { StackH } from "../stackh";
+import { StackV } from "../stackv";
+import { createName } from "../createName";
 
 export type HeapProps = {
   name: Id;
@@ -28,90 +31,80 @@ export const Heap = withBluefish((props: HeapProps) => {
     });
   });
 
+  // const addressNames = new Map<Address, Id>();
+  // for (const row of props.heapArrangement) {
+  //   for (const address of row) {
+  //     if (address !== null) {
+  //       addressNames.set(address, createName(`address-${address}`));
+  //     }
+  //   }
+  // }
+  const addressNames = props.heap.map((_, i) => createName(`address-${i}`));
+
   return (
     <Group>
-      <For each={props.heapArrangement}>
-        {(row, index) => (
-          <Group name={`row${index()}~${props.name}`}>
-            <For each={row}>
-              {(obj, objIndex) =>
-                obj === null ? (
-                  <Rect
-                    name={`row${index()}_col${objIndex()}`}
-                    height={60}
-                    width={140}
-                    fill={"none"}
-                    stroke={"none"}
-                  />
-                ) : (
-                  <HeapObject
-                    name={`row${index()}_col${objIndex()}`}
-                    objectType={props.heap[obj].type}
-                    objectValues={props.heap[obj].values.map((value) => ({
-                      type: typeof value === "string" ? "string" : "pointer",
-                      value: formatValue(value),
-                    }))}
-                  />
-                )
-              }
-            </For>
-            <Distribute direction="horizontal" spacing={75}>
-              <For each={row}>
-                {(obj, objIndex) => (
-                  <Ref select={`row${index()}_col${objIndex()}`} />
-                )}
-              </For>
-            </Distribute>
-            <Align alignment="bottom">
-              <For each={row}>
-                {(obj, objIndex) => (
-                  <Ref select={`row${index()}_col${objIndex()}`} />
-                )}
-              </For>
-            </Align>
-          </Group>
-        )}
-      </For>
-      <Distribute direction="vertical" spacing={75}>
+      <StackV alignment="left" spacing={75}>
         <For each={props.heapArrangement}>
-          {(row, index) => <Ref select={`row${index()}~${props.name}`} />}
+          {(row, index) => (
+            <StackH alignment="bottom" spacing={75}>
+              <For each={row}>
+                {(address) =>
+                  address === null ? (
+                    <Rect
+                      height={60}
+                      width={140}
+                      fill={"none"}
+                      stroke={"none"}
+                    />
+                  ) : (
+                    <HeapObject
+                      name={addressNames[address]}
+                      objectType={props.heap[address].type}
+                      objectValues={props.heap[address].values.map((value) => ({
+                        type: typeof value === "string" ? "string" : "pointer",
+                        value: formatValue(value),
+                      }))}
+                    />
+                  )
+                }
+              </For>
+            </StackH>
+          )}
         </For>
-      </Distribute>
-      <Align alignment="left">
-        <For each={props.heapArrangement}>
-          {(row, index) => <Ref select={`row${index()}~${props.name}`} />}
-        </For>
-      </Align>
+      </StackV>
 
       {/* Add arrows between heap objects */}
       <For each={props.heap}>
-        {(heapObject, heapObIndex) => (
+        {(heapObject, address) => (
           <For each={heapObject.values}>
             {(elmTupleValue, elmTupleIndex) => {
+              // TODO: probably should just box every value to make this simpler
               if (
-                typeof elmTupleValue !== "string" &&
-                typeof elmTupleValue !== "number"
+                typeof elmTupleValue === "object" &&
+                "type" in elmTupleValue &&
+                elmTupleValue.type === "pointer"
               ) {
-                const fromId = `elmVal_${elmTupleIndex()}_${objectIdToComponentId.get(
-                  heapObIndex()
-                )}`;
-                const toId = `elm_0_${objectIdToComponentId.get(
-                  elmTupleValue.value
-                )}`;
-                if (fromId !== undefined && toId !== undefined) {
-                  return (
-                    <Arrow
-                      bow={0}
-                      padEnd={25}
-                      stroke="#1A5683"
-                      start
-                      padStart={0}
-                    >
-                      <Ref select={fromId} />
-                      <Ref select={toId} />
-                    </Arrow>
-                  );
-                }
+                // TODO: come back to this to get more precise starting point
+                // const fromId = `elmVal_${elmTupleIndex()}_${objectIdToComponentId.get(
+                //   address()
+                // )}`;
+                return (
+                  <Arrow
+                    bow={0}
+                    padEnd={25}
+                    stroke="#1A5683"
+                    start
+                    padStart={0}
+                  >
+                    <Ref
+                      select={[
+                        addressNames[address()],
+                        // `elm-${elmTupleIndex()}`,
+                      ]}
+                    />
+                    <Ref select={addressNames[elmTupleValue.value]} />
+                  </Arrow>
+                );
               }
             }}
           </For>
