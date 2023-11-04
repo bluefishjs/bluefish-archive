@@ -14,6 +14,7 @@ draw this out. it's too hard to see
 export type Scope = {
   [key: Id]: {
     layoutNode: Id | undefined;
+    parent: Id; // TODO: not sure if this is used. might be useful for debugging/error reporting, though
     children: { [key: Name]: Id };
   };
 };
@@ -34,17 +35,15 @@ export const createName = (name: string) => {
 
   // setScope(name, genId);
   setScope(genId, {
+    parent: parentId(),
     layoutNode: undefined,
     children: {},
   }); // inside withBluefish, we first check if we have a props.name as input, which will then become the parent context. otherwise we'll generate a new id for the parent context
   setScope(parentId(), "children", name, genId);
 
-  return { scopedName: genId };
+  return genId;
 };
 
 /* 
-TODO:
-- in layout: associate this id with a layout node id
-- in ref: lookup the id to get the layout node id
-- in withBluefish: need to ensure that props.name is always an id
+TODO: initialize
 */

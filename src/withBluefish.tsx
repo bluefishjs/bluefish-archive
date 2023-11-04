@@ -26,20 +26,24 @@ export function withBluefish<ComponentProps>(
     // scenegraph id
     const contextId = useContext(IdContext);
     const genId = createUniqueId();
-    const id = () => props.name ?? contextId() ?? genId;
+    const genScopeId = createUniqueId();
+    // const id = () => props.name ?? contextId() ?? genId;
+    const id = () => contextId() ?? genId;
+    const scopeId = () => props.name ?? genScopeId;
 
     // component scope id
     const [scope, setScope] = useContext(ScopeContext);
-    const scopeId = createMemo(() => {
-      if (props.name !== undefined) {
-        return props.name;
-      }
 
-      // TODO: check if already defined?
+    // TODO: might have to initialize the scope in the store if the scope id was auto-generated
 
-      setScope(genId, {});
-      return genId;
-    });
+    if (scope[scopeId()] === undefined) {
+      setScope(scopeId(), {
+        parent: contextId(),
+        layoutNode: undefined,
+        children: {},
+      });
+    }
+    setScope(scopeId(), "layoutNode", id());
 
     return (
       <ParentScopeIdContext.Provider value={scopeId}>
