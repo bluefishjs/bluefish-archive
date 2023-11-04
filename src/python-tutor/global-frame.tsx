@@ -10,13 +10,14 @@ import Text from "../../src/text";
 import { Value } from "./types";
 import { createName } from "../createName";
 import { StackV } from "../stackv";
+import withBluefish from "../withBluefish";
 
 export type GlobalFrameProps = {
   name?: Id;
   variables: { variable: string; value: Value }[];
 };
 
-export function GlobalFrame(props: GlobalFrameProps) {
+export const GlobalFrame = withBluefish((props: GlobalFrameProps) => {
   const frameName = createName("frame");
   const frameBorderName = createName("frameBorder");
   const labelName = createName("label");
@@ -67,6 +68,6 @@ export function GlobalFrame(props: GlobalFrameProps) {
       </StackV>
     </Group>
   );
-}
+});
 
 export default GlobalFrame;

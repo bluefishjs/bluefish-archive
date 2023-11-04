@@ -20,25 +20,6 @@ export type HeapProps = {
 };
 
 export const Heap = withBluefish((props: HeapProps) => {
-  // Maps object number to the ID of the corresponding heap object
-  // This will help generate Arrows between objects
-  const objectIdToComponentId = new Map<number, string>();
-  props.heapArrangement.forEach((row, rowIndex) => {
-    row.forEach((obj, colIndex) => {
-      if (obj !== null) {
-        objectIdToComponentId.set(obj, `row${rowIndex}_col${colIndex}`);
-      }
-    });
-  });
-
-  // const addressNames = new Map<Address, Id>();
-  // for (const row of props.heapArrangement) {
-  //   for (const address of row) {
-  //     if (address !== null) {
-  //       addressNames.set(address, createName(`address-${address}`));
-  //     }
-  //   }
-  // }
   const addressNames = props.heap.map((_, i) => createName(`address-${i}`));
 
   return (

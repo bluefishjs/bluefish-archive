@@ -26,7 +26,7 @@ export const ScopeContext = createContext<
 export const ParentScopeIdContext = createContext<Accessor<Name>>(() => "");
 
 export const createName = (name: string) => {
-  const genId = createUniqueId();
+  const genId = `${name}-${createUniqueId()}`;
 
   const [scope, setScope] = useContext(ScopeContext);
   const parentId = useContext(ParentScopeIdContext);
@@ -40,8 +40,6 @@ export const createName = (name: string) => {
     children: {},
   }); // inside withBluefish, we first check if we have a props.name as input, which will then become the parent context. otherwise we'll generate a new id for the parent context
   setScope(parentId(), "children", name, genId);
-  console.log(`added ${name} to scope ${parentId()}`);
-  console.log(`${name} refers to scope ${genId}`);
 
   return genId;
 };

@@ -61,20 +61,20 @@ const PythonTutor = withBluefish((props: PythonTutorProps) => {
           "type" in stackSlot.value &&
           stackSlot.value.type === "pointer" ? (
             <Arrow bow={0} stretch={0} flip stroke="#1A5683" padStart={0} start>
-              {/* <Ref
-                select={`valueName_stackSlot${slackSlotIndex()}_globalFrame-${
-                  props.name
-                }`}
-              /> */}
               <Ref
-                select={[globalFrameName, `stackSlot-${stackSlotIndex()}`]}
+                select={[
+                  globalFrameName,
+                  `stackSlot-${stackSlotIndex()}`,
+                  "value",
+                ]}
               />
-              {/* <Ref
-                select={`elm_0_${objectIdToComponentId.get(
-                  stackSlot.value.value
-                )}`}
-              /> */}
-              <Ref select={[heapName, `address-${stackSlot.value.value}`]} />
+              <Ref
+                select={[
+                  heapName,
+                  `address-${stackSlot.value.value}`,
+                  "objectRef",
+                ]}
+              />
             </Arrow>
           ) : null
         }
@@ -106,6 +106,7 @@ export const PythonTutorExample: Story = {
   render: (props) => (
     <Bluefish>
       <PythonTutor
+        name="python-tutor"
         {...props}
         heap={props.heap}
         heapArrangement={props.heapArrangement}

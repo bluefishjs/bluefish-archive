@@ -25,6 +25,7 @@ export function withBluefish<ComponentProps>(
   return function (props: Omit<ComponentProps, "name"> & { name?: Id }) {
     // scenegraph id
     const contextId = useContext(IdContext);
+    const parentScopeId = useContext(ParentScopeIdContext);
     const genId = createUniqueId();
     const genScopeId = createUniqueId();
     // const id = () => props.name ?? contextId() ?? genId;
@@ -38,7 +39,7 @@ export function withBluefish<ComponentProps>(
 
     if (scope[scopeId()] === undefined) {
       setScope(scopeId(), {
-        parent: contextId(),
+        parent: parentScopeId(),
         layoutNode: undefined,
         children: {},
       });
