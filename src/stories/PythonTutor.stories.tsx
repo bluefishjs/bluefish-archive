@@ -55,26 +55,30 @@ const PythonTutor = withBluefish((props: PythonTutorProps) => {
       </StackH>
 
       {/* Make arrows from stack slots to heap objects */}
-      {/* <For each={props.stack}>
-        {(stackSlot, slackSlotIndex) =>
+      <For each={props.stack}>
+        {(stackSlot, stackSlotIndex) =>
           typeof stackSlot.value === "object" &&
           "type" in stackSlot.value &&
           stackSlot.value.type === "pointer" ? (
             <Arrow bow={0} stretch={0} flip stroke="#1A5683" padStart={0} start>
-              <Ref
+              {/* <Ref
                 select={`valueName_stackSlot${slackSlotIndex()}_globalFrame-${
                   props.name
                 }`}
-              />
+              /> */}
               <Ref
+                select={[globalFrameName, `stackSlot-${stackSlotIndex()}`]}
+              />
+              {/* <Ref
                 select={`elm_0_${objectIdToComponentId.get(
                   stackSlot.value.value
                 )}`}
-              />
+              /> */}
+              <Ref select={[heapName, `address-${stackSlot.value.value}`]} />
             </Arrow>
           ) : null
         }
-      </For> */}
+      </For>
     </Group>
   );
 });

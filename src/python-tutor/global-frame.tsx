@@ -8,6 +8,8 @@ import { StackSlot } from "./stack-slot";
 import Distribute from "../../src/distribute";
 import Text from "../../src/text";
 import { Value } from "./types";
+import { createName } from "../createName";
+import { StackV } from "../stackv";
 
 export type GlobalFrameProps = {
   name?: Id;
@@ -15,19 +17,25 @@ export type GlobalFrameProps = {
 };
 
 export function GlobalFrame(props: GlobalFrameProps) {
-  const id = props.name ?? createUniqueId();
+  const frameName = createName("frame");
+  const frameBorderName = createName("frameBorder");
+  const labelName = createName("label");
+  const frameVariablesName = createName("frameVariables");
+  const stackSlotNames = props.variables.map((_, i) =>
+    createName(`stackSlot-${i}`)
+  );
 
   // Font declaration
   const fontFamily = "Andale mono, monospace";
 
   return (
-    <Group x={0} y={0} name={props.name ?? `group_${id}`}>
+    <Group>
       {/* Global Frame and relevant text */}
-      <Rect name={`frame${id}`} height={300} width={200} fill={"#e2ebf6"} />
-      <Rect name={`frameBorder${id}`} height={300} width={5} fill={"#a6b3b6"} />
+      <Rect name={frameName} height={300} width={200} fill={"#e2ebf6"} />
+      <Rect name={frameBorderName} height={300} width={5} fill={"#a6b3b6"} />
       {/* TODO: there is a bug where the text is showing up lower than I expect it to... */}
       <Text
-        name={`label${id}`}
+        name={labelName}
         font-size={"24px"}
         font-family={fontFamily}
         fill={"black"}
@@ -35,42 +43,28 @@ export function GlobalFrame(props: GlobalFrameProps) {
         Global Frame
       </Text>
       <Align alignment="topCenter">
-        <Ref select={`label${id}`} />
-        <Ref select={`frame${id}`} />
+        <Ref select={labelName} />
+        <Ref select={frameName} />
       </Align>
       <Align alignment="centerLeft">
-        <Ref select={`frameBorder${id}`} />
-        <Ref select={`frame${id}`} />
+        <Ref select={frameBorderName} />
+        <Ref select={frameName} />
       </Align>
-      <Group name={`frameVariables${id}`}>
+      <StackV name={frameVariablesName} alignment="right" spacing={10}>
         <For each={props.variables}>
-          {(variable: any, i) => (
+          {(variable, i) => (
             <StackSlot
-              name={`stackSlot${i()}_${id}`}
+              name={stackSlotNames[i()]}
               variable={variable.variable}
-              value={variable.value}
+              value={variable.value as any}
             />
           )}
         </For>
-        <Align alignment="right">
-          <For each={props.variables}>
-            {(variable: any, i) => <Ref select={`stackSlot${i()}_${id}`} />}
-          </For>
-        </Align>
-        <Distribute direction="vertical" spacing={10}>
-          <For each={props.variables}>
-            {(variable: any, i) => <Ref select={`stackSlot${i()}_${id}`} />}
-          </For>
-        </Distribute>
-      </Group>
-      <Distribute direction="vertical" spacing={10}>
-        <Ref select={`label${id}`} />
-        <Ref select={`frameVariables${id}`} />
-      </Distribute>
-      <Align alignment="right">
-        <Ref select={`frameVariables${id}`} />
-        <Ref select={`label${id}`} />
-      </Align>
+      </StackV>
+      <StackV alignment="right" spacing={10}>
+        <Ref select={labelName} />
+        <Ref select={frameVariablesName} />
+      </StackV>
     </Group>
   );
 }

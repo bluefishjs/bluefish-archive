@@ -48,6 +48,7 @@ export const resolveSelection = (
   for (const name of names) {
     const child = scope[currId].children[name];
     if (child === undefined) {
+      console.log(JSON.parse(JSON.stringify(scope)));
       throw new Error(
         `Could not find ${name} in ${currId}. Available names: ${Object.keys(
           scope[currId].children
