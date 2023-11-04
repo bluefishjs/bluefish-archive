@@ -80,10 +80,13 @@ export const Heap = withBluefish((props: HeapProps) => {
                     <Ref
                       select={[
                         addressNames[address()],
-                        // `elm-${elmTupleIndex()}`,
+                        `elm-${elmTupleIndex()}`,
+                        "val",
                       ]}
                     />
-                    <Ref select={addressNames[elmTupleValue.value]} />
+                    <Ref
+                      select={[addressNames[elmTupleValue.value], "elm-0"]}
+                    />
                   </Arrow>
                 );
               }

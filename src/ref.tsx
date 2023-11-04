@@ -58,7 +58,18 @@ export const resolveSelection = (
     currId = child;
   }
 
-  return scope[currId].layoutNode!;
+  const layoutId = scope[currId].layoutNode;
+
+  if (layoutId === undefined) {
+    console.log(JSON.parse(JSON.stringify(scope)));
+    throw new Error(
+      `Could not find layout node for ${currId}. Available names: ${Object.keys(
+        scope[currId].children
+      ).join(", ")}`
+    );
+  }
+
+  return layoutId;
 };
 
 export const Ref = withBluefish((props: RefProps) => {

@@ -7,6 +7,7 @@ import { Id } from "../../src/scenegraph";
 import { Text } from "../../src/text";
 import { Value } from "./types";
 import { createName } from "../createName";
+import withBluefish from "../withBluefish";
 
 export type ElmTupleProps = {
   name?: Id;
@@ -14,7 +15,7 @@ export type ElmTupleProps = {
   tupleData: { type: string; value: Value };
 };
 
-export function ElmTuple(props: ElmTupleProps) {
+export const ElmTuple = withBluefish((props: ElmTupleProps) => {
   const fontFamily = "verdana, arial, helvetica, sans-serif";
 
   const boxName = createName("box");
@@ -62,6 +63,6 @@ export function ElmTuple(props: ElmTupleProps) {
       </Align>
     </Group>
   );
-}
+});
 
 export default ElmTuple;

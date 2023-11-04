@@ -69,11 +69,7 @@ const PythonTutor = withBluefish((props: PythonTutorProps) => {
                 ]}
               />
               <Ref
-                select={[
-                  heapName,
-                  `address-${stackSlot.value.value}`,
-                  "objectRef",
-                ]}
+                select={[heapName, `address-${stackSlot.value.value}`, "elm-0"]}
               />
             </Arrow>
           ) : null

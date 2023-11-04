@@ -43,7 +43,3 @@ export const createName = (name: string) => {
 
   return genId;
 };
-
-/* 
-TODO: initialize
-*/
