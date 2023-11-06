@@ -3,7 +3,7 @@ import { Rect } from "../../rect";
 import { Bluefish } from "../../bluefish";
 import Arrow from "../../arrow";
 import Ref from "../../ref";
-import { GraphLayered } from "../../graphLayered";
+import { GraphLayered, Node, Edge } from "../../graphLayered";
 
 /**
  * Creates a layered graph using [dagre](https://github.com/dagrejs/dagre). The direction of the
@@ -33,52 +33,66 @@ export const FirstStory: Story = {
   },
   render: (props) => (
     <Bluefish>
-      <GraphLayered
-        {...props}
-        edges={[
-          { source: "a", target: "b" },
-          { source: "b", target: "f" },
-          { source: "c", target: "f" },
-          { source: "d", target: "e" },
-          { source: "e", target: "f" },
-        ]}
-      >
-        <Rect
-          name="a"
-          width={144}
-          height={100}
-          fill="LavenderBlush"
-          stroke="#aaa"
-        />
-        <Rect
-          name="b"
-          width={160}
-          height={100}
-          fill="PeachPuff"
-          stroke="#aaa"
-        />
-        <Rect
-          name="c"
-          width={108}
-          height={100}
-          fill="LightSkyBlue"
-          stroke="#aaa"
-        />
-        <Rect
-          name="d"
-          width={168}
-          height={100}
-          fill="PaleGreen"
-          stroke="#aaa"
-        />
-        <Rect name="e" width={144} height={100} fill="Cornsilk" stroke="#aaa" />
-        <Rect
-          name="f"
-          width={121}
-          height={100}
-          fill="MintCream"
-          stroke="#aaa"
-        />
+      <GraphLayered {...props}>
+        <Node id="a">
+          <Rect
+            name="a"
+            width={144}
+            height={100}
+            fill="LavenderBlush"
+            stroke="#aaa"
+          />
+        </Node>
+        <Node id="b">
+          <Rect
+            name="b"
+            width={160}
+            height={100}
+            fill="PeachPuff"
+            stroke="#aaa"
+          />
+        </Node>
+        <Node id="c">
+          <Rect
+            name="c"
+            width={108}
+            height={100}
+            fill="LightSkyBlue"
+            stroke="#aaa"
+          />
+        </Node>
+        <Node id="d">
+          <Rect
+            name="d"
+            width={168}
+            height={100}
+            fill="PaleGreen"
+            stroke="#aaa"
+          />
+        </Node>
+        <Node id="e">
+          <Rect
+            name="e"
+            width={144}
+            height={100}
+            fill="Cornsilk"
+            stroke="#aaa"
+          />
+        </Node>
+        <Node id="f">
+          <Rect
+            name="f"
+            width={121}
+            height={100}
+            fill="MintCream"
+            stroke="#aaa"
+          />
+        </Node>
+        <Edge source="a" target="b" />
+        <Edge source="b" target="f" />
+        <Edge source="c" target="f" />
+        <Edge source="d" target="e" />
+        <Edge source="e" target="f" />
       </GraphLayered>
       <Arrow>
         <Ref select="a" />
