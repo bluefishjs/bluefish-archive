@@ -48,7 +48,6 @@ export function Bluefish(props: BluefishProps) {
   // const autoGenId = useId();
   const autoGenId = createUniqueId();
   const autoGenScopeId = createUniqueId();
-  // const id = props.id ?? autoGenId;
   const id = autoGenId;
   const scopeId = props.id ?? autoGenScopeId;
   // const wroteToWindow = useRef(false);
