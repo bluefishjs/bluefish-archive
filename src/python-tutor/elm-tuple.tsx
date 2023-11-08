@@ -6,45 +6,42 @@ import { Ref } from "../../src/ref";
 import { Id } from "../../src/scenegraph";
 import { Text } from "../../src/text";
 import { Value } from "./types";
+import { createName } from "../createName";
+import withBluefish from "../withBluefish";
 
 export type ElmTupleProps = {
-  x?: number;
-  y?: number;
   name?: Id;
   tupleIndex: string;
   tupleData: { type: string; value: Value };
-  objectId: string;
 };
 
-export function ElmTuple(props: ElmTupleProps) {
-  const id = createUniqueId();
+export const ElmTuple = withBluefish((props: ElmTupleProps) => {
   const fontFamily = "verdana, arial, helvetica, sans-serif";
 
+  const boxName = createName("box");
+  const labelName = createName("label");
+  const valName = createName("val");
+
   return (
-    <Group
-      name={props.name ?? `elm_${props.tupleIndex}_${props.objectId}`}
-      x={props.x}
-      y={props.y}
-    >
+    <Group>
       <Rect
-        name={`elmBox_${props.tupleIndex}_${props.objectId}`}
+        name={boxName}
         height={60}
         width={70}
         fill={"#ffffc6"}
         stroke={"grey"}
       />
       <Text
-        name={`elmLabel_${props.tupleIndex}_${props.objectId}`}
+        name={labelName}
         font-family={fontFamily}
         font-size={"16px"}
         fill={"gray"}
       >
         {props.tupleIndex}
       </Text>
-
       {props.tupleData.type === "string" ? (
         <Text
-          name={`elmVal_${props.tupleIndex}_${props.objectId}`}
+          name={valName}
           font-size={"24px"}
           font-family={fontFamily}
           fill={"black"}
@@ -52,23 +49,20 @@ export function ElmTuple(props: ElmTupleProps) {
           {props.tupleData.value as string}
         </Text>
       ) : (
-        <Text
-          name={`elmVal_${props.tupleIndex}_${props.objectId}`}
-          fill={"none"}
-        >
+        <Text name={valName} fill={"none"}>
           {""}
         </Text>
       )}
       <Align alignment="center">
-        <Ref select={`elmVal_${props.tupleIndex}_${props.objectId}`} />
-        <Ref select={`elmBox_${props.tupleIndex}_${props.objectId}`} />
+        <Ref select={valName} />
+        <Ref select={boxName} />
       </Align>
       <Align alignment="topLeft">
-        <Ref select={`elmLabel_${props.tupleIndex}_${props.objectId}`} />
-        <Ref select={`elmBox_${props.tupleIndex}_${props.objectId}`} />
+        <Ref select={labelName} />
+        <Ref select={boxName} />
       </Align>
     </Group>
   );
-}
+});
 
 export default ElmTuple;

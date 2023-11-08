@@ -112,7 +112,7 @@ export const JetpackCompose: Story = {
           </StackH>
           <Group x={0} name="main-content">
             <Gradient
-              name="sleepBarGradient"
+              id="sleepBarGradient"
               colorOffsets={[
                 { offset: 0, color: "#F1E9BC" },
                 { offset: 100, color: "#f7d590" },
@@ -123,7 +123,7 @@ export const JetpackCompose: Story = {
               y2={1}
             />
             <Gradient
-              name="hoursBarGradient"
+              id="hoursBarGradient"
               colorOffsets={[
                 { offset: 0, color: "#f8e7a0" },
                 { offset: 100, color: "#f8d183" },

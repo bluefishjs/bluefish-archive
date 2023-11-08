@@ -10,6 +10,7 @@ import { StackV } from "../stackv";
 import { StackH } from "../stackh";
 import { Arrow } from "../arrow";
 import { Align } from "../align";
+import { createName } from "../createName";
 
 const meta: Meta = {
   title: "Example/SimpleTree",
@@ -20,19 +21,18 @@ type Story = StoryObj;
 
 // Component to render Tree node
 type NodeProps = WithBluefishProps<{
-  nodeValue: string;
-  id?: string;
+  value: string;
 }>;
 
 const Node = withBluefish((props: NodeProps) => {
-  props = mergeProps({ nodeValue: "?", id: createUniqueId() }, props);
-  const nodeValueId = `${props.name}_value`;
-  const nodeOutlineId = `${props.name}_outline`;
+  props = mergeProps({ value: "?" }, props);
+  const valueName = createName("value");
+  const outlineName = createName("outline");
 
   return (
     <Group>
       <Rect
-        name={nodeOutlineId}
+        name={outlineName}
         width={50}
         height={65}
         rx={5}
@@ -40,16 +40,16 @@ const Node = withBluefish((props: NodeProps) => {
         stroke={"black"}
         opacity={0.5}
       />
-      <Text name={nodeValueId} font-size="24px">
-        {props.nodeValue}
+      <Text name={valueName} font-size="24px">
+        {props.value}
       </Text>
       <Align alignment="centerY">
-        <Ref select={nodeValueId} />
-        <Ref select={nodeOutlineId} />
+        <Ref select={valueName} />
+        <Ref select={outlineName} />
       </Align>
       <Align alignment="centerX">
-        <Ref select={nodeValueId} />
-        <Ref select={nodeOutlineId} />
+        <Ref select={valueName} />
+        <Ref select={outlineName} />
       </Align>
     </Group>
   );
@@ -57,55 +57,52 @@ const Node = withBluefish((props: NodeProps) => {
 
 // Component to render Tree
 type TreeData = {
+  value?: string;
   subtrees?: TreeData[];
-  nodeId?: string;
-  nodeValue?: string;
 };
 
-type TreeProps = WithBluefishProps<{
-  data: TreeData;
-}>;
+type TreeProps = WithBluefishProps<TreeData>;
 
 const Tree = withBluefish((props: TreeProps) => {
   // merge props.data with default
-  props.data = mergeProps(
+  props = mergeProps(
     {
       subtrees: [] as TreeData[],
       nodeId: createUniqueId(),
-      nodeValue: "?",
+      value: "?",
     },
-    props.data
+    props
   );
 
   // merge props with default
   props = mergeProps({ id: createUniqueId() }, props);
 
-  const data = props.data;
-  const subtreeRowId = `subtrees_of_${data.nodeId}`;
+  const nodeName = createName("node");
 
-  let subtreeIds: string[] = data.subtrees.map(
-    (subtree) => `${subtree.nodeId}_subtree`
+  // TODO: could probably get even fancier with this by turning objects into nested names somehow
+  const subtreeNames = (props.subtrees ?? []).map((_, i) =>
+    createName(`subtree${i}`)
   );
 
   return (
     <Group>
-      <Node name={data.nodeId} nodeValue={data.nodeValue} />
+      <Node name={nodeName} value={props.value} />
 
-      {data.subtrees?.length ? (
+      {props.subtrees?.length ? (
         <>
           <StackV spacing={50} alignment="centerX">
-            <Ref select={data.nodeId} />
-            <StackH name={subtreeRowId} alignment="centerY" spacing={50}>
-              <For each={data.subtrees}>
-                {(child, i) => <Tree name={subtreeIds[i()]} data={child} />}
+            <Ref select={nodeName} />
+            <StackH alignment="centerY" spacing={50}>
+              <For each={props.subtrees}>
+                {(child, i) => <Tree name={subtreeNames[i()]} {...child} />}
               </For>
             </StackH>
           </StackV>
-          <For each={data.subtrees}>
+          <For each={props.subtrees}>
             {(child, i) => (
               <Arrow bow={0} stretch={0.1} flip>
-                <Ref select={data.nodeId} />
-                <Ref select={child.nodeId} />
+                <Ref select={nodeName} />
+                <Ref select={[subtreeNames[i()], "node"]} />
               </Arrow>
             )}
           </For>
@@ -117,52 +114,33 @@ const Tree = withBluefish((props: TreeProps) => {
 
 export const TwoLevelTree: Story = {
   args: {
-    id: "tree0",
-    data: {
-      nodeId: "node0",
-      nodeValue: "A",
-      subtrees: [
-        { nodeValue: "B", nodeId: "node1" },
-        { nodeValue: "C", nodeId: "node2" },
-      ],
-    },
+    value: "A",
+    subtrees: [{ value: "B" }, { value: "C" }],
   },
   render: (props) => (
     <Bluefish width={500} height={500}>
-      <Tree {...props} data={props.data} />
+      <Tree {...props} />
     </Bluefish>
   ),
 };
 
 export const ThreeLevelTree: Story = {
   args: {
-    id: "tree1",
-    data: {
-      nodeId: "node0",
-      nodeValue: "A",
-      subtrees: [
-        {
-          nodeValue: "B",
-          nodeId: "node1",
-          subtrees: [
-            { nodeId: "node3", nodeValue: "D" },
-            { nodeId: "node4", nodeValue: "E" },
-          ],
-        },
-        {
-          nodeValue: "C",
-          nodeId: "node2",
-          subtrees: [
-            { nodeId: "node5", nodeValue: "F" },
-            { nodeId: "node6", nodeValue: "G" },
-          ],
-        },
-      ],
-    },
+    value: "A",
+    subtrees: [
+      {
+        value: "B",
+        subtrees: [{ value: "D" }, { value: "E" }],
+      },
+      {
+        value: "C",
+        subtrees: [{ value: "F" }, { value: "G" }],
+      },
+    ],
   },
   render: (props) => (
     <Bluefish width={500} height={500}>
-      <Tree {...props} data={props.data} />
+      <Tree {...props} />
     </Bluefish>
   ),
 };

@@ -11,6 +11,8 @@ import {
   ChildNode,
 } from "./scenegraph";
 import { JSX, ParentProps, Show, createUniqueId, mergeProps } from "solid-js";
+import { ParentScopeIdContext, Scope, ScopeContext } from "./createName";
+import { createStore } from "solid-js/store";
 
 export type BluefishProps = ParentProps<{
   width?: number;
@@ -41,10 +43,13 @@ export function Bluefish(props: BluefishProps) {
   // const bboxStore = createScenegraph();
   const scenegraphContext = createScenegraph();
   const { scenegraph, createNode } = scenegraphContext;
+  const [scope, setScope] = createStore<Scope>({});
 
   // const autoGenId = useId();
   const autoGenId = createUniqueId();
-  const id = props.id ?? autoGenId;
+  const autoGenScopeId = createUniqueId();
+  const id = autoGenId;
+  const scopeId = props.id ?? autoGenScopeId;
   // const wroteToWindow = useRef(false);
 
   // useEffect(() => {
@@ -148,11 +153,15 @@ export function Bluefish(props: BluefishProps) {
   return (
     <>
       <ScenegraphContext.Provider value={scenegraphContext}>
-        <Layout name={id} layout={layout} paint={paint}>
-          <ParentIDContext.Provider value={id}>
-            {props.children}
-          </ParentIDContext.Provider>
-        </Layout>
+        <ScopeContext.Provider value={[scope, setScope]}>
+          <Layout name={id} layout={layout} paint={paint}>
+            <ParentScopeIdContext.Provider value={() => scopeId}>
+              <ParentIDContext.Provider value={id}>
+                {props.children}
+              </ParentIDContext.Provider>
+            </ParentScopeIdContext.Provider>
+          </Layout>
+        </ScopeContext.Provider>
       </ScenegraphContext.Provider>
       <Show when={props.debug === true}>
         <pre>{JSON.stringify(scenegraph, null, 2)}</pre>

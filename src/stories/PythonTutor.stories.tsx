@@ -10,8 +10,10 @@ import { Ref } from "../ref";
 import { withBluefish, WithBluefishProps } from "../withBluefish";
 import { GlobalFrame } from "../python-tutor/global-frame";
 import { Heap } from "../python-tutor/heap";
-import { Address, HeapObject, StackSlot } from "../python-tutor/types";
+import { Address, HeapObject, StackSlot, pointer } from "../python-tutor/types";
 import { For } from "solid-js";
+import { createName } from "../createName";
+import { StackH } from "../stackh";
 
 const meta: Meta = {
   title: "Example/PythonTutor",
@@ -27,6 +29,9 @@ type PythonTutorProps = WithBluefishProps<{
 }>;
 
 const PythonTutor = withBluefish((props: PythonTutorProps) => {
+  const globalFrameName = createName("globalFrame");
+  const heapName = createName("heap");
+
   // Maps object number to the ID of the corresponding heap object
   // This will help generate Arrows between objects
   const objectIdToComponentId = new Map<number, string>();
@@ -39,37 +44,32 @@ const PythonTutor = withBluefish((props: PythonTutorProps) => {
   });
 
   return (
-    <Group name={props.name}>
-      <GlobalFrame name={`globalFrame-${props.name}`} variables={props.stack} />
-      <Heap
-        name={`heap-${props.name}`}
-        heap={props.heap}
-        heapArrangement={props.heapArrangement}
-      />
-      <Distribute direction="horizontal" spacing={60}>
-        <Ref select={`globalFrame-${props.name}`} />
-        <Ref select={`heap-${props.name}`} />
-      </Distribute>
-      <Align alignment="top">
-        <Ref select={`globalFrame-${props.name}`} />
-        <Ref select={`heap-${props.name}`} />
-      </Align>
+    <Group>
+      <StackH alignment="top" spacing={60}>
+        <GlobalFrame name={globalFrameName} variables={props.stack} />
+        <Heap
+          name={heapName}
+          heap={props.heap}
+          heapArrangement={props.heapArrangement}
+        />
+      </StackH>
 
       {/* Make arrows from stack slots to heap objects */}
       <For each={props.stack}>
-        {(stackSlot, slackSlotIndex) =>
-          typeof stackSlot.value !== "string" &&
-          typeof stackSlot.value !== "number" ? (
+        {(stackSlot, stackSlotIndex) =>
+          typeof stackSlot.value === "object" &&
+          "type" in stackSlot.value &&
+          stackSlot.value.type === "pointer" ? (
             <Arrow bow={0} stretch={0} flip stroke="#1A5683" padStart={0} start>
               <Ref
-                select={`valueName_stackSlot${slackSlotIndex()}_globalFrame-${
-                  props.name
-                }`}
+                select={[
+                  globalFrameName,
+                  `stackSlot-${stackSlotIndex()}`,
+                  "value",
+                ]}
               />
               <Ref
-                select={`elm_0_${objectIdToComponentId.get(
-                  stackSlot.value.value
-                )}`}
+                select={[heapName, `address-${stackSlot.value.value}`, "elm-0"]}
               />
             </Arrow>
           ) : null
@@ -81,20 +81,15 @@ const PythonTutor = withBluefish((props: PythonTutorProps) => {
 
 export const PythonTutorExample: Story = {
   args: {
-    id: "pt0",
     stack: [
-      { variable: "c", value: { type: "pointer", value: 0 } },
-      { variable: "d", value: { type: "pointer", value: 1 } },
+      { variable: "c", value: pointer(0) },
+      { variable: "d", value: pointer(1) },
       { variable: "x", value: "5" },
     ],
     heap: [
       {
         type: "tuple",
-        values: [
-          "1",
-          { type: "pointer", value: 1 },
-          { type: "pointer", value: 2 },
-        ],
+        values: ["1", pointer(1), pointer(2)],
       },
       { type: "tuple", values: ["1", "4"] },
       { type: "tuple", values: ["3", "10"] },
@@ -107,6 +102,7 @@ export const PythonTutorExample: Story = {
   render: (props) => (
     <Bluefish>
       <PythonTutor
+        name="python-tutor"
         {...props}
         heap={props.heap}
         heapArrangement={props.heapArrangement}

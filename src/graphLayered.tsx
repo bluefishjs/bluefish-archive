@@ -1,6 +1,6 @@
-import { ParentProps, JSX, mergeProps } from "solid-js";
+import { ParentProps, JSX, mergeProps, children, For } from "solid-js";
 import { StackArgs, stackLayout } from "./stackLayout";
-import withBluefish from "./withBluefish";
+import withBluefish, { WithBluefishProps } from "./withBluefish";
 import Layout from "./layout";
 import { Transform, ChildNode, Id, BBox } from "./scenegraph";
 import * as BBoxUtil from "./util/bbox";
@@ -13,8 +13,6 @@ export type GraphLayeredProps = ParentProps<{
   direction?: "left-right" | "right-left" | "top-bottom" | "bottom-top";
   x?: number;
   y?: number;
-  // TODO: maybe there's a better interface for this?
-  edges: { source: Id; target: Id }[];
 }>;
 
 export const convertDirection = {
@@ -25,32 +23,41 @@ export const convertDirection = {
 };
 
 /* 
-TODO: Maybe add a `Nodes` component and an `Edges` component for specifying those. Like this:
-
-<GraphLayered>
-  <Nodes>
-    <Rect name="a" ... />
-    <Rect name="b" ... />
-    <Rect name="c" ... />
-    ...
-  </Nodes>
-  <Edges>
-    <Edge source="a" target="b" />
-    <Edge source="b" target="c" />
-    ...
-    OR
-    <Arrow>
-      <Ref select="a" />
-      <Ref select="b" />
-    </Arrow>
-    <Arrow>
-      <Ref select="b" />
-      <Ref select="c" />
-    </Arrow>
-    ...
-  </Edges>
-</GraphLayered>
+TODO: might be nice to have a modifier on components like Jetpack Compose instead of having to add a
+new Node component.
 */
+
+export type NodeProps = WithBluefishProps<
+  ParentProps<{ id: string; type?: "node" }>
+>;
+
+export const Node = withBluefish((props: NodeProps) => {
+  props = mergeProps(
+    {
+      type: "node" as const,
+    },
+    props
+  );
+
+  return props as unknown as JSX.Element;
+});
+
+export type EdgeProps = WithBluefishProps<{
+  source: string;
+  target: string;
+  type?: "edge";
+}>;
+
+export const Edge = withBluefish((props: EdgeProps) => {
+  props = mergeProps(
+    {
+      type: "edge" as const,
+    },
+    props
+  );
+
+  return props as unknown as JSX.Element;
+});
 
 export const GraphLayered = withBluefish((props: GraphLayeredProps) => {
   props = mergeProps(
@@ -59,6 +66,16 @@ export const GraphLayered = withBluefish((props: GraphLayeredProps) => {
     },
     props
   );
+
+  const nodesAndEdges = children(() => props.children) as unknown as () => (
+    | NodeProps
+    | EdgeProps
+  )[];
+
+  const nodes = () =>
+    nodesAndEdges().filter((node) => node.type === "node") as NodeProps[];
+  const edges = () =>
+    nodesAndEdges().filter((node) => node.type === "edge") as EdgeProps[];
 
   const layout = (childNodes: ChildNode[]) => {
     // Create a new directed graph
@@ -74,24 +91,33 @@ export const GraphLayered = withBluefish((props: GraphLayeredProps) => {
       return {};
     });
 
-    for (const childNode of childNodes) {
-      g.setNode(childNode.name, {
-        width: childNode.bbox.width,
-        height: childNode.bbox.height,
+    const nodesSnapshot = nodes();
+
+    for (const nodeIdx in childNodes) {
+      g.setNode(nodesSnapshot[nodeIdx].id, {
+        width: childNodes[nodeIdx].bbox.width,
+        height: childNodes[nodeIdx].bbox.height,
       });
     }
 
     // TODO: add code that asserts that the positions aren't fixed and the widths and heights are known
 
+    const edgesSnapshot = edges();
+
     // Add edges to the graph.
-    for (const edge of props.edges) {
+    for (const edge of edgesSnapshot) {
       g.setEdge(edge.source, edge.target);
     }
 
     dagre.layout(g);
 
     for (const node of g.nodes()) {
-      const childNode = childNodes.find((childNode) => childNode.name === node);
+      // to find the childNode, we have to find the index of the id in the nodesSnapshot, then use
+      // that in the childNodes array
+      const childNode =
+        childNodes[
+          nodesSnapshot.findIndex((childNode) => childNode.id === node)
+        ];
       if (!childNode) {
         throw new Error(`Couldn't find node ${node}`);
       }
@@ -135,7 +161,7 @@ export const GraphLayered = withBluefish((props: GraphLayeredProps) => {
 
   return (
     <Layout name={props.name} layout={layout} paint={paint}>
-      {props.children}
+      <For each={nodes()}>{(node) => node.children}</For>
     </Layout>
   );
 });
