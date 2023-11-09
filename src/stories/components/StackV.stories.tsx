@@ -38,20 +38,39 @@ export const DefinedSpacing: Story = {
   },
 };
 
-// export const TotalSpacing: Story = {
-//   args: {
-//     total: 80,
-//     alignment: "centerY",
-//   },
-//   render: (props) => {
-//     return (
-//       <Bluefish width={600} height={100}>
-//         <Row {...props}>
-//           <Rect width={30} height={30} />
-//           <Rect width={20} height={20} />
-//           <Rect width={50} height={50} />
-//         </Row>
-//       </Bluefish>
-//     );
-//   },
-// };
+export const TotalSpacing: Story = {
+  args: {
+    total: 110,
+    alignment: "centerX",
+  },
+  render: (props) => {
+    return (
+      <Bluefish>
+        <StackV {...props}>
+          <Rect width={30} height={30} />
+          <Rect width={20} height={20} />
+          <Rect width={50} height={50} />
+        </StackV>
+      </Bluefish>
+    );
+  },
+};
+
+export const TotalAndSpacing: Story = {
+  args: {
+    spacing: 20,
+    total: 100,
+    alignment: "centerX",
+  },
+  render: (props) => {
+    return (
+      <Bluefish>
+        <StackV {...props}>
+          <Rect width={30} />
+          <Rect width={20} />
+          <Rect width={50} />
+        </StackV>
+      </Bluefish>
+    );
+  },
+};
