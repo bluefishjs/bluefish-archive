@@ -66,5 +66,7 @@ export type {
   ScenegraphContextType,
   LayoutFn,
 } from "./scenegraph";
+export { createName, ScopeContext, ParentScopeIdContext } from "./createName";
+export type { Name, Scope } from "./createName";
 
 export * as Hyperscript from "./hyperscript";
