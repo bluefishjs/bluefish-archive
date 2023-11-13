@@ -31,6 +31,9 @@ export type { DistributeProps } from "./distribute";
 export { Group } from "./group";
 export type { GroupProps } from "./group";
 
+export { Image } from "./image";
+export type { ImageProps } from "./image";
+
 export { Layout } from "./layout";
 export type { LayoutProps } from "./layout";
 
