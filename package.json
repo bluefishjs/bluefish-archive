@@ -1,6 +1,6 @@
 {
   "name": "@bluefish-js/solid",
-  "version": "0.0.17",
+  "version": "0.0.18",
   "description": "A SolidJS diagramming library",
   "type": "module",
   "files": [
