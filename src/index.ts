@@ -1,3 +1,4 @@
+import { WithBluefishProps } from "./withBluefish";
 export { Align } from "./align";
 export type {
   AlignProps,
@@ -50,6 +51,7 @@ export { Text } from "./text";
 export type { TextProps } from "./text/types";
 
 export { withBluefish } from "./withBluefish";
+export type { WithBluefishProps } from "./withBluefish";
 
 export {
   createScenegraph,
