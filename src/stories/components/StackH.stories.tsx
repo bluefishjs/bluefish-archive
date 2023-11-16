@@ -4,9 +4,17 @@ import { Bluefish } from "../../bluefish";
 import Rect from "../../rect";
 
 /**
- * Bluefish's `StackH` component places its children into one horizontal stack, through defining either the spacing between each item or total width (not yet working?) that the horizontal stack should occupy.
+ * `StackH` stacks its children horizontally. It takes parameters:
+ * - `alignment`: determines how to align the children vertically. This should be a 1D vertical
+ *   alignment: `top`, `centerY`, or `bottom`.
+ * - `spacing`: determines the amount of space to put between each child
+ * - `total`: determines the total size of the stack in the stacking axis
  *
- * Options for alignment of the children are: `top`, `centerY`, and `bottom`.
+ * Spacing/Total Behavior:
+ * - If only `spacing` is specified, each child will be placed `spacing` apart.
+ * - If only `total` is specified, this spacing will be divided evenly among the children.
+ * - If both `spacing` and `total` are specified, the children will be resized to fit the total
+ *  size with `spacing` between them.
  */
 const meta: Meta<typeof StackH> = {
   title: "Components/StackH",

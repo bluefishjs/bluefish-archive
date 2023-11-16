@@ -7,6 +7,9 @@ import Rect from "../../rect";
  * Bluefish's `Distribute` component distributes its children across one axis. Takes parameters:
  * - `direction`: either `horizontal` or `vertical`, determines which axis to distribute its children
  * - `spacing`: determines the amount of space to put between each child
+ *
+ * Each child of a `Distribute` should be positioned in its other axis e.g. with an `Align` or
+ * another `Distribute`.
  */
 const meta: Meta<typeof Distribute> = {
   title: "Components/Distribute",

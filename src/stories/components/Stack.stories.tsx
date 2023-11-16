@@ -4,7 +4,18 @@ import { Bluefish } from "../../bluefish";
 import Rect from "../../rect";
 
 /**
- * TODO: write some docs
+ * `Stack` combines `StackH` and `StackV` into a single component. It takes parameters:
+ * - `direction`: either `horizontal` or `vertical`, determines which axis to stack its children
+ * - `alignment`: determines how to align the children in the other axis. This should be a 1D align
+ *   like in `Align`.
+ * - `spacing`: determines the amount of space to put between each child
+ * - `total`: determines the total size of the stack in the stacking axis
+ *
+ * Spacing/Total Behavior:
+ * - If only `spacing` is specified, each child will be placed `spacing` apart.
+ * - If only `total` is specified, this spacing will be divided evenly among the children.
+ * - If both `spacing` and `total` are specified, the children will be resized to fit the total
+ *  size with `spacing` between them.
  */
 const meta: Meta<typeof Stack> = {
   title: "Components/Stack",
