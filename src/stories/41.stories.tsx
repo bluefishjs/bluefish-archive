@@ -29,6 +29,7 @@ export const App: Story = {
     await userEvent.click(canvas.getByRole("button"));
     await userEvent.click(canvas.getByRole("button"));
     await userEvent.click(canvas.getByRole("button"));
+    await userEvent.click(canvas.getByRole("button"));
   },
   render: () => {
     const [planet, setPlanet] = createSignal("mercury");
