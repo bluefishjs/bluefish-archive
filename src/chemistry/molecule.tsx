@@ -12,34 +12,32 @@ import { For } from "solid-js";
 export type MoleculeProps = { chemicalFormula: string; ariaLabel: string };
 
 export const Molecule = withBluefish((props: MoleculeProps) => {
-  let options = {};
+  const options = {};
   let bonds: any[] = [];
   let atoms: any[] = [];
   let rings: any[] = [];
 
-  let chemicalDrawer = new SvgDrawer(options);
+  const chemicalDrawer = new SvgDrawer(options);
 
   SmilesDrawer.parse(props.chemicalFormula, function (tree: any) {
     let preprocessor = chemicalDrawer.preprocessor;
     preprocessor.initDraw(tree, "dark", false, []);
 
-    if (!false) {
-      chemicalDrawer.themeManager = new ThemeManager(
-        chemicalDrawer.opts.themes,
-        "dark"
-      );
-      if (chemicalDrawer.svgWrapper === null || chemicalDrawer.clear) {
-        const fakeSvgWrapper = {
-          maxX: -Number.MAX_VALUE,
-          maxY: -Number.MAX_VALUE,
-          minX: Number.MAX_VALUE,
-          minY: Number.MAX_VALUE,
-          opts: chemicalDrawer.opts,
-          drawingWidth: 0,
-          drawingHeight: 0,
-        };
-        chemicalDrawer.svgWrapper = fakeSvgWrapper;
-      }
+    chemicalDrawer.themeManager = new ThemeManager(
+      chemicalDrawer.opts.themes,
+      "dark"
+    );
+    if (chemicalDrawer.svgWrapper === null || chemicalDrawer.clear) {
+      const fakeSvgWrapper = {
+        maxX: -Number.MAX_VALUE,
+        maxY: -Number.MAX_VALUE,
+        minX: Number.MAX_VALUE,
+        minY: Number.MAX_VALUE,
+        opts: chemicalDrawer.opts,
+        drawingWidth: 0,
+        drawingHeight: 0,
+      };
+      chemicalDrawer.svgWrapper = fakeSvgWrapper;
     }
 
     preprocessor.processGraph();
@@ -140,7 +138,7 @@ export const Molecule = withBluefish((props: MoleculeProps) => {
    * @param {Vertex[]} vertices An array of vertices containing the vertices associated with the current molecule.
    */
   function determineDimensions(svgWrapper: any, vertices: any) {
-    for (var i = 0; i < vertices.length; i++) {
+    for (const i = 0; i < vertices.length; i++) {
       if (!vertices[i].value.isDrawn) {
         continue;
       }
@@ -154,7 +152,7 @@ export const Molecule = withBluefish((props: MoleculeProps) => {
     }
 
     // Add padding
-    let padding = svgWrapper.opts.padding;
+    const padding = svgWrapper.opts.padding;
     svgWrapper.maxX += padding;
     svgWrapper.maxY += padding;
     svgWrapper.minX -= padding;
@@ -163,24 +161,6 @@ export const Molecule = withBluefish((props: MoleculeProps) => {
     svgWrapper.drawingWidth = svgWrapper.maxX - svgWrapper.minX;
     svgWrapper.drawingHeight = svgWrapper.maxY - svgWrapper.minY;
   }
-
-  // function findOffsetsToFitDiagram(vertices: any) {
-  //   let xOffsets: any[] = [];
-  //   let yOffsets: any[] = [];
-
-  //   for (let i = 0; i < vertices.length; i++) {
-  //     let vertex = vertices[i];
-  //     xOffsets.push(vertex.xLoc);
-  //     yOffsets.push(vertex.yLoc);
-  //   }
-
-  //   let minX = Math.abs(Math.min(...xOffsets));
-  //   let minY = Math.abs(Math.min(...yOffsets));
-
-  //   return [minX, minY];
-  // }
-
-  // const [minXOffset, minYOffset] = findOffsetsToFitDiagram(atoms);
 
   function findEdgesVerticesOfRing(ringElm: any, edges: any, vertices: any) {
     let ringEdges: any[] = [];
