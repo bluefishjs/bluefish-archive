@@ -164,23 +164,23 @@ export const Molecule = withBluefish((props: MoleculeProps) => {
     svgWrapper.drawingHeight = svgWrapper.maxY - svgWrapper.minY;
   }
 
-  function findOffsetsToFitDiagram(vertices: any) {
-    let xOffsets: any[] = [];
-    let yOffsets: any[] = [];
+  // function findOffsetsToFitDiagram(vertices: any) {
+  //   let xOffsets: any[] = [];
+  //   let yOffsets: any[] = [];
 
-    for (let i = 0; i < vertices.length; i++) {
-      let vertex = vertices[i];
-      xOffsets.push(vertex.xLoc);
-      yOffsets.push(vertex.yLoc);
-    }
+  //   for (let i = 0; i < vertices.length; i++) {
+  //     let vertex = vertices[i];
+  //     xOffsets.push(vertex.xLoc);
+  //     yOffsets.push(vertex.yLoc);
+  //   }
 
-    let minX = Math.abs(Math.min(...xOffsets));
-    let minY = Math.abs(Math.min(...yOffsets));
+  //   let minX = Math.abs(Math.min(...xOffsets));
+  //   let minY = Math.abs(Math.min(...yOffsets));
 
-    return [minX, minY];
-  }
+  //   return [minX, minY];
+  // }
 
-  const [minXOffset, minYOffset] = findOffsetsToFitDiagram(atoms);
+  // const [minXOffset, minYOffset] = findOffsetsToFitDiagram(atoms);
 
   function findEdgesVerticesOfRing(ringElm: any, edges: any, vertices: any) {
     let ringEdges: any[] = [];
@@ -212,8 +212,8 @@ export const Molecule = withBluefish((props: MoleculeProps) => {
           <Atom
             {...v}
             name={atomNames[index()]}
-            cx={(v.xLoc + minXOffset + 10) * 1.2}
-            cy={(v.yLoc + minYOffset + 10) * 1.2}
+            cx={(v.xLoc + 10) * 1.2}
+            cy={(v.yLoc + 10) * 1.2}
             r={10}
             fill="black"
             content={v.value.element}
@@ -232,8 +232,8 @@ export const Molecule = withBluefish((props: MoleculeProps) => {
             stroke-width={2}
             name={bondNames[index()]}
             bondType={e.bondType}
-            ringCenterX={(e.ringCenterX + minXOffset + 10) * 1.2}
-            ringCenterY={(e.ringCenterY + minYOffset + 10) * 1.2}
+            ringCenterX={(e.ringCenterX + 10) * 1.2}
+            ringCenterY={(e.ringCenterY + 10) * 1.2}
           >
             <Ref select={atomNames[e.sourceNum]} />
             <Ref select={atomNames[e.destNum]} />
@@ -246,8 +246,9 @@ export const Molecule = withBluefish((props: MoleculeProps) => {
         {(v) => (
           <Atom
             {...v}
-            cx={(v.xLoc + minXOffset + 10) * 1.2}
-            cy={(v.yLoc + minYOffset + 10) * 1.2}
+            name={v.name + "-overdraw"}
+            cx={(v.xLoc + 10) * 1.2}
+            cy={(v.yLoc + 10) * 1.2}
             r={10}
             fill="black"
             content={v.value.element}
