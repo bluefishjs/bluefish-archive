@@ -5,6 +5,7 @@
 import type { Meta, StoryObj } from "storybook-solidjs";
 import { Bluefish } from "../bluefish";
 import { Molecule } from "../chemistry/molecule";
+import Background from "../background";
 
 const meta: Meta = {
   title: "Example/Molecule",

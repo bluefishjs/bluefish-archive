@@ -48,7 +48,9 @@ export const Layout: Component<LayoutProps> = (props) => {
     createChildRepr,
   } = UNSAFE_useScenegraph();
 
-  createNode(props.name, parentId);
+  createRenderEffect(() => {
+    createNode(props.name, parentId);
+  });
 
   // evaluate the child props before running the effect so that children's layout functions are
   // called before the parent's layout function

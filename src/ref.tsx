@@ -1,4 +1,10 @@
-import { Component, createEffect, useContext } from "solid-js";
+import {
+  Component,
+  createEffect,
+  createRenderEffect,
+  onCleanup,
+  useContext,
+} from "solid-js";
 import { Id, UNSAFE_useScenegraph, ParentIDContext } from "./scenegraph";
 import withBluefish from "./withBluefish";
 import { Name, Scope, ScopeContext } from "./createName";
@@ -73,27 +79,26 @@ export const resolveSelection = (
 };
 
 export const Ref = withBluefish((props: RefProps) => {
-  const { name, select } = props;
-
   const parentId = useContext(ParentIDContext);
   const [scope] = useContext(ScopeContext);
-  const { createRef, getBBox } = UNSAFE_useScenegraph();
+  const { createRef } = UNSAFE_useScenegraph();
 
   if (parentId === null) {
     throw new Error("Ref must be a child of a Layout");
   }
 
-  const normalizedSelection = normalizeSelection(select);
-
   // TODO: what do we do if the layout node isn't defined?
-  createRef(name, resolveSelection(scope, normalizedSelection), parentId);
+  createRenderEffect(() => {
+    const normalizedSelection = normalizeSelection(props.select);
 
-  // touch the refId's bbox to ensure ref is resolved immediately
-  // createEffect(() => {
-  //   console.log("ref", props.id, props.refId);
-  //   getBBox(id);
-  //   console.log("ref", props.id, JSON.parse(JSON.stringify(getBBox(id))));
-  // });
+    createRef(
+      props.name,
+      resolveSelection(scope, normalizedSelection),
+      parentId
+    );
+
+    // TODO: cleanup
+  });
 
   return <></>;
 });
