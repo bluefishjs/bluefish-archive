@@ -1,6 +1,13 @@
-import { Component, createEffect, useContext } from "solid-js";
+import {
+  Component,
+  createEffect,
+  createRenderEffect,
+  onCleanup,
+  useContext,
+} from "solid-js";
 import { Id, UNSAFE_useScenegraph, ParentIDContext } from "./scenegraph";
 import withBluefish from "./withBluefish";
+import { Name, Scope, ScopeContext } from "./createName";
 
 // The properties we want:
 // every time the refId's bbox is updated, it should be propagated to the id
@@ -13,28 +20,85 @@ import withBluefish from "./withBluefish";
 // avoid cycles. whenever the Ref's bbox is requested, we'll compute it. whenever the Ref's bbox is
 // "modified," we'll instead modify the refId's bbox.
 
+export type Selection = Id | [Id, ...Name[]];
+export type NormalizedSelection = [Id, ...Name[]];
+
 export type RefProps = {
-  id: Id;
-  refId: Id;
+  name: Id;
+  select: Selection;
+};
+
+export const normalizeSelection = (select: Selection): NormalizedSelection => {
+  if (Array.isArray(select)) {
+    return select;
+  } else {
+    return [select];
+  }
+};
+
+// TODO: probably scopeIds and layoutIds should have different types...
+export const resolveSelection = (
+  scope: Scope,
+  select: NormalizedSelection
+): Id => {
+  const [id, ...names] = select;
+
+  let currId = id;
+
+  if (!(id in scope)) {
+    throw new Error(
+      `Could not find ${id}. Available names: ${Object.keys(scope).join(", ")}`
+    );
+  }
+
+  for (const name of names) {
+    const child = scope[currId].children[name];
+    if (child === undefined) {
+      console.log(JSON.parse(JSON.stringify(scope)));
+      throw new Error(
+        `Could not find ${name} in ${currId}. Available names: ${Object.keys(
+          scope[currId].children
+        ).join(", ")}`
+      );
+    }
+    currId = child;
+  }
+
+  const layoutId = scope[currId].layoutNode;
+
+  if (layoutId === undefined) {
+    console.log(JSON.parse(JSON.stringify(scope)));
+    throw new Error(
+      `Could not find layout node for ${currId}. Available names: ${Object.keys(
+        scope[currId].children
+      ).join(", ")}`
+    );
+  }
+
+  return layoutId;
 };
 
 export const Ref = withBluefish((props: RefProps) => {
-  const { id, refId } = props;
-
   const parentId = useContext(ParentIDContext);
-  const { createRef, getBBox } = UNSAFE_useScenegraph();
+  const [scope] = useContext(ScopeContext);
+  const { createRef } = UNSAFE_useScenegraph();
 
   if (parentId === null) {
     throw new Error("Ref must be a child of a Layout");
   }
-  createRef(id, refId, parentId);
 
-  // touch the refId's bbox to ensure ref is resolved immediately
-  // createEffect(() => {
-  //   console.log("ref", props.id, props.refId);
-  //   getBBox(id);
-  //   console.log("ref", props.id, JSON.parse(JSON.stringify(getBBox(id))));
-  // });
+  // TODO: what do we do if the layout node isn't defined?
+  createRenderEffect(() => {
+    const normalizedSelection = normalizeSelection(props.select);
+
+    createRef(
+      props.name,
+      resolveSelection(scope, normalizedSelection),
+      parentId
+    );
+
+    // TODO: cleanup
+  });
 
   return <></>;
 });

@@ -8,26 +8,35 @@ import { StackSlot } from "./stack-slot";
 import Distribute from "../../src/distribute";
 import Text from "../../src/text";
 import { Value } from "./types";
+import { createName } from "../createName";
+import { StackV } from "../stackv";
+import withBluefish from "../withBluefish";
 
 export type GlobalFrameProps = {
-  id?: Id;
+  name?: Id;
   variables: { variable: string; value: Value }[];
 };
 
-export function GlobalFrame(props: GlobalFrameProps) {
-  const id = props.id ?? createUniqueId();
+export const GlobalFrame = withBluefish((props: GlobalFrameProps) => {
+  const frameName = createName("frame");
+  const frameBorderName = createName("frameBorder");
+  const labelName = createName("label");
+  const frameVariablesName = createName("frameVariables");
+  const stackSlotNames = props.variables.map((_, i) =>
+    createName(`stackSlot-${i}`)
+  );
 
   // Font declaration
   const fontFamily = "Andale mono, monospace";
 
   return (
-    <Group x={0} y={0} id={props.id ?? `group_${id}`}>
+    <Group>
       {/* Global Frame and relevant text */}
-      <Rect id={`frame${id}`} height={300} width={200} fill={"#e2ebf6"} />
-      <Rect id={`frameBorder${id}`} height={300} width={5} fill={"#a6b3b6"} />
+      <Rect name={frameName} height={300} width={200} fill={"#e2ebf6"} />
+      <Rect name={frameBorderName} height={300} width={5} fill={"#a6b3b6"} />
       {/* TODO: there is a bug where the text is showing up lower than I expect it to... */}
       <Text
-        id={`label${id}`}
+        name={labelName}
         font-size={"24px"}
         font-family={fontFamily}
         fill={"black"}
@@ -35,44 +44,30 @@ export function GlobalFrame(props: GlobalFrameProps) {
         Global Frame
       </Text>
       <Align alignment="topCenter">
-        <Ref refId={`label${id}`} />
-        <Ref refId={`frame${id}`} />
+        <Ref select={labelName} />
+        <Ref select={frameName} />
       </Align>
       <Align alignment="centerLeft">
-        <Ref refId={`frameBorder${id}`} />
-        <Ref refId={`frame${id}`} />
+        <Ref select={frameBorderName} />
+        <Ref select={frameName} />
       </Align>
-      <Group id={`frameVariables${id}`}>
+      <StackV name={frameVariablesName} alignment="right" spacing={10}>
         <For each={props.variables}>
-          {(variable: any, i) => (
+          {(variable, i) => (
             <StackSlot
-              id={`stackSlot${i()}_${id}`}
+              name={stackSlotNames[i()]}
               variable={variable.variable}
-              value={variable.value}
+              value={variable.value as any}
             />
           )}
         </For>
-        <Align alignment="right">
-          <For each={props.variables}>
-            {(variable: any, i) => <Ref refId={`stackSlot${i()}_${id}`} />}
-          </For>
-        </Align>
-        <Distribute direction="vertical" spacing={10}>
-          <For each={props.variables}>
-            {(variable: any, i) => <Ref refId={`stackSlot${i()}_${id}`} />}
-          </For>
-        </Distribute>
-      </Group>
-      <Distribute direction="vertical" spacing={10}>
-        <Ref refId={`label${id}`} />
-        <Ref refId={`frameVariables${id}`} />
-      </Distribute>
-      <Align alignment="right">
-        <Ref refId={`frameVariables${id}`} />
-        <Ref refId={`label${id}`} />
-      </Align>
+      </StackV>
+      <StackV alignment="right" spacing={10}>
+        <Ref select={labelName} />
+        <Ref select={frameVariablesName} />
+      </StackV>
     </Group>
   );
-}
+});
 
 export default GlobalFrame;

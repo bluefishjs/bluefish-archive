@@ -1,5 +1,12 @@
+import { WithBluefishProps } from "./withBluefish";
 export { Align } from "./align";
-export type { AlignProps, Alignment1D, Alignment2D, AlignmentHorizontal, AlignmentVertical } from "./align";
+export type {
+  AlignProps,
+  Alignment1D,
+  Alignment2D,
+  AlignmentHorizontal,
+  AlignmentVertical,
+} from "./align";
 
 export { Arrow } from "./arrow";
 export type { ArrowProps } from "./arrow";
@@ -16,14 +23,17 @@ export type { BluefishProps } from "./bluefish";
 export { Circle } from "./circle";
 export type { CircleProps } from "./circle";
 
-export { Col } from "./col";
-export type { ColProps } from "./col";
+export { StackV } from "./stackv";
+export type { StackVProps } from "./stackv";
 
 export { Distribute } from "./distribute";
 export type { DistributeProps } from "./distribute";
 
 export { Group } from "./group";
 export type { GroupProps } from "./group";
+
+export { Image } from "./image";
+export type { ImageProps } from "./image";
 
 export { Layout } from "./layout";
 export type { LayoutProps } from "./layout";
@@ -34,13 +44,14 @@ export type { RectProps } from "./rect";
 export { Ref } from "./ref";
 export type { RefProps } from "./ref";
 
-export { Row } from "./row";
-export type { RowProps } from "./row";
+export { StackH } from "./stackh";
+export type { StackHProps } from "./stackh";
 
 export { Text } from "./text";
 export type { TextProps } from "./text/types";
 
 export { withBluefish } from "./withBluefish";
+export type { WithBluefishProps } from "./withBluefish";
 
 export {
   createScenegraph,
@@ -60,5 +71,7 @@ export type {
   ScenegraphContextType,
   LayoutFn,
 } from "./scenegraph";
+export { createName, ScopeContext, ParentScopeIdContext } from "./createName";
+export type { Name, Scope } from "./createName";
 
 export * as Hyperscript from "./hyperscript";

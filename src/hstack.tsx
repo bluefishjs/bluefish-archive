@@ -5,11 +5,11 @@ import Layout from "./layout";
 import { BBox, Transform, ChildNode } from "./scenegraph";
 import { AlignmentVertical } from "./align";
 
-export type RowProps = ParentProps<
+export type HStackProps = ParentProps<
   Omit<StackArgs, "direction"> & { alignment?: AlignmentVertical }
 >;
 
-export const Row = withBluefish((props: RowProps) => {
+export const HStack = withBluefish((props: HStackProps) => {
   const layout = (childNodes: ChildNode[]) => {
     const stackProps = mergeProps(
       {
@@ -40,7 +40,7 @@ export const Row = withBluefish((props: RowProps) => {
   };
 
   return (
-    <Layout id={props.id} layout={layout} paint={paint}>
+    <Layout name={props.name} layout={layout} paint={paint}>
       {props.children}
     </Layout>
   );

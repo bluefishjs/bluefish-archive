@@ -8,9 +8,12 @@ import { For, createUniqueId } from "solid-js";
 import ElmTuple from "./elm-tuple";
 import withBluefish from "../../src/withBluefish";
 import { Value } from "./types";
+import { createName } from "../createName";
+import { StackH } from "../stackh";
+import { StackV } from "../stackv";
 
 export type ObjectProps = {
-  id: Id;
+  name: Id;
   objectType: string;
   objectValues: {
     type: string;
@@ -19,53 +22,35 @@ export type ObjectProps = {
 };
 
 export const HeapObject = withBluefish((props: ObjectProps) => {
-  const id = () => props.id;
-
   const fontFamily = "verdana, arial, helvetica, sans-serif";
 
-  const objectRef = `objectRef${id()}`;
+  const objectTypeName = createName("objectType");
+  const objectRefName = createName("objectRef");
+
+  const elmNames = props.objectValues.map((_, i) => createName(`elm-${i}`));
 
   return (
-    <Group id={id()}>
+    <StackV alignment="left" spacing={10}>
       <Text
-        id={`objectTypeRef${id()}`}
+        name={objectTypeName}
         font-family={fontFamily}
         font-size={"16px"}
         fill={"grey"}
       >
         {props.objectType}
       </Text>
-      <Group id={objectRef}>
+      <StackH name={objectRefName} spacing={0}>
         <For each={props.objectValues}>
           {(elementData, index) => (
             <ElmTuple
-              id={`elm_${index()}_${id()}`}
+              name={elmNames[index()]}
               tupleIndex={`${index()}`}
               tupleData={elementData}
-              objectId={id()}
             />
           )}
         </For>
-        <Align alignment="centerY">
-          <For each={props.objectValues}>
-            {(elementData, index) => <Ref refId={`elm_${index()}_${id()}`} />}
-          </For>
-        </Align>
-        <Distribute direction="horizontal" spacing={0}>
-          <For each={props.objectValues}>
-            {(elementData, index) => <Ref refId={`elm_${index()}_${id()}`} />}
-          </For>
-        </Distribute>
-      </Group>
-      <Distribute direction={"vertical"} spacing={10}>
-        <Ref refId={`objectTypeRef${id()}`} />
-        <Ref refId={objectRef} />
-      </Distribute>
-      <Align alignment={"left"}>
-        <Ref refId={`objectTypeRef${id()}`} />
-        <Ref refId={objectRef} />
-      </Align>
-    </Group>
+      </StackH>
+    </StackV>
   );
 });
 

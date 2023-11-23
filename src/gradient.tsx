@@ -1,3 +1,4 @@
+import { For } from "solid-js";
 import withBluefish from "./withBluefish";
 
 type ColorOffset = { offset: number; color: string };
@@ -11,7 +12,7 @@ type GradientProps = {
   y2?: number;
 };
 
-export const Gradient = withBluefish((props: GradientProps) => {
+export const Gradient = (props: GradientProps) => {
   return (
     <g>
       <linearGradient
@@ -21,15 +22,17 @@ export const Gradient = withBluefish((props: GradientProps) => {
         y1={props.y1}
         y2={props.y2}
       >
-        {props.colorOffsets.map((colorOffset) => (
-          <stop
-            offset={`${colorOffset.offset}%`}
-            stop-color={colorOffset.color}
-          />
-        ))}
+        <For each={props.colorOffsets}>
+          {(colorOffset) => (
+            <stop
+              offset={`${colorOffset.offset}%`}
+              stop-color={colorOffset.color}
+            />
+          )}
+        </For>
       </linearGradient>
     </g>
   );
-});
+};
 
 export default Gradient;

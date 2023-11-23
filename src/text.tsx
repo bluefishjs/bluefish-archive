@@ -34,7 +34,7 @@ export const Text = withBluefish((props: TextProps) => {
   );
 
   const [_, textProps] = splitProps(props, [
-    "id",
+    "name",
     "dx",
     "dy",
     "innerRef",
@@ -113,7 +113,7 @@ export const Text = withBluefish((props: TextProps) => {
     );
   };
 
-  return <Layout id={props.id} layout={layout} paint={paint} />;
+  return <Layout name={props.name} layout={layout} paint={paint} />;
 });
 
 export default Text;

@@ -11,8 +11,8 @@ import Text from "../text";
 import Rect from "../rect";
 import { Blob } from "../blob";
 import { PaperScope, Path, Point, Size } from "paper/dist/paper-core";
-import { Col } from "../col";
-import { Row } from "../row";
+import { StackV } from "../stackv";
+import { StackH } from "../stackh";
 
 const meta: Meta = {
   title: "Example/Math3ma",
@@ -75,13 +75,13 @@ export const Math3ma: Story = {
     return (
       <Bluefish width={500} height={500} padding={20}>
         <Background
-          id="background"
+          name="background"
           x={10}
           y={10}
           padding={20}
           background={() => (
             <Blob
-              id="blob"
+              name="blob"
               path={myPath}
               stroke="black"
               stroke-width={3}
@@ -89,11 +89,11 @@ export const Math3ma: Story = {
             />
           )}
         >
-          <Row spacing={50}>
+          <StackH spacing={50}>
             <Background
               background={() => (
                 <Blob
-                  id="blob2"
+                  name="blob2"
                   path={myPath2}
                   stroke="black"
                   stroke-width={3}
@@ -103,20 +103,20 @@ export const Math3ma: Story = {
             >
               <Text vertical-anchor="start">Borel sets</Text>
             </Background>
-            <Text id="x" font-size={"20px"} vertical-anchor="start">
+            <Text name="x" font-size={"20px"} vertical-anchor="start">
               x
             </Text>
-          </Row>
+          </StackH>
         </Background>
-        <Col spacing={20}>
-          <Ref refId="background" />
-          <Text id="text" vertical-anchor="start" width={65}>
+        <StackV spacing={20}>
+          <Ref select="background" />
+          <Text name="text" vertical-anchor="start" width={65}>
             {"f^{-1}(N) lives here!"}
           </Text>
-        </Col>
+        </StackV>
         <Arrow flip>
-          <Ref refId="text" />
-          <Ref refId="x" />
+          <Ref select="text" />
+          <Ref select="x" />
         </Arrow>
       </Bluefish>
     );

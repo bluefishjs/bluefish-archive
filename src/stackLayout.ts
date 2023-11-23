@@ -10,7 +10,7 @@ import { maybe, maybeMax, maybeSub } from "./util/maybe";
 import * as BBox from "./util/bbox";
 
 export type StackArgs = {
-  id: Id;
+  name: Id;
   x?: number;
   y?: number;
   alignment?: Alignment1D;
@@ -22,7 +22,7 @@ export type StackArgs = {
 export const stackLayout =
   (args: StackArgs): LayoutFn =>
   (childNodes: ChildNode[]) => {
-    if (args.id.endsWith("DEBUG")) {
+    if (args.name.endsWith("DEBUG")) {
       debugger;
     }
 

@@ -4,7 +4,7 @@ import { BBox, Id, Transform } from "./scenegraph";
 import { splitProps } from "solid-js";
 import withBluefish from "./withBluefish";
 
-export type RectProps = JSX.RectSVGAttributes<SVGRectElement> & {
+export type ImageProps = JSX.ImageSVGAttributes<SVGImageElement> & {
   name: Id;
   x?: number;
   y?: number;
@@ -12,7 +12,7 @@ export type RectProps = JSX.RectSVGAttributes<SVGRectElement> & {
   height?: number;
 };
 
-export const Rect = withBluefish((props: RectProps) => {
+export const Image = withBluefish((props: ImageProps) => {
   const layout = () => {
     return {
       bbox: {
@@ -34,7 +34,7 @@ export const Rect = withBluefish((props: RectProps) => {
     const [_, rest] = splitProps(props, ["name", "x", "y", "width", "height"]);
 
     return (
-      <rect
+      <image
         {...rest}
         x={
           (paintProps.bbox.left ?? 0) + (paintProps.transform.translate.x ?? 0)
@@ -49,4 +49,4 @@ export const Rect = withBluefish((props: RectProps) => {
   return <Layout name={props.name} layout={layout} paint={paint} />;
 });
 
-export default Rect;
+export default Image;

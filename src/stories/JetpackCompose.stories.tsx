@@ -10,7 +10,7 @@ import Text from "../text";
 import { For, ParentProps, mergeProps } from "solid-js";
 import Gradient from "../gradient";
 import Bluefish from "../bluefish";
-import { Background, Col, Row } from "..";
+import { Background, StackV, StackH } from "..";
 import { Meta, StoryObj } from "storybook-solidjs";
 
 const meta: Meta = {
@@ -69,7 +69,7 @@ const ComposeText = withBluefish((props: ComposeTextProps) => {
       letter-spacing={props.letterSpacing}
       x={props.x}
       y={props.y}
-      id={props.id}
+      name={props.id}
     >
       {props.children as string}
     </Text>
@@ -96,8 +96,8 @@ export const JetpackCompose: Story = {
   render: () => {
     return (
       <Bluefish id="jetpack-compose" width={1000} height={600} padding={20}>
-        <Col spacing={30}>
-          <Row spacing={100} id="resolution">
+        <StackV spacing={30}>
+          <StackH spacing={100} name="resolution">
             <For each={displayedResolutions}>
               {(resolution) =>
                 resolution.selected === true ? (
@@ -109,8 +109,8 @@ export const JetpackCompose: Story = {
                 )
               }
             </For>
-          </Row>
-          <Group x={0} id="main-content">
+          </StackH>
+          <Group x={0} name="main-content">
             <Gradient
               id="sleepBarGradient"
               colorOffsets={[
@@ -136,19 +136,19 @@ export const JetpackCompose: Story = {
               background={() => (
                 <Rect fill="url(#hoursBarGradient)" rx="15px" />
               )}
-              id={"hours"}
+              name={"hours"}
             >
-              <Row spacing={60}>
+              <StackH spacing={60}>
                 <For each={hours}>
                   {(hour, ind) => (
-                    <ComposeText id={`hour-${hour}`}>{hour}</ComposeText>
+                    <ComposeText name={`hour-${hour}`}>{hour}</ComposeText>
                   )}
                 </For>
-              </Row>
+              </StackH>
             </Background>
 
-            <Col spacing={20} alignment="right" id={"sleepBarContainer"}>
-              <Ref refId="hours" />
+            <StackV spacing={20} alignment="right" name={"sleepBarContainer"}>
+              <Ref select="hours" />
               <For each={dayToSleepBars}>
                 {(dayToSleepBar, ind) => (
                   <Rect
@@ -156,16 +156,16 @@ export const JetpackCompose: Story = {
                     width={sleepBarWidth(dayToSleepBar.sleep)}
                     fill="url(#sleepBarGradient)"
                     rx="10px"
-                    id={`sleepBar-${ind()}`}
+                    name={`sleepBar-${ind()}`}
                   />
                 )}
               </For>
-            </Col>
+            </StackV>
 
-            <Align alignment="left" id="days">
+            <Align alignment="left" name="days">
               <For each={dayToSleepBars}>
                 {(dayToSleepBar, ind) => (
-                  <ComposeText id={`day-${ind()}`}>
+                  <ComposeText name={`day-${ind()}`}>
                     {dayToSleepBar.day}
                   </ComposeText>
                 )}
@@ -173,20 +173,20 @@ export const JetpackCompose: Story = {
             </Align>
 
             <Distribute spacing={80} direction="horizontal">
-              <Ref refId="days" />
-              <Ref refId="hours" />
+              <Ref select="days" />
+              <Ref select="hours" />
             </Distribute>
 
             <For each={dayToSleepBars}>
               {(dayToSleepBar, ind) => (
                 <Align alignment="top">
-                  <Ref refId={`day-${ind()}`} />
-                  <Ref refId={`sleepBar-${ind()}`} />
+                  <Ref select={`day-${ind()}`} />
+                  <Ref select={`sleepBar-${ind()}`} />
                 </Align>
               )}
             </For>
           </Group>
-        </Col>
+        </StackV>
       </Bluefish>
     );
   },

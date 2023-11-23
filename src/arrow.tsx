@@ -15,7 +15,7 @@ import { ArrowOptions, getBoxToBoxArrow } from "perfect-arrows";
 
 export type ArrowProps = ParentProps<
   {
-    id: Id;
+    name: Id;
     x?: number;
     y?: number;
     start?: boolean;
@@ -45,7 +45,7 @@ export const Arrow = withBluefish((props: ArrowProps) => {
   const layout = (childIds: ChildNode[]) => {
     childIds = Array.from(childIds);
 
-    if (props.id.endsWith("DEBUG")) {
+    if (props.name.endsWith("DEBUG")) {
       debugger;
     }
 
@@ -158,7 +158,7 @@ export const Arrow = withBluefish((props: ArrowProps) => {
   };
 
   return (
-    <Layout id={props.id} layout={layout} paint={paint}>
+    <Layout name={props.name} layout={layout} paint={paint}>
       {props.children}
     </Layout>
   );
