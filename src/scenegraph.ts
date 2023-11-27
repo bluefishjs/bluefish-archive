@@ -6,10 +6,12 @@ import { createContext, useContext } from "solid-js";
 import { BBox } from "./util/bbox";
 
 export type Id = string;
+export type Inferred = { inferred: true };
+export const inferred: Inferred = { inferred: true };
 
 export type { BBox };
 
-export type BBoxOwners = { [key in keyof BBox]?: Id };
+export type BBoxOwners = { [key in keyof BBox]?: Id | Inferred };
 
 export type Transform = {
   translate: {
@@ -63,6 +65,61 @@ export type ScenegraphNode =
 export type Scenegraph = {
   [key: Id]: ScenegraphNode;
 };
+
+export const inferenceRules: {
+  from: (keyof BBox)[];
+  to: keyof BBox;
+  calculate: (dims: number[]) => number;
+}[] = [
+  {
+    from: ["right", "width"],
+    to: "left",
+    calculate: ([right, width]) => right - width,
+  },
+  {
+    from: ["bottom", "height"],
+    to: "top",
+    calculate: ([bottom, height]) => bottom - height,
+  },
+  {
+    from: ["left", "width"],
+    to: "right",
+    calculate: ([left, width]) => left + width,
+  },
+  {
+    from: ["top", "height"],
+    to: "bottom",
+    calculate: ([top, height]) => top + height,
+  },
+  {
+    from: ["left", "right"],
+    to: "width",
+    calculate: ([left, right]) => right - left,
+  },
+  {
+    from: ["top", "bottom"],
+    to: "height",
+    calculate: ([top, bottom]) => bottom - top,
+  },
+];
+
+export function inferBBoxValues(bbox: BBox, owners: BBoxOwners): BBox {
+  const inferredBBox = { ...bbox };
+
+  inferenceRules.forEach((rule) => {
+    if (
+      rule.from.every((key) => inferredBBox[key] !== undefined) &&
+      inferredBBox[rule.to] === undefined
+    ) {
+      inferredBBox[rule.to] = rule.calculate(
+        rule.from.map((key) => inferredBBox[key]!)
+      );
+      owners[rule.to] = inferred;
+    }
+  });
+
+  return inferredBBox;
+}
 
 export const createScenegraph = (): ScenegraphContextType => {
   const [scenegraph, setScenegraph] = createStore<Scenegraph>({});
