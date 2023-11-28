@@ -126,7 +126,7 @@ export const Align = withBluefish((props: AlignProps) => {
 
     // TODO: should be able to filter by ownership instead
     const verticalValueArr = verticalPlaceables
-      .filter(([placeable, _]) => placeable!.owned.y)
+      .filter(([placeable, _]) => placeable!.owned.top)
       .map(([placeable, alignment]) => {
         return [
           placeable,
@@ -144,7 +144,7 @@ export const Align = withBluefish((props: AlignProps) => {
       verticalValueArr.length === 0 ? 0 : (verticalValueArr[0][1] as number);
 
     const horizontalValueArr = horizontalPlaceables
-      .filter(([placeable, _]) => placeable!.owned.x)
+      .filter(([placeable, _]) => placeable!.owned.left)
       .map(([placeable, alignment]) => {
         return [
           placeable,
@@ -163,7 +163,7 @@ export const Align = withBluefish((props: AlignProps) => {
         : (horizontalValueArr[0][1] as number);
 
     for (const [placeable, alignment] of verticalPlaceables) {
-      if (placeable!.owned.y) continue;
+      if (placeable!.owned.top) continue;
       if (alignment === "top") {
         placeable!.bbox.top = verticalValue;
       } else if (alignment === "centerY") {
@@ -178,7 +178,7 @@ export const Align = withBluefish((props: AlignProps) => {
     }
 
     for (const [placeable, alignment] of horizontalPlaceables) {
-      if (placeable!.owned.x) continue;
+      if (placeable!.owned.left) continue;
       if (alignment === "left") {
         placeable!.bbox.left = horizontalValue;
       } else if (alignment === "centerX") {

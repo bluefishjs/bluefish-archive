@@ -3,15 +3,15 @@ import { getLCAChainSuffixes } from "./util/lca";
 import _ from "lodash";
 import { maybeAdd, maybeAddAll, maybeDiv, maybeSub } from "./util/maybe";
 import { createContext, useContext } from "solid-js";
-import { BBox } from "./util/bbox";
+import { BBox, Dim } from "./util/bbox";
 
 export type Id = string;
 export type Inferred = { inferred: true };
 export const inferred: Inferred = { inferred: true };
 
-export type { BBox };
+export type { BBox, Dim };
 
-export type BBoxOwners = { [key in keyof BBox]?: Id | Inferred };
+export type BBoxOwners = { [key in Dim]?: Id | Inferred };
 
 export type Transform = {
   translate: {
@@ -37,12 +37,7 @@ export type TransformOwners = {
 export type ChildNode = {
   name: Id;
   bbox: BBox;
-  owned: {
-    x: boolean;
-    y: boolean;
-    width: boolean;
-    height: boolean;
-  };
+  owned: { [key in Dim]: boolean };
 };
 
 export type ScenegraphNode =
@@ -67,8 +62,8 @@ export type Scenegraph = {
 };
 
 export const inferenceRules: {
-  from: (keyof BBox)[];
-  to: keyof BBox;
+  from: Dim[];
+  to: Dim;
   calculate: (dims: number[]) => number;
 }[] = [
   {
@@ -381,7 +376,7 @@ the align node.
     // const { id: resolvedId, transform: accumulatedTransform } = resolveRef(id);
 
     // if any of the bbox values are NaN (undefined is ok), console.error and skip
-    for (const key of Object.keys(bbox) as Array<keyof BBox>) {
+    for (const key of Object.keys(bbox) as Array<Dim>) {
       if (bbox[key] !== undefined && isNaN(bbox[key]!)) {
         console.error(
           `setBBox: ${owner} tried to update ${id}'s bbox with ${JSON.stringify(
@@ -398,7 +393,7 @@ the align node.
         const node = n as ScenegraphNode & { type: "node" }; // guaranteed by resolveRef
 
         // check bbox ownership
-        for (const key of Object.keys(bbox) as Array<keyof BBox>) {
+        for (const key of Object.keys(bbox) as Array<Dim>) {
           if (
             bbox[key] !== undefined &&
             node.bboxOwners[key] !== undefined &&
@@ -445,13 +440,13 @@ the align node.
           translate: transform?.translate ?? {},
         };
 
-        for (const key of Object.keys(bbox) as Array<keyof BBox>) {
+        for (const key of Object.keys(bbox) as Array<Dim>) {
           if (bbox[key] !== undefined) {
             node.bbox[key] = bbox[key];
           }
         }
 
-        for (const key of Object.keys(newBBoxOwners) as Array<keyof BBox>) {
+        for (const key of Object.keys(newBBoxOwners) as Array<Dim>) {
           if (newBBoxOwners[key] !== undefined) {
             node.bboxOwners[key] = newBBoxOwners[key];
           }
@@ -496,7 +491,7 @@ the align node.
     );
 
     // if any of the bbox values are NaN (undefined is ok), console.error and skip
-    for (const key of Object.keys(bbox) as Array<keyof BBox>) {
+    for (const key of Object.keys(bbox) as Array<Dim>) {
       if (bbox[key] !== undefined && isNaN(bbox[key]!)) {
         // error message should include id, bbox, owner
         console.error(
@@ -594,34 +589,33 @@ the align node.
   };
 
   const ownedByOther = (
-    id: Id, // with respect to this node
-    check: Id, // is this node already owned
-    axis: "x" | "y" | "width" | "height" // along this axis
+    id: Id, // with respect to `id`
+    check: Id, // is `check` already owned
+    dim: Dim // on this `dim`?
   ): boolean => {
-    // debugger;
     const { id: resolvedId } = resolveRef(check, "check");
     const node = scenegraph[resolvedId] as ScenegraphNode & { type: "node" }; // guaranteed by resolveRef
 
-    if (axis === "x") {
-      return (
-        node.transformOwners.translate.x !== undefined &&
-        node.transformOwners.translate.x !== id
+    if (dim === "left" || dim === "centerX" || dim === "right") {
+      return !(
+        node.bboxOwners[dim] === undefined &&
+        node.bboxOwners[dim] === id &&
+        node.transformOwners.translate.x === undefined &&
+        node.transformOwners.translate.x === id
       );
-    } else if (axis === "y") {
-      return (
-        node.transformOwners.translate.y !== undefined &&
-        node.transformOwners.translate.y !== id
+    } else if (dim === "top" || dim === "centerY" || dim === "bottom") {
+      return !(
+        node.bboxOwners[dim] === undefined &&
+        node.bboxOwners[dim] === id &&
+        node.transformOwners.translate.y === undefined &&
+        node.transformOwners.translate.y === id
       );
-    } else if (axis === "width") {
-      return (
-        node.bboxOwners.width !== undefined && node.bboxOwners.width !== id
-      );
-    } else if (axis === "height") {
-      return (
-        node.bboxOwners.height !== undefined && node.bboxOwners.height !== id
+    } else if (dim === "width" || dim === "height") {
+      return !(
+        node.bboxOwners[dim] === undefined && node.bboxOwners[dim] === id
       );
     } else {
-      throw new Error("ownedByOther: axis is neither x nor y");
+      throw new Error(`Invalid dim: ${dim}`);
     }
   };
 
@@ -642,6 +636,32 @@ the align node.
 
           setBBox(owner, childId, { left });
         },
+        get centerX() {
+          return getBBox(childId).centerX;
+        },
+        set centerX(centerX: number | undefined) {
+          if (centerX === undefined) {
+            console.error(
+              `${owner} tried to set ${childId}'s centerX to undefined. Skipping...`
+            );
+            return;
+          }
+
+          setBBox(owner, childId, { centerX });
+        },
+        get right() {
+          return getBBox(childId).right;
+        },
+        set right(right: number | undefined) {
+          if (right === undefined) {
+            console.error(
+              `${owner} tried to set ${childId}'s right to undefined. Skipping...`
+            );
+            return;
+          }
+
+          setBBox(owner, childId, { right });
+        },
         get top() {
           return getBBox(childId).top;
         },
@@ -654,6 +674,32 @@ the align node.
           }
 
           setBBox(owner, childId, { top });
+        },
+        get centerY() {
+          return getBBox(childId).centerY;
+        },
+        set centerY(centerY: number | undefined) {
+          if (centerY === undefined) {
+            console.error(
+              `${owner} tried to set ${childId}'s centerY to undefined. Skipping...`
+            );
+            return;
+          }
+
+          setBBox(owner, childId, { centerY });
+        },
+        get bottom() {
+          return getBBox(childId).bottom;
+        },
+        set bottom(bottom: number | undefined) {
+          if (bottom === undefined) {
+            console.error(
+              `${owner} tried to set ${childId}'s bottom to undefined. Skipping...`
+            );
+            return;
+          }
+
+          setBBox(owner, childId, { bottom });
         },
         get width() {
           return getBBox(childId).width;
@@ -681,25 +727,25 @@ the align node.
 
           setBBox(owner, childId, { height });
         },
-        get right() {
-          return maybeAdd(this.left, this.width);
-        },
-        get bottom() {
-          return maybeAdd(this.top, this.height);
-        },
-        get centerX() {
-          return maybeAdd(this.left, maybeDiv(this.width, 2));
-        },
-        get centerY() {
-          return maybeAdd(this.top, maybeDiv(this.height, 2));
-        },
       },
       owned: {
-        get x() {
-          return ownedByOther(owner, childId, "x");
+        get left() {
+          return ownedByOther(owner, childId, "left");
         },
-        get y() {
-          return ownedByOther(owner, childId, "y");
+        get centerX() {
+          return ownedByOther(owner, childId, "centerX");
+        },
+        get right() {
+          return ownedByOther(owner, childId, "right");
+        },
+        get top() {
+          return ownedByOther(owner, childId, "top");
+        },
+        get centerY() {
+          return ownedByOther(owner, childId, "centerY");
+        },
+        get bottom() {
+          return ownedByOther(owner, childId, "bottom");
         },
         get width() {
           return ownedByOther(owner, childId, "width");
@@ -745,16 +791,7 @@ export type ScenegraphContextType = {
   setCustomData: (id: Id, customData: any) => void;
   getBBox: (id: Id) => BBox;
   setBBox: (owner: Id, id: Id, bbox: BBox) => void;
-  // ownedByUs: (
-  //   id: Id,
-  //   check: Id,
-  //   axis: "x" | "y" | "width" | "height"
-  // ) => boolean;
-  ownedByOther: (
-    id: Id,
-    check: Id,
-    axis: "x" | "y" | "width" | "height"
-  ) => boolean;
+  ownedByOther: (id: Id, check: Id, dim: Dim) => boolean;
   createChildRepr: (owner: Id, childId: Id) => ChildNode;
 };
 

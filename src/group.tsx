@@ -30,11 +30,11 @@ export const Group = withBluefish((props: GroupProps) => {
     }
 
     for (const childNode of childNodes) {
-      if (!childNode.owned.x) {
+      if (!childNode.owned.left) {
         childNode.bbox.left = 0;
       }
 
-      if (!childNode.owned.y) {
+      if (!childNode.owned.top) {
         childNode.bbox.top = 0;
       }
     }

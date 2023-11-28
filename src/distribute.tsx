@@ -90,7 +90,7 @@ export const Distribute = withBluefish((props: DistributeProps) => {
         throw new Error("invalid options");
       }
 
-      const fixedElement = childNodes.findIndex((childId) => childId.owned.y);
+      const fixedElement = childNodes.findIndex((childId) => childId.owned.top);
 
       // use spacing and height to evenly distribute elements while ensuring that the fixed element
       // is fixed
@@ -107,7 +107,7 @@ export const Distribute = withBluefish((props: DistributeProps) => {
       // subtract off spacing and the sizes of the first fixedElement elements
       let y = startingY;
       for (const childId of childNodes) {
-        if (!childId.owned.y) {
+        if (!childId.owned.top) {
           childId.bbox.top = y;
         }
         y += childId.bbox.height! + spacing;
@@ -186,7 +186,9 @@ export const Distribute = withBluefish((props: DistributeProps) => {
         throw new Error("Invalid options for space");
       }
 
-      const fixedElement = childNodes.findIndex((childId) => childId.owned.x);
+      const fixedElement = childNodes.findIndex(
+        (childId) => childId.owned.left
+      );
 
       // use spacing and width to evenly distribute elements while ensuring that the fixed element
       // is fixed
@@ -203,7 +205,7 @@ export const Distribute = withBluefish((props: DistributeProps) => {
       // subtract off spacing and the sizes of the first fixedElement elements
       let x = startingX;
       for (const childId of childNodes) {
-        if (!childId.owned.x) {
+        if (!childId.owned.left) {
           childId.bbox.left = x;
         }
         x += childId.bbox.width! + spacing;

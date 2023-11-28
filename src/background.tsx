@@ -35,11 +35,11 @@ export const Background = withBluefish((props: BackgroundProps) => {
 
     let left: number;
     let top: number;
-    if (!backgroundChild.owned.x) {
+    if (!backgroundChild.owned.left) {
       // infer x from rest
 
       const lefts = rest
-        .filter((childNode) => childNode.owned.x)
+        .filter((childNode) => childNode.owned.left)
         .map((childNode) => childNode.bbox.left);
 
       const x = lefts.length === 0 ? 0 : maybeMin(lefts) ?? 0;
@@ -48,10 +48,10 @@ export const Background = withBluefish((props: BackgroundProps) => {
     } else {
       throw new Error("Background x must be inferred from children");
     }
-    if (!backgroundChild.owned.y) {
+    if (!backgroundChild.owned.top) {
       // infer y from rest
       const tops = rest
-        .filter((childNode) => childNode.owned.y)
+        .filter((childNode) => childNode.owned.top)
         .map((childNode) => childNode.bbox.top);
 
       const y = tops.length === 0 ? 0 : maybeMin(tops) ?? 0;
@@ -64,7 +64,7 @@ export const Background = withBluefish((props: BackgroundProps) => {
     if (!backgroundChild.owned.width) {
       // infer width from rest
       const rights = rest
-        .filter((childNode) => childNode.owned.x && childNode.owned.width)
+        .filter((childNode) => childNode.owned.left && childNode.owned.width)
         .map((childNode) =>
           maybeAdd(childNode.bbox.left, childNode.bbox.width)
         );
@@ -82,7 +82,7 @@ export const Background = withBluefish((props: BackgroundProps) => {
 
     // center all children horizontally in the background
     for (const childId of rest) {
-      if (childId.owned.x) continue;
+      if (childId.owned.left) continue;
       childId.bbox.left =
         left + (backgroundChild.bbox.width! - childId.bbox.width!) / 2;
     }
@@ -90,7 +90,7 @@ export const Background = withBluefish((props: BackgroundProps) => {
     if (!backgroundChild.owned.height) {
       // infer height from rest
       const bottoms = rest
-        .filter((childNode) => childNode.owned.y && childNode.owned.height)
+        .filter((childNode) => childNode.owned.top && childNode.owned.height)
         .map((childNode) =>
           maybeAdd(childNode.bbox.top, childNode.bbox.height)
         );
@@ -108,7 +108,7 @@ export const Background = withBluefish((props: BackgroundProps) => {
 
     // center all children vertically in the background
     for (const childId of rest) {
-      if (childId.owned.y) continue;
+      if (childId.owned.top) continue;
       childId.bbox.top =
         top + (backgroundChild.bbox.height! - childId.bbox.height!) / 2;
     }

@@ -45,7 +45,7 @@ export const stackLayout =
 
     // TODO: should be able to filter by ownership instead
     const verticalValueArr = verticalPlaceables
-      .filter(([placeable, _]) => placeable!.owned.y)
+      .filter(([placeable, _]) => placeable!.owned.top)
       .map(([placeable, alignment]) => {
         return [
           placeable,
@@ -63,7 +63,7 @@ export const stackLayout =
       verticalValueArr.length === 0 ? 0 : (verticalValueArr[0][1] as number);
 
     const horizontalValueArr = horizontalPlaceables
-      .filter(([placeable, _]) => placeable!.owned.x)
+      .filter(([placeable, _]) => placeable!.owned.left)
       .map(([placeable, alignment]) => {
         return [
           placeable,
@@ -82,7 +82,7 @@ export const stackLayout =
         : (horizontalValueArr[0][1] as number);
 
     for (const [placeable, alignment] of verticalPlaceables) {
-      if (placeable!.owned.y) continue;
+      if (placeable!.owned.top) continue;
       if (alignment === "top") {
         placeable!.bbox.top = verticalValue;
       } else if (alignment === "centerY") {
@@ -97,7 +97,7 @@ export const stackLayout =
     }
 
     for (const [placeable, alignment] of horizontalPlaceables) {
-      if (placeable!.owned.x) continue;
+      if (placeable!.owned.left) continue;
       if (alignment === "left") {
         placeable!.bbox.left = horizontalValue;
       } else if (alignment === "centerX") {
@@ -180,7 +180,7 @@ export const stackLayout =
         throw new Error("invalid options");
       }
 
-      const fixedElement = childNodes.findIndex((childId) => childId.owned.y);
+      const fixedElement = childNodes.findIndex((childId) => childId.owned.top);
 
       // use spacing and height to evenly distribute elements while ensuring that the fixed element
       // is fixed
@@ -197,7 +197,7 @@ export const stackLayout =
       // subtract off spacing and the sizes of the first fixedElement elements
       let y = startingY;
       for (const childId of childNodes) {
-        if (!childId.owned.y) {
+        if (!childId.owned.top) {
           childId.bbox.top = y;
         }
         y += childId.bbox.height! + spacing;
@@ -282,7 +282,9 @@ export const stackLayout =
         throw new Error("Invalid options for space");
       }
 
-      const fixedElement = childNodes.findIndex((childId) => childId.owned.x);
+      const fixedElement = childNodes.findIndex(
+        (childId) => childId.owned.left
+      );
 
       // use spacing and width to evenly distribute elements while ensuring that the fixed element
       // is fixed
@@ -299,7 +301,7 @@ export const stackLayout =
       // subtract off spacing and the sizes of the first fixedElement elements
       let x = startingX;
       for (const childId of childNodes) {
-        if (!childId.owned.x) {
+        if (!childId.owned.left) {
           childId.bbox.left = x;
         }
         x += childId.bbox.width! + spacing;

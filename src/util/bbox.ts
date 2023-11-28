@@ -1,15 +1,16 @@
 import { maybeAdd, maybeDiv, maybeMax, maybeMin, maybeSub } from "./maybe";
 
-export type BBox = {
-  left?: number;
-  top?: number;
-  right?: number;
-  bottom?: number;
-  centerX?: number;
-  centerY?: number;
-  width?: number;
-  height?: number;
-};
+export type Dim =
+  | "left"
+  | "top"
+  | "centerX"
+  | "centerY"
+  | "right"
+  | "bottom"
+  | "width"
+  | "height";
+
+export type BBox = { [key in Dim]?: number };
 
 export const from = (bboxes: BBox[]): BBox => {
   const bboxesStructOfArray = {
