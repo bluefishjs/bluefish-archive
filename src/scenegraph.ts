@@ -3,13 +3,14 @@ import { getLCAChainSuffixes } from "./util/lca";
 import _ from "lodash";
 import { maybeAdd, maybeAddAll, maybeDiv, maybeSub } from "./util/maybe";
 import { createContext, useContext } from "solid-js";
-import { BBox, Dim } from "./util/bbox";
+import { BBox, Dim, Axis, axisMap, inferenceRules } from "./util/bbox";
 
 export type Id = string;
 export type Inferred = { inferred: true };
 export const inferred: Inferred = { inferred: true };
 
-export type { BBox, Dim };
+export type { BBox, Dim, Axis };
+export { axisMap };
 
 export type BBoxOwners = { [key in Dim]?: Id | Inferred };
 
@@ -61,59 +62,19 @@ export type Scenegraph = {
   [key: Id]: ScenegraphNode;
 };
 
-export const inferenceRules: {
-  from: Dim[];
-  to: Dim;
-  calculate: (dims: number[]) => number;
-}[] = [
-  {
-    from: ["right", "width"],
-    to: "left",
-    calculate: ([right, width]) => right - width,
-  },
-  {
-    from: ["bottom", "height"],
-    to: "top",
-    calculate: ([bottom, height]) => bottom - height,
-  },
-  {
-    from: ["left", "width"],
-    to: "right",
-    calculate: ([left, width]) => left + width,
-  },
-  {
-    from: ["top", "height"],
-    to: "bottom",
-    calculate: ([top, height]) => top + height,
-  },
-  {
-    from: ["left", "right"],
-    to: "width",
-    calculate: ([left, right]) => right - left,
-  },
-  {
-    from: ["top", "bottom"],
-    to: "height",
-    calculate: ([top, bottom]) => bottom - top,
-  },
-];
-
-export function inferBBoxValues(bbox: BBox, owners: BBoxOwners): BBox {
-  const inferredBBox = { ...bbox };
+// Propagates bbox dims to other dims that can be inferred
+export function propagateBBoxValues(bbox: BBox, owners: BBoxOwners): void {
+  // const inferredBBox = { ...bbox };
 
   inferenceRules.forEach((rule) => {
     if (
-      rule.from.every((key) => inferredBBox[key] !== undefined) &&
-      inferredBBox[rule.to] === undefined
+      rule.from.every((key) => bbox[key] !== undefined) &&
+      bbox[rule.to] === undefined
     ) {
-      inferredBBox[rule.to] = rule.calculate(
-        rule.from.map((key) => inferredBBox[key]!)
-      );
+      bbox[rule.to] = rule.calculate(rule.from.map((key) => bbox[key]!));
       owners[rule.to] = inferred;
     }
   });
-
-  return inferredBBox;
 }
 
 export const createScenegraph = (): ScenegraphContextType => {
@@ -337,9 +298,37 @@ the align node.
           transform.translate.x
         );
       },
+      get centerX() {
+        return maybeAddAll(
+          node.bbox.centerX,
+          node.transform.translate.x,
+          transform.translate.x
+        );
+      },
+      get right() {
+        return maybeAddAll(
+          node.bbox.right,
+          node.transform.translate.x,
+          transform.translate.x
+        );
+      },
       get top() {
         return maybeAddAll(
           node.bbox.top,
+          node.transform.translate.y,
+          transform.translate.y
+        );
+      },
+      get centerY() {
+        return maybeAddAll(
+          node.bbox.centerY,
+          node.transform.translate.y,
+          transform.translate.y
+        );
+      },
+      get bottom() {
+        return maybeAddAll(
+          node.bbox.bottom,
           node.transform.translate.y,
           transform.translate.y
         );
@@ -349,18 +338,6 @@ the align node.
       },
       get height() {
         return node.bbox.height;
-      },
-      get right() {
-        return maybeAdd(this.left, this.width);
-      },
-      get bottom() {
-        return maybeAdd(this.top, this.height);
-      },
-      get centerX() {
-        return maybeAdd(this.left, maybeDiv(this.width, 2));
-      },
-      get centerY() {
-        return maybeAdd(this.top, maybeDiv(this.height, 2));
       },
     };
   };
@@ -424,7 +401,11 @@ the align node.
 
         const newBBoxOwners: BBoxOwners = {
           ...(bbox.left !== undefined ? { left: owner } : {}),
+          ...(bbox.centerX !== undefined ? { centerX: owner } : {}),
+          ...(bbox.right !== undefined ? { right: owner } : {}),
           ...(bbox.top !== undefined ? { top: owner } : {}),
+          ...(bbox.centerY !== undefined ? { centerY: owner } : {}),
+          ...(bbox.bottom !== undefined ? { bottom: owner } : {}),
           ...(bbox.width !== undefined ? { width: owner } : {}),
           ...(bbox.height !== undefined ? { height: owner } : {}),
         };
@@ -467,6 +448,8 @@ the align node.
         if (newTransformOwners.translate.y !== undefined) {
           node.transformOwners.translate.y = newTransformOwners.translate.y;
         }
+
+        propagateBBoxValues(bbox, node.bboxOwners);
       })
     );
   };
@@ -510,66 +493,59 @@ the align node.
       translate: {},
     };
 
-    if (bbox.left !== undefined) {
-      if (accumulatedTransform.translate.x === undefined) {
-        console.error(
-          `setBBox: ${owner} tried to update ${resolvedId}'s bbox.left with ${bbox.left}, but the accumulated transform.translate.x is undefined. Skipping...`
-        );
-      }
-      if (
-        node.bboxOwners.left === owner ||
-        node.bboxOwners.left === undefined
-      ) {
-        proposedBBox.left = bbox.left;
-        proposedTransform.translate.x = 0;
-      } else if (
-        node.transformOwners.translate.x === owner ||
-        node.transformOwners.translate.x === undefined
-      ) {
-        proposedTransform.translate.x = bbox.left - node.bbox.left!;
-      }
-    }
+    for (const dim of [
+      "left",
+      "centerX",
+      "right",
+      "top",
+      "centerY",
+      "bottom",
+    ] as const) {
+      if (bbox[dim] === undefined) continue;
 
-    if (bbox.width !== undefined) {
+      const axis = axisMap[dim];
+      if (accumulatedTransform.translate[axis] === undefined) {
+        console.error(
+          `setBBox: ${owner} tried to update ${resolvedId}'s bbox.${dim} with ${bbox[dim]}, but the accumulated transform.translate.${axis} is undefined. Skipping...`
+        );
+        continue;
+      }
+
       if (
-        node.bboxOwners.width === owner ||
-        node.bboxOwners.width === undefined
+        node.bboxOwners[dim] === owner ||
+        node.bboxOwners[dim] === undefined
       ) {
-        proposedBBox.width = bbox.width;
+        if (node.transformOwners.translate[axis] === undefined) {
+          // need to set the translate[axis] so that the dim doesn't move
+          // NOTE: this case doesn't always happen. e.g. `right` could be set before `left` in which
+          // case `right` has already set the translate.x
+          proposedTransform.translate[axis] = 0;
+        }
+        proposedBBox[dim] = bbox[dim]! - node.transform.translate[axis]!;
+      } else if (
+        node.transformOwners.translate[axis] === owner ||
+        node.transformOwners.translate[axis] === undefined
+      ) {
+        proposedTransform.translate[axis] = bbox[dim]! - node.bbox[dim]!;
       } else {
         console.error(
-          `setBBox: ${owner} tried to update ${resolvedId}'s bbox.width with ${bbox.width}, but it was already set by ${node.bboxOwners.width}. Only one component can set a bbox property. We skipped this update.`
+          `setBBox: ${owner} tried to update ${resolvedId}'s bbox.${dim} with ${bbox[dim]}, but it was already set by ${node.bboxOwners[dim]}. Only one component can set a bbox property. We skipped this update.`
         );
         return;
       }
     }
 
-    if (bbox.top !== undefined) {
-      if (accumulatedTransform.translate.y === undefined) {
-        console.error(
-          `setBBox: ${owner} tried to update ${resolvedId}'s bbox.top with ${bbox.top}, but the accumulated transform.translate.y is undefined. Skipping...`
-        );
-      }
-      if (node.bboxOwners.top === owner || node.bboxOwners.top === undefined) {
-        proposedBBox.top = bbox.top;
-        proposedTransform.translate.y = 0;
-      } else if (
-        node.transformOwners.translate.y === owner ||
-        node.transformOwners.translate.y === undefined
-      ) {
-        proposedTransform.translate.y = bbox.top - node.bbox.top!;
-      }
-    }
+    for (const dim of ["width", "height"] as const) {
+      if (bbox[dim] === undefined) continue;
 
-    if (bbox.height !== undefined) {
       if (
-        node.bboxOwners.height === owner ||
-        node.bboxOwners.height === undefined
+        node.bboxOwners[dim] === owner ||
+        node.bboxOwners[dim] === undefined
       ) {
-        proposedBBox.height = bbox.height;
+        proposedBBox[dim] = bbox[dim]!;
       } else {
         console.error(
-          `setBBox: ${owner} tried to update ${resolvedId}'s bbox.height with ${bbox.height}, but it was already set by ${node.bboxOwners.height}. Only one component can set a bbox property. We skipped this update.`
+          `setBBox: ${owner} tried to update ${resolvedId}'s bbox.${dim} with ${bbox[dim]}, but it was already set by ${node.bboxOwners[dim]}. Only one component can set a bbox property. We skipped this update.`
         );
         return;
       }
