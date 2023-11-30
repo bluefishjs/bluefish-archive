@@ -357,7 +357,9 @@ the align node.
     for (const key of Object.keys(bbox) as Array<Dim>) {
       if (bbox[key] !== undefined && isNaN(bbox[key]!)) {
         console.error(
-          `setBBox: ${owner} tried to update ${id}'s bbox with ${JSON.stringify(
+          `setBBox: ${resolveName(owner)} tried to update ${resolveName(
+            id
+          )}'s bbox with ${JSON.stringify(
             bbox
           )}, but the bbox contains NaN values. Skipping...`
         );
@@ -464,7 +466,7 @@ the align node.
           node.transformOwners.translate.y = newTransformOwners.translate.y;
         }
 
-        propagateBBoxValues(bbox, node.bboxOwners);
+        propagateBBoxValues(node.bbox, node.bboxOwners);
       })
     );
   };
