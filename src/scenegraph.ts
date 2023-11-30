@@ -574,21 +574,21 @@ the align node.
 
     if (dim === "left" || dim === "centerX" || dim === "right") {
       return !(
-        node.bboxOwners[dim] === undefined &&
-        node.bboxOwners[dim] === id &&
-        node.transformOwners.translate.x === undefined &&
+        node.bboxOwners[dim] === undefined ||
+        node.bboxOwners[dim] === id ||
+        node.transformOwners.translate.x === undefined ||
         node.transformOwners.translate.x === id
       );
     } else if (dim === "top" || dim === "centerY" || dim === "bottom") {
       return !(
-        node.bboxOwners[dim] === undefined &&
-        node.bboxOwners[dim] === id &&
-        node.transformOwners.translate.y === undefined &&
+        node.bboxOwners[dim] === undefined ||
+        node.bboxOwners[dim] === id ||
+        node.transformOwners.translate.y === undefined ||
         node.transformOwners.translate.y === id
       );
     } else if (dim === "width" || dim === "height") {
       return !(
-        node.bboxOwners[dim] === undefined && node.bboxOwners[dim] === id
+        node.bboxOwners[dim] === undefined || node.bboxOwners[dim] === id
       );
     } else {
       throw new Error(`Invalid dim: ${dim}`);
