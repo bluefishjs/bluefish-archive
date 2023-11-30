@@ -543,8 +543,10 @@ the align node.
           // NOTE: this case doesn't always happen. e.g. `right` could be set before `left` in which
           // case `right` has already set the translate.x
           proposedTransform.translate[axis] = 0;
+          proposedBBox[dim] = bbox[dim]!;
+        } else {
+          proposedBBox[dim] = bbox[dim]! - node.transform.translate[axis]!;
         }
-        proposedBBox[dim] = bbox[dim]! - node.transform.translate[axis]!;
       } else if (
         node.transformOwners.translate[axis] === owner ||
         node.transformOwners.translate[axis] === undefined

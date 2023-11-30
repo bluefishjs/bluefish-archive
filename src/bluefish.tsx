@@ -111,11 +111,11 @@ export function Bluefish(props: BluefishProps) {
     return {
       transform: {
         translate: {
-          x: left,
-          y: top,
+          x: 0,
+          y: 0,
         },
       },
-      bbox: { left, top, right, bottom, width, height },
+      bbox: { left, top, width, height },
     };
   };
 
@@ -135,14 +135,10 @@ export function Bluefish(props: BluefishProps) {
         height={height()}
         viewBox={`${
           -props.padding! +
-          (props.positioning === "absolute"
-            ? 0
-            : paintProps.transform.translate.x ?? 0)
+          (props.positioning === "absolute" ? 0 : paintProps.bbox.left ?? 0)
         } ${
           -props.padding! +
-          (props.positioning === "absolute"
-            ? 0
-            : paintProps.transform.translate.y ?? 0)
+          (props.positioning === "absolute" ? 0 : paintProps.bbox.top ?? 0)
         } ${width()} ${height()}`}
       >
         {props.children}

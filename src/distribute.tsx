@@ -16,7 +16,6 @@ export type DistributeProps = ParentProps<{
 
 export const Distribute = withBluefish((props: DistributeProps) => {
   const layout = (childNodes: ChildNode[]) => {
-    // debugger;
     childNodes = Array.from(childNodes);
 
     if (props.name.endsWith("DEBUG")) {
@@ -113,11 +112,9 @@ export const Distribute = withBluefish((props: DistributeProps) => {
         y += childId.bbox.height! + spacing;
       }
 
-      // TODO: is the width computation correct? should it take position into account?
       return {
         bbox: {
           top: startingY,
-          width: maybeMax(childNodes.map((childId) => childId.bbox.width)),
           height,
         },
         transform: {
@@ -211,11 +208,9 @@ export const Distribute = withBluefish((props: DistributeProps) => {
         x += childId.bbox.width! + spacing;
       }
 
-      // TODO: is the height computation correct? should it take position into account?
       return {
         bbox: {
           left: startingX,
-          height: maybeMax(childNodes.map((childId) => childId.bbox.height)),
           width,
         },
         transform: {
