@@ -4,6 +4,7 @@ import _ from "lodash";
 import { maybeAdd, maybeAddAll, maybeDiv, maybeSub } from "./util/maybe";
 import { createContext, useContext } from "solid-js";
 import { BBox, Dim, Axis, axisMap, inferenceRules } from "./util/bbox";
+import { resolveName } from "./createName";
 
 export type Id = string;
 export type Inferred = { inferred: true };
@@ -377,7 +378,13 @@ the align node.
             node.bboxOwners[key] !== owner
           ) {
             console.error(
-              `${owner} tried to set ${id}'s ${key} to ${bbox[key]} but it was already set by ${node.bboxOwners[key]}. Only one component can set a bbox property. We skipped this update.`
+              `${resolveName(owner)} tried to set ${resolveName(
+                id
+              )}'s ${key} to ${
+                bbox[key]
+              } but it was already set by ${resolveName(
+                node.bboxOwners[key]! as any /* TODO: handle inferred case */
+              )}. Only one component can set a bbox property. We skipped this update.`
             );
             return node;
           }
@@ -393,7 +400,15 @@ the align node.
             node.transformOwners.translate[key] !== owner
           ) {
             console.error(
-              `${owner} tried to set ${id}'s translate.${key} to ${transform?.translate[key]} but it was already set by ${node.transformOwners.translate[key]}. Only one component can set a transform property. We skipped this update.`
+              `${resolveName(owner)} tried to set ${resolveName(
+                id
+              )}'s translate.${key} to ${
+                transform?.translate[key]
+              } but it was already set by ${resolveName(
+                node.transformOwners.translate[
+                  key
+                ]! as any /* TODO: handle inferred case */
+              )}. Only one component can set a transform property. We skipped this update.`
             );
             return node;
           }
@@ -478,7 +493,9 @@ the align node.
       if (bbox[key] !== undefined && isNaN(bbox[key]!)) {
         // error message should include id, bbox, owner
         console.error(
-          `setBBox: ${owner} tried to update ${resolvedId}'s bbox with ${JSON.stringify(
+          `setBBox: ${resolveName(owner)} tried to update ${resolveName(
+            resolvedId
+          )}'s bbox with ${JSON.stringify(
             bbox
           )}, but the bbox contains NaN values. Skipping...`
         );
@@ -506,7 +523,11 @@ the align node.
       const axis = axisMap[dim];
       if (accumulatedTransform.translate[axis] === undefined) {
         console.error(
-          `setBBox: ${owner} tried to update ${resolvedId}'s bbox.${dim} with ${bbox[dim]}, but the accumulated transform.translate.${axis} is undefined. Skipping...`
+          `setBBox: ${resolveName(owner)} tried to update ${resolveName(
+            resolvedId
+          )}'s bbox.${dim} with ${
+            bbox[dim]
+          }, but the accumulated transform.translate.${axis} is undefined. Skipping...`
         );
         continue;
       }
@@ -529,7 +550,13 @@ the align node.
         proposedTransform.translate[axis] = bbox[dim]! - node.bbox[dim]!;
       } else {
         console.error(
-          `setBBox: ${owner} tried to update ${resolvedId}'s bbox.${dim} with ${bbox[dim]}, but it was already set by ${node.bboxOwners[dim]}. Only one component can set a bbox property. We skipped this update.`
+          `setBBox: ${resolveName(owner)} tried to update ${resolveName(
+            resolvedId
+          )}'s bbox.${dim} with ${
+            bbox[dim]
+          }, but it was already set by ${resolveName(
+            node.bboxOwners[dim]! as any /* TODO: handle inferred case */
+          )}. Only one component can set a bbox property. We skipped this update.`
         );
         return;
       }
@@ -545,7 +572,13 @@ the align node.
         proposedBBox[dim] = bbox[dim]!;
       } else {
         console.error(
-          `setBBox: ${owner} tried to update ${resolvedId}'s bbox.${dim} with ${bbox[dim]}, but it was already set by ${node.bboxOwners[dim]}. Only one component can set a bbox property. We skipped this update.`
+          `setBBox: ${resolveName(owner)} tried to update ${resolveName(
+            resolvedId
+          )}'s bbox.${dim} with ${
+            bbox[dim]
+          }, but it was already set by ${resolveName(
+            node.bboxOwners[dim]! as any /* TODO: handle inferred case */
+          )}. Only one component can set a bbox property. We skipped this update.`
         );
         return;
       }
@@ -605,7 +638,9 @@ the align node.
         set left(left: number | undefined) {
           if (left === undefined) {
             console.error(
-              `${owner} tried to set ${childId}'s left to undefined. Skipping...`
+              `${resolveName(owner)} tried to set ${resolveName(
+                childId
+              )}'s left to undefined. Skipping...`
             );
             return;
           }
@@ -618,7 +653,9 @@ the align node.
         set centerX(centerX: number | undefined) {
           if (centerX === undefined) {
             console.error(
-              `${owner} tried to set ${childId}'s centerX to undefined. Skipping...`
+              `${resolveName(owner)} tried to set ${resolveName(
+                childId
+              )}'s centerX to undefined. Skipping...`
             );
             return;
           }
@@ -631,7 +668,9 @@ the align node.
         set right(right: number | undefined) {
           if (right === undefined) {
             console.error(
-              `${owner} tried to set ${childId}'s right to undefined. Skipping...`
+              `${resolveName(owner)} tried to set ${resolveName(
+                childId
+              )}'s right to undefined. Skipping...`
             );
             return;
           }
@@ -644,7 +683,9 @@ the align node.
         set top(top: number | undefined) {
           if (top === undefined) {
             console.error(
-              `${owner} tried to set ${childId}'s top to undefined. Skipping...`
+              `${resolveName(owner)} tried to set ${resolveName(
+                childId
+              )}'s top to undefined. Skipping...`
             );
             return;
           }
@@ -657,7 +698,9 @@ the align node.
         set centerY(centerY: number | undefined) {
           if (centerY === undefined) {
             console.error(
-              `${owner} tried to set ${childId}'s centerY to undefined. Skipping...`
+              `${resolveName(owner)} tried to set ${resolveName(
+                childId
+              )}'s centerY to undefined. Skipping...`
             );
             return;
           }
@@ -670,7 +713,9 @@ the align node.
         set bottom(bottom: number | undefined) {
           if (bottom === undefined) {
             console.error(
-              `${owner} tried to set ${childId}'s bottom to undefined. Skipping...`
+              `${resolveName(owner)} tried to set ${resolveName(
+                childId
+              )}'s bottom to undefined. Skipping...`
             );
             return;
           }
@@ -683,7 +728,9 @@ the align node.
         set width(width: number | undefined) {
           if (width === undefined) {
             console.error(
-              `${owner} tried to set ${childId}'s width to undefined. Skipping...`
+              `${resolveName(owner)} tried to set ${resolveName(
+                childId
+              )}'s width to undefined. Skipping...`
             );
             return;
           }
@@ -696,7 +743,9 @@ the align node.
         set height(height: number | undefined) {
           if (height === undefined) {
             console.error(
-              `${owner} tried to set ${childId}'s height to undefined. Skipping...`
+              `${resolveName(owner)} tried to set ${resolveName(
+                childId
+              )}'s height to undefined. Skipping...`
             );
             return;
           }

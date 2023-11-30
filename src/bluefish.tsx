@@ -164,6 +164,7 @@ export function Bluefish(props: BluefishProps) {
         </ScopeContext.Provider>
       </ScenegraphContext.Provider>
       <Show when={props.debug === true}>
+        <br />
         <div style={{ float: "left", "margin-right": "40px" }}>
           <h1>Scenegraph</h1>
           <pre>{JSON.stringify(scenegraph, null, 2)}</pre>
