@@ -4,6 +4,9 @@ import { Bluefish } from "../../bluefish";
 import { Rect } from "../../rect";
 import Group from "../../group";
 import Distribute from "../../distribute";
+import Ref from "../../ref";
+import { StackH } from "../../stackh";
+import Background from "../../background";
 
 /**
  * Bluefish's `Align` component contains many different options for aligning its children components. Taking in any number of components as children,
@@ -54,27 +57,44 @@ export const AlignComponent: Story = {
   render: (props) => {
     return (
       <Bluefish>
-        <Distribute direction="horizontal" spacing={50}>
-          <Group>
-            <Align name="verticalAlign" alignment={props.alignment1}>
-              <Rect x={20} width={30} height={30} fill={"red"} />
-              <Rect x={70} width={50} height={50} fill={"blue"} />
-              <Rect x={160} width={80} height={80} fill={"green"} />
-            </Align>
-          </Group>
-          <Group>
-            <Align name="horizontalAlign" alignment={props.alignment2}>
-              <Rect y={20} width={30} height={30} fill={"red"} />
-              <Rect y={60} width={50} height={50} fill={"blue"} />
-            </Align>
-          </Group>
-          <Group>
-            <Align name="otherAlign" alignment={props.alignment3}>
-              <Rect width={50} height={50} fill={"blue"} />
-              <Rect width={30} height={30} fill={"red"} />
-            </Align>
-          </Group>
-        </Distribute>
+        <StackH spacing={100}>
+          <Background>
+            <Group>
+              <Rect name="rect1" x={20} width={30} height={30} fill={"red"} />
+              <Rect name="rect2" x={80} width={50} height={50} fill={"blue"} />
+              <Rect
+                name="rect3"
+                x={140}
+                width={80}
+                height={80}
+                fill={"green"}
+              />
+              <Align name="verticalAlign" alignment={props.alignment1}>
+                <Ref select="rect1" />
+                <Ref select="rect2" />
+                <Ref select="rect3" />
+              </Align>
+            </Group>
+          </Background>
+          <Background>
+            <Group>
+              <Rect name="rect4" y={20} width={30} height={30} fill={"red"} />
+              <Rect name="rect5" y={60} width={50} height={50} fill={"blue"} />
+              <Align name="horizontalAlign" alignment={props.alignment2}>
+                <Ref select="rect4" />
+                <Ref select="rect5" />
+              </Align>
+            </Group>
+          </Background>
+          <Background>
+            <Group>
+              <Align name="otherAlign" alignment={props.alignment3}>
+                <Rect width={50} height={50} fill={"blue"} />
+                <Rect width={30} height={30} fill={"red"} />
+              </Align>
+            </Group>
+          </Background>
+        </StackH>
       </Bluefish>
     );
   },

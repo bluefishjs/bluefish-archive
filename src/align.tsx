@@ -167,7 +167,24 @@ export const Align = withBluefish((props: AlignProps) => {
           y: maybeSub(props.y, bbox.top),
         },
       },
-      bbox,
+      bbox: {
+        left:
+          horizontalAlignment(props.alignment) !== undefined
+            ? bbox.left
+            : undefined,
+        width:
+          horizontalAlignment(props.alignment) !== undefined
+            ? bbox.width
+            : undefined,
+        top:
+          verticalAlignment(props.alignment) !== undefined
+            ? bbox.top
+            : undefined,
+        height:
+          verticalAlignment(props.alignment) !== undefined
+            ? bbox.height
+            : undefined,
+      },
     };
   };
 
