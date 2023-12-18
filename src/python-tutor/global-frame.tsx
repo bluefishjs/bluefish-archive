@@ -30,7 +30,24 @@ export const GlobalFrame = withBluefish((props: GlobalFrameProps) => {
   const fontFamily = "Andale mono, monospace";
 
   return (
-    <Group>
+    <Group
+      rels={() => (
+        <>
+          <Align alignment="topCenter">
+            <Ref select={labelName} />
+            <Ref select={frameName} />
+          </Align>
+          <Align alignment="centerLeft">
+            <Ref select={frameBorderName} />
+            <Ref select={frameName} />
+          </Align>
+          <StackV alignment="right" spacing={10}>
+            <Ref select={labelName} />
+            <Ref select={frameVariablesName} />
+          </StackV>
+        </>
+      )}
+    >
       {/* Global Frame and relevant text */}
       <Rect name={frameName} height={300} width={200} fill={"#e2ebf6"} />
       <Rect name={frameBorderName} height={300} width={5} fill={"#a6b3b6"} />
@@ -43,14 +60,6 @@ export const GlobalFrame = withBluefish((props: GlobalFrameProps) => {
       >
         Global Frame
       </Text>
-      <Align alignment="topCenter">
-        <Ref select={labelName} />
-        <Ref select={frameName} />
-      </Align>
-      <Align alignment="centerLeft">
-        <Ref select={frameBorderName} />
-        <Ref select={frameName} />
-      </Align>
       <StackV name={frameVariablesName} alignment="right" spacing={10}>
         <For each={props.variables}>
           {(variable, i) => (
@@ -61,10 +70,6 @@ export const GlobalFrame = withBluefish((props: GlobalFrameProps) => {
             />
           )}
         </For>
-      </StackV>
-      <StackV alignment="right" spacing={10}>
-        <Ref select={labelName} />
-        <Ref select={frameVariablesName} />
       </StackV>
     </Group>
   );
