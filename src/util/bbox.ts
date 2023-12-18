@@ -1,15 +1,29 @@
 import { maybeAdd, maybeDiv, maybeMax, maybeMin, maybeSub } from "./maybe";
 
-export type BBox = {
-  left?: number;
-  top?: number;
-  right?: number;
-  bottom?: number;
-  centerX?: number;
-  centerY?: number;
-  width?: number;
-  height?: number;
+export type Dim =
+  | "left"
+  | "top"
+  | "centerX"
+  | "centerY"
+  | "right"
+  | "bottom"
+  | "width"
+  | "height";
+
+export type Axis = "x" | "y";
+
+export const axisMap: { [key in Dim]: "x" | "y" } = {
+  left: "x",
+  centerX: "x",
+  right: "x",
+  top: "y",
+  centerY: "y",
+  bottom: "y",
+  width: "x",
+  height: "y",
 };
+
+export type BBox = { [key in Dim]?: number };
 
 export const from = (bboxes: BBox[]): BBox => {
   const bboxesStructOfArray = {
@@ -52,3 +66,76 @@ export const from = (bboxes: BBox[]): BBox => {
     height,
   };
 };
+
+// This is basically a baked version of an LP solver for bbox constraints.
+// TODO: These rules are not complete. e.g. left = centerX - width / 2 is missing.
+export const inferenceRules: {
+  from: Dim[];
+  to: Dim;
+  calculate: (dims: number[]) => number;
+}[] = [
+  // width = right - left
+  {
+    from: ["right", "width"],
+    to: "left",
+    calculate: ([right, width]) => right - width,
+  },
+  {
+    from: ["left", "width"],
+    to: "right",
+    calculate: ([left, width]) => left + width,
+  },
+  {
+    from: ["left", "right"],
+    to: "width",
+    calculate: ([left, right]) => right - left,
+  },
+  // height = bottom - top
+  {
+    from: ["bottom", "height"],
+    to: "top",
+    calculate: ([bottom, height]) => bottom - height,
+  },
+  {
+    from: ["top", "height"],
+    to: "bottom",
+    calculate: ([top, height]) => top + height,
+  },
+  {
+    from: ["top", "bottom"],
+    to: "height",
+    calculate: ([top, bottom]) => bottom - top,
+  },
+  // centerX = (left + right) / 2
+  {
+    from: ["left", "right"],
+    to: "centerX",
+    calculate: ([left, right]) => (left + right) / 2,
+  },
+  {
+    from: ["left", "centerX"],
+    to: "right",
+    calculate: ([left, centerX]) => centerX * 2 - left,
+  },
+  {
+    from: ["right", "centerX"],
+    to: "left",
+    calculate: ([right, centerX]) => centerX * 2 - right,
+  },
+  // centerY = (top + bottom) / 2
+  {
+    from: ["top", "bottom"],
+    to: "centerY",
+    calculate: ([top, bottom]) => (top + bottom) / 2,
+  },
+  {
+    from: ["top", "centerY"],
+    to: "bottom",
+    calculate: ([top, centerY]) => centerY * 2 - top,
+  },
+  {
+    from: ["bottom", "centerY"],
+    to: "top",
+    calculate: ([bottom, centerY]) => centerY * 2 - bottom,
+  },
+];

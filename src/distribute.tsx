@@ -16,7 +16,6 @@ export type DistributeProps = ParentProps<{
 
 export const Distribute = withBluefish((props: DistributeProps) => {
   const layout = (childNodes: ChildNode[]) => {
-    // debugger;
     childNodes = Array.from(childNodes);
 
     if (props.name.endsWith("DEBUG")) {
@@ -90,7 +89,7 @@ export const Distribute = withBluefish((props: DistributeProps) => {
         throw new Error("invalid options");
       }
 
-      const fixedElement = childNodes.findIndex((childId) => childId.owned.y);
+      const fixedElement = childNodes.findIndex((childId) => childId.owned.top);
 
       // use spacing and height to evenly distribute elements while ensuring that the fixed element
       // is fixed
@@ -107,17 +106,15 @@ export const Distribute = withBluefish((props: DistributeProps) => {
       // subtract off spacing and the sizes of the first fixedElement elements
       let y = startingY;
       for (const childId of childNodes) {
-        if (!childId.owned.y) {
+        if (!childId.owned.top) {
           childId.bbox.top = y;
         }
         y += childId.bbox.height! + spacing;
       }
 
-      // TODO: is the width computation correct? should it take position into account?
       return {
         bbox: {
           top: startingY,
-          width: maybeMax(childNodes.map((childId) => childId.bbox.width)),
           height,
         },
         transform: {
@@ -186,7 +183,9 @@ export const Distribute = withBluefish((props: DistributeProps) => {
         throw new Error("Invalid options for space");
       }
 
-      const fixedElement = childNodes.findIndex((childId) => childId.owned.x);
+      const fixedElement = childNodes.findIndex(
+        (childId) => childId.owned.left
+      );
 
       // use spacing and width to evenly distribute elements while ensuring that the fixed element
       // is fixed
@@ -203,17 +202,15 @@ export const Distribute = withBluefish((props: DistributeProps) => {
       // subtract off spacing and the sizes of the first fixedElement elements
       let x = startingX;
       for (const childId of childNodes) {
-        if (!childId.owned.x) {
+        if (!childId.owned.left) {
           childId.bbox.left = x;
         }
         x += childId.bbox.width! + spacing;
       }
 
-      // TODO: is the height computation correct? should it take position into account?
       return {
         bbox: {
           left: startingX,
-          height: maybeMax(childNodes.map((childId) => childId.bbox.height)),
           width,
         },
         transform: {

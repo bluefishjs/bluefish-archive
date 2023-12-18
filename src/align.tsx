@@ -96,7 +96,7 @@ export type AlignProps = ParentProps<{
   name: Id;
   x?: number;
   y?: number;
-  alignment?: Alignment2D | Alignment1D;
+  alignment: Alignment2D | Alignment1D;
 }>;
 
 export const Align = withBluefish((props: AlignProps) => {
@@ -108,93 +108,54 @@ export const Align = withBluefish((props: AlignProps) => {
       debugger;
     }
 
-    const verticalAlignments = childNodes
+    const alignments = childNodes
       .map((m) => /* m.guidePrimary ?? */ props.alignment)
-      .map((alignment) => maybe(alignment, verticalAlignment));
+      .map((alignment) => splitAlignment(alignment));
 
-    const horizontalAlignments = childNodes
-      .map((m) => /* m.guidePrimary ?? */ props.alignment)
-      .map((alignment) => maybe(alignment, horizontalAlignment));
+    // horizontal
+    const horizontalPlaceables = _.zip(childNodes, alignments)
+      .filter(([placeable, alignment]) => alignment![0] !== undefined)
+      .map(([placeable, alignment]) => [placeable, alignment![0]]) as [
+      ChildNode,
+      AlignmentVertical
+    ][];
 
-    const verticalPlaceables = _.zip(childNodes, verticalAlignments).filter(
-      ([placeable, alignment]) => alignment !== undefined
-    );
-
-    const horizontalPlaceables = _.zip(childNodes, horizontalAlignments).filter(
-      ([placeable, alignment]) => alignment !== undefined
-    );
-
-    // TODO: should be able to filter by ownership instead
-    const verticalValueArr = verticalPlaceables
-      .filter(([placeable, _]) => placeable!.owned.y)
-      .map(([placeable, alignment]) => {
-        return [
-          placeable,
-          alignment !== undefined ? placeable!.bbox[alignment] : undefined,
-        ];
-      })
+    const existingHorizontalPositions = horizontalPlaceables
       .filter(
-        ([placeable, value]) =>
-          // scenegraph[placeable!].transformOwners.translate.y !== id &&
-          value !== undefined
-      );
-
-    // TODO: we should probably make it so that the default value depends on the x & y props
-    const verticalValue =
-      verticalValueArr.length === 0 ? 0 : (verticalValueArr[0][1] as number);
-
-    const horizontalValueArr = horizontalPlaceables
-      .filter(([placeable, _]) => placeable!.owned.x)
+        ([placeable, alignment]) => placeable!.owned[alignment as BBox.Dim]
+      )
       .map(([placeable, alignment]) => {
-        return [
-          placeable,
-          alignment !== undefined ? placeable!.bbox[alignment] : undefined,
-        ];
-      })
-      .filter(
-        ([placeable, value]) =>
-          // scenegraph[placeable!].transformOwners.translate.x !== id &&
-          value !== undefined
-      );
+        return [placeable!, placeable!.bbox[alignment as BBox.Dim]!];
+      }) satisfies [ChildNode, number][];
 
-    const horizontalValue =
-      horizontalValueArr.length === 0
-        ? 0
-        : (horizontalValueArr[0][1] as number);
-
-    for (const [placeable, alignment] of verticalPlaceables) {
-      if (placeable!.owned.y) continue;
-      if (alignment === "top") {
-        placeable!.bbox.top = verticalValue;
-      } else if (alignment === "centerY") {
-        const height = placeable!.bbox.height;
-        if (height === undefined) {
-          continue;
-        }
-        placeable!.bbox.top = verticalValue - height / 2;
-      } else if (alignment === "bottom") {
-        placeable!.bbox.top = verticalValue - placeable!.bbox.height!;
-      }
-    }
+    const defaultHorizontalValue = existingHorizontalPositions[0]?.[1] ?? 0;
 
     for (const [placeable, alignment] of horizontalPlaceables) {
-      if (placeable!.owned.x) continue;
-      if (alignment === "left") {
-        placeable!.bbox.left = horizontalValue;
-      } else if (alignment === "centerX") {
-        const width = placeable!.bbox.width;
-        if (width === undefined) {
-          continue;
-        }
-        placeable!.bbox.left = horizontalValue - width / 2;
-      } else if (alignment === "right") {
-        // placeable!.right = horizontalValue;
-        const width = placeable!.bbox.width;
-        if (width === undefined) {
-          continue;
-        }
-        placeable!.bbox.left = horizontalValue - width;
-      }
+      if (placeable!.owned[alignment as BBox.Dim]) continue;
+      placeable!.bbox[alignment as BBox.Dim] = defaultHorizontalValue;
+    }
+
+    // vertical
+    const verticalPlaceables = _.zip(childNodes, alignments)
+      .filter(([placeable, alignment]) => alignment![1] !== undefined)
+      .map(([placeable, alignment]) => [placeable, alignment![1]]) as [
+      ChildNode,
+      AlignmentHorizontal
+    ][];
+
+    const existingVerticalPositions = verticalPlaceables
+      .filter(
+        ([placeable, alignment]) => placeable!.owned[alignment as BBox.Dim]
+      )
+      .map(([placeable, alignment]) => {
+        return [placeable!, placeable!.bbox[alignment as BBox.Dim]!];
+      }) satisfies [ChildNode, number][];
+
+    const defaultVerticalValue = existingVerticalPositions[0]?.[1] ?? 0;
+
+    for (const [placeable, alignment] of verticalPlaceables) {
+      if (placeable!.owned[alignment as BBox.Dim]) continue;
+      placeable!.bbox[alignment as BBox.Dim] = defaultVerticalValue;
     }
 
     const bbox = BBox.from(childNodes.map((childNode) => childNode.bbox));
@@ -206,7 +167,24 @@ export const Align = withBluefish((props: AlignProps) => {
           y: maybeSub(props.y, bbox.top),
         },
       },
-      bbox,
+      bbox: {
+        left:
+          horizontalAlignment(props.alignment) !== undefined
+            ? bbox.left
+            : undefined,
+        width:
+          horizontalAlignment(props.alignment) !== undefined
+            ? bbox.width
+            : undefined,
+        top:
+          verticalAlignment(props.alignment) !== undefined
+            ? bbox.top
+            : undefined,
+        height:
+          verticalAlignment(props.alignment) !== undefined
+            ? bbox.height
+            : undefined,
+      },
     };
   };
 

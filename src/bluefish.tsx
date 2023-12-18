@@ -77,11 +77,11 @@ export function Bluefish(props: BluefishProps) {
   }
   const layout = (childNodes: ChildNode[]) => {
     for (const childNode of childNodes) {
-      if (!childNode.owned.x) {
+      if (!childNode.owned.left) {
         childNode.bbox.left = 0;
       }
 
-      if (!childNode.owned.y) {
+      if (!childNode.owned.top) {
         childNode.bbox.top = 0;
       }
     }
@@ -111,11 +111,11 @@ export function Bluefish(props: BluefishProps) {
     return {
       transform: {
         translate: {
-          x: left,
-          y: top,
+          x: 0,
+          y: 0,
         },
       },
-      bbox: { left, top, right, bottom, width, height },
+      bbox: { left, top, width, height },
     };
   };
 
@@ -135,14 +135,10 @@ export function Bluefish(props: BluefishProps) {
         height={height()}
         viewBox={`${
           -props.padding! +
-          (props.positioning === "absolute"
-            ? 0
-            : paintProps.transform.translate.x ?? 0)
+          (props.positioning === "absolute" ? 0 : paintProps.bbox.left ?? 0)
         } ${
           -props.padding! +
-          (props.positioning === "absolute"
-            ? 0
-            : paintProps.transform.translate.y ?? 0)
+          (props.positioning === "absolute" ? 0 : paintProps.bbox.top ?? 0)
         } ${width()} ${height()}`}
       >
         {props.children}
@@ -164,7 +160,15 @@ export function Bluefish(props: BluefishProps) {
         </ScopeContext.Provider>
       </ScenegraphContext.Provider>
       <Show when={props.debug === true}>
-        <pre>{JSON.stringify(scenegraph, null, 2)}</pre>
+        <br />
+        <div style={{ float: "left", "margin-right": "40px" }}>
+          <h1>Scenegraph</h1>
+          <pre>{JSON.stringify(scenegraph, null, 2)}</pre>
+        </div>
+        <div style={{ float: "left" }}>
+          <h1>Scope</h1>
+          <pre>{JSON.stringify(scope, null, 2)}</pre>
+        </div>
       </Show>
     </>
   );

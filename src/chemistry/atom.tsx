@@ -52,10 +52,10 @@ export type AtomProps = JSX.CircleSVGAttributes<SVGCircleElement> & {
 };
 
 export const Atom = withBluefish((props: AtomProps) => {
-  const numHydrogens = maxBonds[props.content] - props.bondCount;
-  const hydrogenString = "H".repeat(numHydrogens);
-  const atomContent =
-    props.content === "C" ? "" : props.content + hydrogenString;
+  const numHydrogens = () => maxBonds[props.content] - props.bondCount;
+  const hydrogenString = () => "H".repeat(numHydrogens());
+  const atomContent = () =>
+    props.content === "C" ? "" : props.content + hydrogenString();
   const layout = () => {
     return {
       bbox: {
@@ -81,7 +81,7 @@ export const Atom = withBluefish((props: AtomProps) => {
     return (
       <>
         {/* if atom content length is greater than 1, then render a rectangle instead */}
-        {atomContent.length > 1 ? (
+        {atomContent().length > 1 ? (
           <rect
             x={
               (paintProps.bbox.left ?? 0) -
@@ -92,7 +92,7 @@ export const Atom = withBluefish((props: AtomProps) => {
               (paintProps.bbox.top ?? 0) +
               (paintProps.transform.translate.y ?? 0)
             }
-            width={(paintProps.bbox.width ?? 0) * atomContent.length}
+            width={(paintProps.bbox.width ?? 0) * atomContent().length}
             height={paintProps.bbox.height ?? 0}
             fill={"white"}
             rx={r() / 2}
@@ -111,7 +111,7 @@ export const Atom = withBluefish((props: AtomProps) => {
               (paintProps.transform.translate.y ?? 0)
             }
             r={r()}
-            fill={atomContent.length === 0 ? "none" : "white"}
+            fill={atomContent().length === 0 ? "none" : "white"}
           />
         )}
         <text
@@ -129,7 +129,7 @@ export const Atom = withBluefish((props: AtomProps) => {
           text-anchor={"middle"}
           dominant-baseline="central"
         >
-          {atomContent}
+          {atomContent()}
         </text>
       </>
     );

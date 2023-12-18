@@ -7,6 +7,7 @@ import SmilesDrawer from "smiles-drawer/app.js";
 import SvgDrawer from "smiles-drawer/src/SvgDrawer";
 import ThemeManager from "smiles-drawer/src/ThemeManager";
 import { For } from "solid-js";
+import Circle from "../circle";
 
 // Code for chemical molecule; integrates with Smiles Drawer
 export type MoleculeProps = { chemicalFormula: string; ariaLabel: string };
@@ -138,12 +139,12 @@ export const Molecule = withBluefish((props: MoleculeProps) => {
    * @param {Vertex[]} vertices An array of vertices containing the vertices associated with the current molecule.
    */
   function determineDimensions(svgWrapper: any, vertices: any) {
-    for (const i = 0; i < vertices.length; i++) {
-      if (!vertices[i].value.isDrawn) {
+    for (const vertex of vertices) {
+      if (!vertex.value.isDrawn) {
         continue;
       }
 
-      let p = vertices[i].position;
+      let p = vertex.position;
 
       if (svgWrapper.maxX < p.x) svgWrapper.maxX = p.x;
       if (svgWrapper.maxY < p.y) svgWrapper.maxY = p.y;

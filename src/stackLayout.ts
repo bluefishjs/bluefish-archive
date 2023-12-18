@@ -27,93 +27,27 @@ export const stackLayout =
     }
 
     /* ALIGNMENT */
-    const verticalAlignments = childNodes
-      .map((m) => /* m.guidePrimary ?? */ args.alignment)
-      .map((alignment) => maybe(alignment, verticalAlignment));
-
-    const horizontalAlignments = childNodes
-      .map((m) => /* m.guidePrimary ?? */ args.alignment)
-      .map((alignment) => maybe(alignment, horizontalAlignment));
-
-    const verticalPlaceables = _.zip(childNodes, verticalAlignments).filter(
-      ([placeable, alignment]) => alignment !== undefined
+    const alignments = childNodes.map(
+      (m) => /* m.guidePrimary ?? */ args.alignment
     );
 
-    const horizontalPlaceables = _.zip(childNodes, horizontalAlignments).filter(
+    const placeables = _.zip(childNodes, alignments).filter(
       ([placeable, alignment]) => alignment !== undefined
-    );
+    ) as [ChildNode, Alignment1D][];
 
-    // TODO: should be able to filter by ownership instead
-    const verticalValueArr = verticalPlaceables
-      .filter(([placeable, _]) => placeable!.owned.y)
-      .map(([placeable, alignment]) => {
-        return [
-          placeable,
-          alignment !== undefined ? placeable!.bbox[alignment] : undefined,
-        ];
-      })
+    const existingPositions = placeables
       .filter(
-        ([placeable, value]) =>
-          // scenegraph[placeable!].transformOwners.translate.y !== id &&
-          value !== undefined
-      );
-
-    // TODO: we should probably make it so that the default value depends on the x & y args
-    const verticalValue =
-      verticalValueArr.length === 0 ? 0 : (verticalValueArr[0][1] as number);
-
-    const horizontalValueArr = horizontalPlaceables
-      .filter(([placeable, _]) => placeable!.owned.x)
+        ([placeable, alignment]) => placeable!.owned[alignment as BBox.Dim]
+      )
       .map(([placeable, alignment]) => {
-        return [
-          placeable,
-          alignment !== undefined ? placeable!.bbox[alignment] : undefined,
-        ];
-      })
-      .filter(
-        ([placeable, value]) =>
-          // scenegraph[placeable!].transformOwners.translate.x !== id &&
-          value !== undefined
-      );
+        return [placeable!, placeable!.bbox[alignment as BBox.Dim]!];
+      }) satisfies [ChildNode, number][];
 
-    const horizontalValue =
-      horizontalValueArr.length === 0
-        ? 0
-        : (horizontalValueArr[0][1] as number);
+    const defaultValue = existingPositions[0]?.[1] ?? 0;
 
-    for (const [placeable, alignment] of verticalPlaceables) {
-      if (placeable!.owned.y) continue;
-      if (alignment === "top") {
-        placeable!.bbox.top = verticalValue;
-      } else if (alignment === "centerY") {
-        const height = placeable!.bbox.height;
-        if (height === undefined) {
-          continue;
-        }
-        placeable!.bbox.top = verticalValue - height / 2;
-      } else if (alignment === "bottom") {
-        placeable!.bbox.top = verticalValue - placeable!.bbox.height!;
-      }
-    }
-
-    for (const [placeable, alignment] of horizontalPlaceables) {
-      if (placeable!.owned.x) continue;
-      if (alignment === "left") {
-        placeable!.bbox.left = horizontalValue;
-      } else if (alignment === "centerX") {
-        const width = placeable!.bbox.width;
-        if (width === undefined) {
-          continue;
-        }
-        placeable!.bbox.left = horizontalValue - width / 2;
-      } else if (alignment === "right") {
-        // placeable!.right = horizontalValue;
-        const width = placeable!.bbox.width;
-        if (width === undefined) {
-          continue;
-        }
-        placeable!.bbox.left = horizontalValue - width;
-      }
+    for (const [placeable, alignment] of placeables) {
+      if (placeable!.owned[alignment as BBox.Dim]) continue;
+      placeable!.bbox[alignment as BBox.Dim] = defaultValue;
     }
 
     /* DISTRIBUTE */
@@ -180,7 +114,7 @@ export const stackLayout =
         throw new Error("invalid options");
       }
 
-      const fixedElement = childNodes.findIndex((childId) => childId.owned.y);
+      const fixedElement = childNodes.findIndex((childId) => childId.owned.top);
 
       // use spacing and height to evenly distribute elements while ensuring that the fixed element
       // is fixed
@@ -197,7 +131,7 @@ export const stackLayout =
       // subtract off spacing and the sizes of the first fixedElement elements
       let y = startingY;
       for (const childId of childNodes) {
-        if (!childId.owned.y) {
+        if (!childId.owned.top) {
           childId.bbox.top = y;
         }
         y += childId.bbox.height! + spacing;
@@ -282,7 +216,9 @@ export const stackLayout =
         throw new Error("Invalid options for space");
       }
 
-      const fixedElement = childNodes.findIndex((childId) => childId.owned.x);
+      const fixedElement = childNodes.findIndex(
+        (childId) => childId.owned.left
+      );
 
       // use spacing and width to evenly distribute elements while ensuring that the fixed element
       // is fixed
@@ -299,7 +235,7 @@ export const stackLayout =
       // subtract off spacing and the sizes of the first fixedElement elements
       let x = startingX;
       for (const childId of childNodes) {
-        if (!childId.owned.x) {
+        if (!childId.owned.left) {
           childId.bbox.left = x;
         }
         x += childId.bbox.width! + spacing;

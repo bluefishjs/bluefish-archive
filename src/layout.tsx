@@ -26,7 +26,7 @@ import { IdContext } from "./withBluefish";
 
 export type LayoutProps = ParentProps<{
   name: Id;
-  bbox?: Partial<BBox>;
+  bbox?: BBox;
   layout: LayoutFn;
   paint: (props: {
     bbox: BBox;
