@@ -6,6 +6,7 @@ import {
   mergeProps,
   createMemo,
   createEffect,
+  children,
 } from "solid-js";
 import { StackArgs, stackLayout } from "./stackLayout";
 import { BBox, Transform, ChildNode } from "./scenegraph";

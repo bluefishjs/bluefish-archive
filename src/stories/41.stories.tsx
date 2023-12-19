@@ -51,7 +51,7 @@ export const App: Story = {
         <button onClick={handler}>Click Me</button>
         <div>Current planet: {planet()}</div>
         <div>
-          <Bluefish>
+          <Bluefish debug>
             <Background padding={20}>
               <StackH spacing={50}>
                 <Circle

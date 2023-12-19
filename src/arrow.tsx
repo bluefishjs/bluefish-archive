@@ -90,6 +90,30 @@ export const Arrow = withBluefish((props: ArrowProps) => {
         ae: arrow[6],
         as: arrow[7],
         ec: arrow[8],
+        fromBBoxLeft: fromBBox.left ?? 0,
+        fromBBoxRight: fromBBox.right ?? 0,
+        fromBBoxTop: fromBBox.top ?? 0,
+        fromBBoxBottom: fromBBox.bottom ?? 0,
+        fromBBoxWidth: fromBBox.width ?? 0,
+        fromBBoxHeight: fromBBox.height ?? 0,
+        toBBoxLeft: toBBox.left ?? 0,
+        toBBoxRight: toBBox.right ?? 0,
+        toBBoxTop: toBBox.top ?? 0,
+        toBBoxBottom: toBBox.bottom ?? 0,
+        toBBoxWidth: toBBox.width ?? 0,
+        toBBoxHeight: toBBox.height ?? 0,
+        // fromBBox: {
+        //   left: fromBBox.left ?? 0,
+        //   top: fromBBox.top ?? 0,
+        //   width: fromBBox.width ?? 0,
+        //   height: fromBBox.height ?? 0,
+        // },
+        // toBBox: {
+        //   left: toBBox.left ?? 0,
+        //   top: toBBox.top ?? 0,
+        //   width: toBBox.width ?? 0,
+        //   height: toBBox.height ?? 0,
+        // },
       },
     };
   };
@@ -150,6 +174,24 @@ export const Arrow = withBluefish((props: ArrowProps) => {
               paintProps.customData.ey
             }) rotate(${endAngleAsDegrees()})`}
             fill={props.stroke}
+          />
+          <rect
+            x={paintProps.customData.fromBBoxLeft}
+            y={paintProps.customData.fromBBoxTop}
+            width={paintProps.customData.fromBBoxWidth}
+            height={paintProps.customData.fromBBoxHeight}
+            fill="none"
+            stroke="red"
+            stroke-width="1"
+          />
+          <rect
+            x={paintProps.customData.toBBoxLeft}
+            y={paintProps.customData.toBBoxTop}
+            width={paintProps.customData.toBBoxWidth}
+            height={paintProps.customData.toBBoxHeight}
+            fill="none"
+            stroke="blue"
+            stroke-width="1"
           />
           {paintProps.children}
         </g>

@@ -1,9 +1,12 @@
+import { debugOwnerComputations, debugProps } from "@solid-devtools/logger";
 import { Dynamic } from "solid-js/web";
 import {
   Component,
+  For,
   JSX,
   ParentProps,
   batch,
+  children,
   createEffect,
   createMemo,
   createRenderEffect,
@@ -11,6 +14,7 @@ import {
   mergeProps,
   on,
   onCleanup,
+  onMount,
   untrack,
   useContext,
 } from "solid-js";
@@ -23,6 +27,7 @@ import {
   Id,
 } from "./scenegraph";
 import { IdContext } from "./withBluefish";
+import { ScopeContext } from "./createName";
 
 export type LayoutProps = ParentProps<{
   name: Id;
@@ -37,20 +42,33 @@ export type LayoutProps = ParentProps<{
 }>;
 
 export const Layout: Component<LayoutProps> = (props) => {
+  // debugProps(props);
+  // debugOwnerComputations();
   // const [isFirstRender, setIsFirstRender] = useState(true);
 
   const parentId = useContext(ParentIDContext);
+  const [scope, setScope] = useContext(ScopeContext);
+
   const {
     scenegraph,
     createNode,
+    deleteNode,
     mergeBBoxAndTransform,
     setCustomData,
+    setLayout,
     createChildRepr,
   } = UNSAFE_useScenegraph();
 
   createRenderEffect(() => {
     createNode(props.name, parentId);
   });
+
+  onCleanup(() => {
+    console.log("cleanup", props.name);
+    deleteNode(props.name, setScope);
+  });
+
+  // const c = () => children(() => props.children).toArray();
 
   // evaluate the child props before running the effect so that children's layout functions are
   // called before the parent's layout function
@@ -69,40 +87,25 @@ export const Layout: Component<LayoutProps> = (props) => {
           }}
           customData={scenegraph[props.name]?.customData}
         >
+          {/* <For each={c()}>{(child) => child!.element}</For> */}
+          {/* {c()} */}
           {props.children}
         </Dynamic>
       </IdContext.Provider>
     </ParentIDContext.Provider>
   );
 
-  createEffect(() => {
-    // const id = props.id;
-    // console.log("layout", props.id);
-    // for (const childId of scenegraph[props.id]?.children) {
-    //   // runLayout
-    //   const node = untrack(() => getNode(scenegraph, childId));
-    //   untrack(() => node.runLayout());
-    // }
-    // debugger;
-    const { bbox, transform, customData } = props.layout(
-      Array.from(scenegraph[props.name]?.children ?? []).map((childId: Id) =>
-        createChildRepr(props.name, childId)
-      )
-    );
-    // setBBox(props.id, bbox, props.id, transform);
-    mergeBBoxAndTransform(props.name, props.name, bbox, transform);
-    setCustomData(props.name, customData);
-    // console.log(
-    //   "layout",
-    //   props.id,
-    //   JSON.parse(JSON.stringify({ bbox, transform })),
-    //   JSON.parse(JSON.stringify(untrack(() => getBBox(props.id)))),
-    //   "DONE"
-    // );
-    // untrack(() => console.log(JSON.parse(JSON.stringify(scenegraph))));
+  createRenderEffect(() => {
+    // run this later so that the children's layout functions are called before the parent's layout function
+    setLayout(props.name, props.layout);
   });
 
   return jsx;
+  // TODO: convert to this form
+  // return {
+  //   id: () => props.name,
+  //   element: jsx,
+  // };
 };
 
 export default Layout;

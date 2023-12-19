@@ -10,7 +10,14 @@ import {
   BBox,
   ChildNode,
 } from "./scenegraph";
-import { JSX, ParentProps, Show, createUniqueId, mergeProps } from "solid-js";
+import {
+  JSX,
+  ParentProps,
+  Show,
+  createEffect,
+  createUniqueId,
+  mergeProps,
+} from "solid-js";
 import { ParentScopeIdContext, Scope, ScopeContext } from "./createName";
 import { createStore } from "solid-js/store";
 
@@ -72,9 +79,14 @@ export function Bluefish(props: BluefishProps) {
   //   };
   // });
 
-  if (scenegraph[id] === undefined) {
-    createNode(id, null);
-  }
+  // if (scenegraph[id] === undefined) {
+  //   createNode(id, null);
+  // }
+
+  // createEffect(() => {
+  //   scenegraph[id]?.layout();
+  // });
+
   const layout = (childNodes: ChildNode[]) => {
     for (const childNode of childNodes) {
       if (!childNode.owned.left) {
@@ -141,7 +153,7 @@ export function Bluefish(props: BluefishProps) {
           (props.positioning === "absolute" ? 0 : paintProps.bbox.top ?? 0)
         } ${width()} ${height()}`}
       >
-        {props.children}
+        {paintProps.children}
       </svg>
     );
   };
