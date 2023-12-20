@@ -16,6 +16,7 @@ export type GroupProps = ParentProps<{
   name: Id;
   x?: number;
   y?: number;
+  rels?: () => JSX.Element;
 }>;
 
 export const Group = withBluefish((props: GroupProps) => {
@@ -91,6 +92,7 @@ export const Group = withBluefish((props: GroupProps) => {
   return (
     <Layout name={props.name} layout={layout} paint={paint}>
       {props.children}
+      {props.rels?.() ?? null}
     </Layout>
   );
 });
