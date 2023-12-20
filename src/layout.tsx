@@ -1,21 +1,11 @@
-import { debugOwnerComputations, debugProps } from "@solid-devtools/logger";
 import { Dynamic } from "solid-js/web";
 import {
   Component,
-  For,
   JSX,
   ParentProps,
-  batch,
   children,
-  createEffect,
-  createMemo,
   createRenderEffect,
-  createSignal,
-  mergeProps,
-  on,
   onCleanup,
-  onMount,
-  untrack,
   useContext,
 } from "solid-js";
 import {
@@ -42,22 +32,11 @@ export type LayoutProps = ParentProps<{
 }>;
 
 export const Layout: Component<LayoutProps> = (props) => {
-  // debugProps(props);
-  // debugOwnerComputations();
-  // const [isFirstRender, setIsFirstRender] = useState(true);
-
   const parentId = useContext(ParentIDContext);
-  const [scope, setScope] = useContext(ScopeContext);
+  const [_scope, setScope] = useContext(ScopeContext);
 
-  const {
-    scenegraph,
-    createNode,
-    deleteNode,
-    mergeBBoxAndTransform,
-    setCustomData,
-    setLayout,
-    createChildRepr,
-  } = UNSAFE_useScenegraph();
+  const { scenegraph, createNode, deleteNode, setLayout } =
+    UNSAFE_useScenegraph();
 
   createRenderEffect(() => {
     createNode(props.name, parentId);
@@ -67,8 +46,6 @@ export const Layout: Component<LayoutProps> = (props) => {
     console.log("cleanup", props.name);
     deleteNode(props.name, setScope);
   });
-
-  // const c = () => children(() => props.children).toArray();
 
   // evaluate the child props before running the effect so that children's layout functions are
   // called before the parent's layout function
@@ -87,8 +64,6 @@ export const Layout: Component<LayoutProps> = (props) => {
           }}
           customData={scenegraph[props.name]?.customData}
         >
-          {/* <For each={c()}>{(child) => child!.element}</For> */}
-          {/* {c()} */}
           {props.children}
         </Dynamic>
       </IdContext.Provider>
@@ -101,11 +76,6 @@ export const Layout: Component<LayoutProps> = (props) => {
   });
 
   return jsx;
-  // TODO: convert to this form
-  // return {
-  //   id: () => props.name,
-  //   element: jsx,
-  // };
 };
 
 export default Layout;

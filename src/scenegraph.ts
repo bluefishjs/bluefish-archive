@@ -1,7 +1,7 @@
 import { SetStoreFunction, createStore, produce } from "solid-js/store";
 import { getLCAChainSuffixes } from "./util/lca";
 import _ from "lodash";
-import { maybeAdd, maybeAddAll, maybeDiv, maybeSub } from "./util/maybe";
+import { maybeAdd, maybeAddAll } from "./util/maybe";
 import { createContext, createMemo, useContext } from "solid-js";
 import { BBox, Dim, Axis, axisMap, inferenceRules } from "./util/bbox";
 import { Scope, resolveName } from "./createName";

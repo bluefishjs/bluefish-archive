@@ -45,47 +45,14 @@ export function Bluefish(props: BluefishProps) {
     props
   );
 
-  // const bboxStore = useMemo(() => observable.map(), []);
-  // const bboxStore = useMemo(() => createScenegraph(), []);
-  // const bboxStore = createScenegraph();
   const scenegraphContext = createScenegraph();
   const { scenegraph, createNode } = scenegraphContext;
   const [scope, setScope] = createStore<Scope>({});
 
-  // const autoGenId = useId();
   const autoGenId = createUniqueId();
   const autoGenScopeId = createUniqueId();
   const id = autoGenId;
   const scopeId = props.id ?? autoGenScopeId;
-  // const wroteToWindow = useRef(false);
-
-  // useEffect(() => {
-  //   if (window.bluefish === undefined) {
-  //     window.bluefish = {};
-  //   }
-
-  //   if (window.bluefish[id] !== undefined) {
-  //     console.error(`Duplicate id ${id}. Not writing to window.bluefish`);
-  //   } else {
-  //     window.bluefish[id] = scenegraph;
-  //     wroteToWindow.current = true;
-  //   }
-
-  //   return () => {
-  //     if (window.bluefish !== undefined && wroteToWindow.current) {
-  //       delete window.bluefish[id];
-  //       wroteToWindow.current = false;
-  //     }
-  //   };
-  // });
-
-  // if (scenegraph[id] === undefined) {
-  //   createNode(id, null);
-  // }
-
-  // createEffect(() => {
-  //   scenegraph[id]?.layout();
-  // });
 
   const layout = (childNodes: ChildNode[]) => {
     for (const childNode of childNodes) {

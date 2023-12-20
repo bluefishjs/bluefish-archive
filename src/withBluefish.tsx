@@ -1,14 +1,11 @@
 import {
   Accessor,
   Component,
-  JSX,
   createContext,
-  createMemo,
   createUniqueId,
-  mergeProps,
   useContext,
 } from "solid-js";
-import { Id, UNSAFE_useScenegraph } from "./scenegraph";
+import { Id } from "./scenegraph";
 import { ParentScopeIdContext, ScopeContext } from "./createName";
 import { Dynamic } from "solid-js/web";
 
@@ -50,10 +47,6 @@ export function withBluefish<ComponentProps>(
     return (
       <ParentScopeIdContext.Provider value={scopeId}>
         <IdContext.Provider value={id}>
-          {/* <WrappedComponent
-            {...(props as WithBluefishProps<ComponentProps>)}
-            name={id()}
-          /> */}
           <Dynamic
             component={WrappedComponent}
             {...(props as WithBluefishProps<ComponentProps>)}
