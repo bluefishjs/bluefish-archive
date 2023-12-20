@@ -43,7 +43,6 @@ export const Layout: Component<LayoutProps> = (props) => {
   });
 
   onCleanup(() => {
-    console.log("cleanup", props.name);
     deleteNode(props.name, setScope);
   });
 
