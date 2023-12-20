@@ -81,7 +81,7 @@ export const resolveSelection = (
 export const Ref = withBluefish((props: RefProps) => {
   const parentId = useContext(ParentIDContext);
   const [scope] = useContext(ScopeContext);
-  const { createRef } = UNSAFE_useScenegraph();
+  const { createRef, deleteRef } = UNSAFE_useScenegraph();
 
   if (parentId === null) {
     throw new Error("Ref must be a child of a Layout");
@@ -97,7 +97,9 @@ export const Ref = withBluefish((props: RefProps) => {
       parentId
     );
 
-    // TODO: cleanup
+    onCleanup(() => {
+      deleteRef(props.name);
+    });
   });
 
   return <></>;

@@ -127,7 +127,9 @@ export const createScenegraph = (): ScenegraphContextType => {
     if (node.parent !== null) {
       setScenegraph(node.parent, (node: ScenegraphNode) => {
         if (node.type === "ref") {
-          console.error(`deleteNode: cannot delete ref node ${id}`);
+          console.error(
+            `deleteNode: cannot delete layout node ${id}, parent is a ref`
+          );
           return node;
         }
 
@@ -153,6 +155,38 @@ export const createScenegraph = (): ScenegraphContextType => {
         }
       })
     );
+
+    setScenegraph({ ...scenegraph, [id]: undefined });
+  };
+
+  const deleteRef = (id: Id) => {
+    const node = scenegraph[id];
+
+    if (node === undefined) {
+      console.error(`deleteRef: node ${id} not found`);
+      return;
+    }
+
+    if (node.type === "node") {
+      console.error(`deleteRef: cannot delete layout node ${id}`);
+      return;
+    }
+
+    if (node.parent !== null) {
+      setScenegraph(node.parent, (node: ScenegraphNode) => {
+        if (node.type === "ref") {
+          console.error(
+            `deleteRef: cannot delete ref node ${id}, parent is a ref`
+          );
+          return node;
+        }
+
+        return {
+          ...node,
+          children: node.children.filter((c) => c !== id),
+        };
+      });
+    }
 
     setScenegraph({ ...scenegraph, [id]: undefined });
   };
@@ -867,6 +901,7 @@ the align node.
     createNode,
     deleteNode,
     createRef,
+    deleteRef,
     // mid-level API
     resolveRef,
     mergeBBoxAndTransform,
@@ -885,6 +920,7 @@ export type ScenegraphContextType = {
   createNode: (id: Id, parentId: Id | null) => void;
   deleteNode: (id: Id, setScope: SetStoreFunction<Scope>) => void;
   createRef: (id: Id, refId: Id, parentId: Id) => void;
+  deleteRef: (id: Id) => void;
   resolveRef: (
     id: Id,
     mode: "read" | "write" | "check"
