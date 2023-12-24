@@ -43,3 +43,19 @@ export const createName = (name: string) => {
 
   return genId;
 };
+
+export const resolveName = (
+  layoutNode: Id,
+  options?: { default?: boolean }
+): Name | undefined => {
+  options = {
+    default: true,
+    ...options,
+  };
+  const [scope] = useContext(ScopeContext);
+  const name = Object.keys(scope).find(
+    (name) => scope[name].layoutNode === layoutNode
+  );
+
+  return name ?? (options?.default ? layoutNode : undefined);
+};
