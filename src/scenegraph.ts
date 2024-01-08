@@ -1,10 +1,10 @@
 import { SetStoreFunction, createStore, produce } from "solid-js/store";
 import { getLCAChainSuffixes } from "./util/lca";
 import _ from "lodash";
-import { maybeAdd, maybeAddAll, maybeDiv, maybeSub } from "./util/maybe";
-import { createContext, useContext } from "solid-js";
+import { maybeAdd, maybeAddAll } from "./util/maybe";
+import { createContext, createMemo, useContext } from "solid-js";
 import { BBox, Dim, Axis, axisMap, inferenceRules } from "./util/bbox";
-import { resolveName } from "./createName";
+import { Scope, resolveName } from "./createName";
 
 export type Id = string;
 export type Inferred = { inferred: true };
@@ -49,9 +49,10 @@ export type ScenegraphNode =
       bboxOwners: BBoxOwners;
       transform: Transform;
       transformOwners: TransformOwners;
-      children: Set<Id>;
+      children: Id[];
       parent: Id | null;
       customData?: any;
+      layout: () => void;
     }
   | {
       type: "ref";
@@ -89,9 +90,10 @@ export const createScenegraph = (): ScenegraphContextType => {
       bboxOwners: {},
       transform: { translate: {} },
       transformOwners: { translate: {} },
-      children: new Set(),
+      children: [],
       parent: parentId,
       customData: { customData: {} },
+      layout: () => {},
     });
 
     if (parentId !== null) {
@@ -103,10 +105,90 @@ export const createScenegraph = (): ScenegraphContextType => {
 
         return {
           ...node,
-          children: new Set([...node.children, id]),
+          children: [...node.children, id],
         };
       });
     }
+  };
+
+  const deleteNode = (id: Id, setScope: SetStoreFunction<Scope>) => {
+    const node = scenegraph[id];
+
+    if (node === undefined) {
+      console.error(`deleteNode: node ${id} not found`);
+      return;
+    }
+
+    if (node.type === "ref") {
+      console.error(`deleteNode: cannot delete ref node ${id}`);
+      return;
+    }
+
+    if (node.parent !== null) {
+      setScenegraph(node.parent, (node: ScenegraphNode) => {
+        if (node.type === "ref") {
+          console.error(
+            `deleteNode: cannot delete layout node ${id}, parent is a ref`
+          );
+          return node;
+        }
+
+        return {
+          ...node,
+          children: node.children.filter((c) => c !== id),
+        };
+      });
+    }
+
+    // COMBAK: it's not yet clear whether nodes should be recursively deleted
+    // for (const childId of node.children) {
+    //   deleteNode(childId);
+    // }
+
+    // filter out scopes that have this id as their layoutNode
+    setScope(
+      produce((scope) => {
+        for (const key of Object.keys(scope) as Array<Id>) {
+          if (scope[key].layoutNode === id) {
+            delete scope[key];
+          }
+        }
+      })
+    );
+
+    setScenegraph({ ...scenegraph, [id]: undefined });
+  };
+
+  const deleteRef = (id: Id) => {
+    const node = scenegraph[id];
+
+    if (node === undefined) {
+      console.error(`deleteRef: node ${id} not found`);
+      return;
+    }
+
+    if (node.type === "node") {
+      console.error(`deleteRef: cannot delete layout node ${id}`);
+      return;
+    }
+
+    if (node.parent !== null) {
+      setScenegraph(node.parent, (node: ScenegraphNode) => {
+        if (node.type === "ref") {
+          console.error(
+            `deleteRef: cannot delete ref node ${id}, parent is a ref`
+          );
+          return node;
+        }
+
+        return {
+          ...node,
+          children: node.children.filter((c) => c !== id),
+        };
+      });
+    }
+
+    setScenegraph({ ...scenegraph, [id]: undefined });
   };
 
   const createRef = (id: Id, refId: Id, parentId: Id) => {
@@ -125,7 +207,7 @@ export const createScenegraph = (): ScenegraphContextType => {
 
         return {
           ...node,
-          children: new Set([...node.children, id]),
+          children: [...node.children, id],
         };
       });
     }
@@ -484,6 +566,33 @@ the align node.
     );
   };
 
+  const setLayout = (id: Id, layout: LayoutFn) => {
+    const layoutMemo = createMemo(() => {
+      for (const childId of scenegraph[id]?.children ?? []) {
+        if ("layout" in scenegraph[childId]) {
+          scenegraph[childId].layout();
+        }
+      }
+
+      const { bbox, transform, customData } = layout(
+        (scenegraph[id]?.children ?? []).map((childId: Id) =>
+          createChildRepr(id, childId)
+        )
+      );
+      // setBBox(props.id, bbox, props.id, transform);
+      mergeBBoxAndTransform(id, id, bbox, transform);
+      setCustomData(id, customData);
+    });
+
+    setScenegraph(
+      id,
+      produce((n: ScenegraphNode) => {
+        const node = n as ScenegraphNode & { type: "node" }; // guaranteed by resolveRef
+        node.layout = layoutMemo;
+      })
+    );
+  };
+
   const setBBox = (owner: Id, id: Id, bbox: BBox) => {
     const { id: resolvedId, transform: accumulatedTransform } = resolveRef(
       id,
@@ -790,12 +899,15 @@ the align node.
     scenegraph,
     // constructors
     createNode,
+    deleteNode,
     createRef,
+    deleteRef,
     // mid-level API
     resolveRef,
     mergeBBoxAndTransform,
     // API
     setCustomData,
+    setLayout,
     getBBox,
     setBBox,
     ownedByOther,
@@ -806,7 +918,9 @@ the align node.
 export type ScenegraphContextType = {
   scenegraph: Scenegraph;
   createNode: (id: Id, parentId: Id | null) => void;
+  deleteNode: (id: Id, setScope: SetStoreFunction<Scope>) => void;
   createRef: (id: Id, refId: Id, parentId: Id) => void;
+  deleteRef: (id: Id) => void;
   resolveRef: (
     id: Id,
     mode: "read" | "write" | "check"
@@ -818,6 +932,7 @@ export type ScenegraphContextType = {
     transform: Transform
   ) => void;
   setCustomData: (id: Id, customData: any) => void;
+  setLayout: (id: Id, layout: LayoutFn) => void;
   getBBox: (id: Id) => BBox;
   setBBox: (owner: Id, id: Id, bbox: BBox) => void;
   ownedByOther: (id: Id, check: Id, dim: Dim) => boolean;
