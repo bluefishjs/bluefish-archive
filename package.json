@@ -8,6 +8,7 @@
   ],
   "main": "./dist/bluefish.umd.cjs",
   "module": "./dist/bluefish.js",
+  "types": "./dist/bluefish.d.ts",
   "exports": {
     ".": {
       "import": "./dist/bluefish.js",
