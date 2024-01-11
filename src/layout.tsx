@@ -3,15 +3,9 @@ import {
   Component,
   JSX,
   ParentProps,
-  batch,
-  createEffect,
-  createMemo,
+  children,
   createRenderEffect,
-  createSignal,
-  mergeProps,
-  on,
   onCleanup,
-  untrack,
   useContext,
 } from "solid-js";
 import {
@@ -23,6 +17,7 @@ import {
   Id,
 } from "./scenegraph";
 import { IdContext } from "./withBluefish";
+import { ScopeContext } from "./createName";
 
 export type LayoutProps = ParentProps<{
   name: Id;
@@ -37,19 +32,18 @@ export type LayoutProps = ParentProps<{
 }>;
 
 export const Layout: Component<LayoutProps> = (props) => {
-  // const [isFirstRender, setIsFirstRender] = useState(true);
-
   const parentId = useContext(ParentIDContext);
-  const {
-    scenegraph,
-    createNode,
-    mergeBBoxAndTransform,
-    setCustomData,
-    createChildRepr,
-  } = UNSAFE_useScenegraph();
+  const [_scope, setScope] = useContext(ScopeContext);
+
+  const { scenegraph, createNode, deleteNode, setLayout } =
+    UNSAFE_useScenegraph();
 
   createRenderEffect(() => {
     createNode(props.name, parentId);
+  });
+
+  onCleanup(() => {
+    deleteNode(props.name, setScope);
   });
 
   // evaluate the child props before running the effect so that children's layout functions are
@@ -75,31 +69,9 @@ export const Layout: Component<LayoutProps> = (props) => {
     </ParentIDContext.Provider>
   );
 
-  createEffect(() => {
-    // const id = props.id;
-    // console.log("layout", props.id);
-    // for (const childId of scenegraph[props.id]?.children) {
-    //   // runLayout
-    //   const node = untrack(() => getNode(scenegraph, childId));
-    //   untrack(() => node.runLayout());
-    // }
-    // debugger;
-    const { bbox, transform, customData } = props.layout(
-      Array.from(scenegraph[props.name]?.children ?? []).map((childId: Id) =>
-        createChildRepr(props.name, childId)
-      )
-    );
-    // setBBox(props.id, bbox, props.id, transform);
-    mergeBBoxAndTransform(props.name, props.name, bbox, transform);
-    setCustomData(props.name, customData);
-    // console.log(
-    //   "layout",
-    //   props.id,
-    //   JSON.parse(JSON.stringify({ bbox, transform })),
-    //   JSON.parse(JSON.stringify(untrack(() => getBBox(props.id)))),
-    //   "DONE"
-    // );
-    // untrack(() => console.log(JSON.parse(JSON.stringify(scenegraph))));
+  createRenderEffect(() => {
+    // run this later so that the children's layout functions are called before the parent's layout function
+    setLayout(props.name, props.layout);
   });
 
   return jsx;

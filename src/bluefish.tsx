@@ -10,7 +10,14 @@ import {
   BBox,
   ChildNode,
 } from "./scenegraph";
-import { JSX, ParentProps, Show, createUniqueId, mergeProps } from "solid-js";
+import {
+  JSX,
+  ParentProps,
+  Show,
+  createEffect,
+  createUniqueId,
+  mergeProps,
+} from "solid-js";
 import { ParentScopeIdContext, Scope, ScopeContext } from "./createName";
 import { createStore } from "solid-js/store";
 
@@ -38,43 +45,15 @@ export function Bluefish(props: BluefishProps) {
     props
   );
 
-  // const bboxStore = useMemo(() => observable.map(), []);
-  // const bboxStore = useMemo(() => createScenegraph(), []);
-  // const bboxStore = createScenegraph();
   const scenegraphContext = createScenegraph();
   const { scenegraph, createNode } = scenegraphContext;
   const [scope, setScope] = createStore<Scope>({});
 
-  // const autoGenId = useId();
   const autoGenId = createUniqueId();
   const autoGenScopeId = createUniqueId();
   const id = autoGenId;
   const scopeId = props.id ?? autoGenScopeId;
-  // const wroteToWindow = useRef(false);
 
-  // useEffect(() => {
-  //   if (window.bluefish === undefined) {
-  //     window.bluefish = {};
-  //   }
-
-  //   if (window.bluefish[id] !== undefined) {
-  //     console.error(`Duplicate id ${id}. Not writing to window.bluefish`);
-  //   } else {
-  //     window.bluefish[id] = scenegraph;
-  //     wroteToWindow.current = true;
-  //   }
-
-  //   return () => {
-  //     if (window.bluefish !== undefined && wroteToWindow.current) {
-  //       delete window.bluefish[id];
-  //       wroteToWindow.current = false;
-  //     }
-  //   };
-  // });
-
-  if (scenegraph[id] === undefined) {
-    createNode(id, null);
-  }
   const layout = (childNodes: ChildNode[]) => {
     for (const childNode of childNodes) {
       if (!childNode.owned.left) {
@@ -141,7 +120,7 @@ export function Bluefish(props: BluefishProps) {
           (props.positioning === "absolute" ? 0 : paintProps.bbox.top ?? 0)
         } ${width()} ${height()}`}
       >
-        {props.children}
+        {paintProps.children}
       </svg>
     );
   };
