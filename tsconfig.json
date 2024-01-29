@@ -1,4 +1,13 @@
 {
+  "exclude": [
+    "node_modules",
+    "dist",
+    "examples",
+    "experiments",
+    "public",
+    "src/stories",
+    "vite.config.ts"
+  ],
   "compilerOptions": {
     "strict": true,
     "target": "ESNext",
@@ -9,8 +18,10 @@
     "jsx": "preserve",
     "jsxImportSource": "solid-js",
     "types": ["vite/client"],
-    "noEmit": true,
+    "emitDeclarationOnly": true,
     "isolatedModules": true,
-    "declaration": true
+    "declaration": true,
+    "declarationDir": "dist",
+    "declarationMap": true
   }
 }
