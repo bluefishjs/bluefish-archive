@@ -1,6 +1,6 @@
 {
   "name": "@bluefish-js/solid",
-  "version": "0.0.20",
+  "version": "0.0.21",
   "description": "A SolidJS diagramming library",
   "type": "module",
   "files": [
@@ -8,7 +8,7 @@
   ],
   "main": "./dist/bluefish.umd.cjs",
   "module": "./dist/bluefish.js",
-  "types": "./dist/bluefish.d.ts",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "import": "./dist/bluefish.js",
