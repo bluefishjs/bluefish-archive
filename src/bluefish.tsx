@@ -55,7 +55,7 @@ const createOnError =
   (scenegraph: Scenegraph, scope: Scope) => (error: BluefishError) => {
     const resolveScopeName = createResolveScopeName(scope);
     const errorMessage = `Error in ${resolveScopeName(error.source)}:
-    ${error.display(resolveScopeName)}
+    ${error.display(resolveScopeName)} (${error.type})
 
 Error path from root:
   ${getAncestorChain(scenegraph, error.source)

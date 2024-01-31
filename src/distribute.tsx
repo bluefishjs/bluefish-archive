@@ -5,6 +5,8 @@ import { JSX } from "solid-js/jsx-runtime";
 import { ParentProps } from "solid-js";
 import { maybeMax } from "./util/maybe";
 import withBluefish from "./withBluefish";
+import { useError } from "./errorContext";
+import { dimUnownedError } from "./errors";
 
 // export type DistributeProps = SpaceVerticalProps | SpaceHorizontalProps;
 export type DistributeProps = ParentProps<{
@@ -16,6 +18,8 @@ export type DistributeProps = ParentProps<{
 
 export const Distribute = withBluefish(
   (props: DistributeProps) => {
+    const error = useError();
+
     const layout = (childNodes: ChildNode[]) => {
       childNodes = Array.from(childNodes);
 
@@ -56,9 +60,12 @@ export const Distribute = withBluefish(
           // we expect all heights to be owned by other
           for (const childNode of childNodes) {
             if (!childNode.owned.height) {
-              // throw new Error(`${childId}'s height is undefined`);
-              console.error(
-                `Distribute: ${childNode.name}'s height is undefined`
+              error(
+                dimUnownedError({
+                  source: props.name,
+                  name: childNode.name,
+                  dim: "height",
+                })
               );
               return { bbox: {}, transform: { translate: {} } };
             }
@@ -72,9 +79,12 @@ export const Distribute = withBluefish(
           // we expect all heights to be owned by other
           for (const childNode of childNodes) {
             if (!childNode.owned.height) {
-              // throw new Error(`${childId}'s height is undefined`);
-              console.error(
-                `Distribute: ${childNode.name}'s height is undefined`
+              error(
+                dimUnownedError({
+                  source: props.name,
+                  name: childNode.name,
+                  dim: "height",
+                })
               );
               return { bbox: {}, transform: { translate: {} } };
             }
@@ -157,9 +167,12 @@ export const Distribute = withBluefish(
           // we expect all widths to be owned by other
           for (const childNode of childNodes) {
             if (!childNode.owned.width) {
-              // throw new Error(`${childId}'s width is undefined`);
-              console.error(
-                `Distribute: ${childNode.name}'s width is undefined`
+              error(
+                dimUnownedError({
+                  source: props.name,
+                  name: childNode.name,
+                  dim: "width",
+                })
               );
               return { bbox: {}, transform: { translate: {} } };
             }
@@ -173,9 +186,12 @@ export const Distribute = withBluefish(
           // we expect all widths to be owned by other
           for (const childNode of childNodes) {
             if (!childNode.owned.width) {
-              // throw new Error(`${childId}'s width is undefined`);
-              console.error(
-                `Distribute: ${childNode.name}'s width is undefined`
+              error(
+                dimUnownedError({
+                  source: props.name,
+                  name: childNode.name,
+                  dim: "width",
+                })
               );
               return { bbox: {}, transform: { translate: {} } };
             }

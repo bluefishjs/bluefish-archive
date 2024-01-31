@@ -5,6 +5,15 @@ import { maybeAdd, maybeAddAll } from "./util/maybe";
 import { createContext, createMemo, useContext } from "solid-js";
 import { BBox, Dim, Axis, axisMap, inferenceRules } from "./util/bbox";
 import { Scope, resolveName } from "./createName";
+import { useError } from "./errorContext";
+import {
+  deleteNodeRefError,
+  deleteRefNodeError,
+  dimNaNError,
+  dimSetUndefinedError,
+  idNotFoundError,
+  parentRefError,
+} from "./errors";
 
 export type Id = string;
 export type Inferred = { inferred: true };
@@ -84,6 +93,8 @@ export const createScenegraph = (): ScenegraphContextType => {
 
   // constructors //
   const createNode = (id: Id, parentId: Id | null) => {
+    const error = useError();
+
     setScenegraph(id, {
       type: "node",
       bbox: {},
@@ -99,7 +110,13 @@ export const createScenegraph = (): ScenegraphContextType => {
     if (parentId !== null) {
       setScenegraph(parentId, (node: ScenegraphNode) => {
         if (node.type === "ref") {
-          console.error("Cannot add children to a ref node.");
+          error(
+            parentRefError({
+              source: parentId,
+              caller: "createNode",
+              child: id,
+            })
+          );
           return node;
         }
 
@@ -112,23 +129,30 @@ export const createScenegraph = (): ScenegraphContextType => {
   };
 
   const deleteNode = (id: Id, setScope: SetStoreFunction<Scope>) => {
+    const error = useError();
+
     const node = scenegraph[id];
 
     if (node === undefined) {
-      console.error(`deleteNode: node ${id} not found`);
+      error(idNotFoundError({ source: id, caller: "deleteNode" }));
       return;
     }
 
     if (node.type === "ref") {
-      console.error(`deleteNode: cannot delete ref node ${id}`);
+      error(deleteNodeRefError(id));
       return;
     }
 
     if (node.parent !== null) {
+      const nodeParent = node.parent;
       setScenegraph(node.parent, (node: ScenegraphNode) => {
         if (node.type === "ref") {
-          console.error(
-            `deleteNode: cannot delete layout node ${id}, parent is a ref`
+          error(
+            parentRefError({
+              source: nodeParent,
+              caller: "deleteNode",
+              child: id,
+            })
           );
           return node;
         }
@@ -160,23 +184,30 @@ export const createScenegraph = (): ScenegraphContextType => {
   };
 
   const deleteRef = (id: Id) => {
+    const error = useError();
+
     const node = scenegraph[id];
 
     if (node === undefined) {
-      console.error(`deleteRef: node ${id} not found`);
+      error(idNotFoundError({ source: id, caller: "deleteRef" }));
       return;
     }
 
     if (node.type === "node") {
-      console.error(`deleteRef: cannot delete layout node ${id}`);
+      error(deleteRefNodeError(id));
       return;
     }
 
     if (node.parent !== null) {
+      const nodeParent = node.parent;
       setScenegraph(node.parent, (node: ScenegraphNode) => {
         if (node.type === "ref") {
-          console.error(
-            `deleteRef: cannot delete ref node ${id}, parent is a ref`
+          error(
+            parentRefError({
+              source: nodeParent,
+              caller: "deleteRef",
+              child: id,
+            })
           );
           return node;
         }
@@ -192,6 +223,8 @@ export const createScenegraph = (): ScenegraphContextType => {
   };
 
   const createRef = (id: Id, refId: Id, parentId: Id) => {
+    const error = useError();
+
     setScenegraph(id, {
       type: "ref",
       refId,
@@ -201,7 +234,13 @@ export const createScenegraph = (): ScenegraphContextType => {
     if (parentId !== null) {
       setScenegraph(parentId, (node: ScenegraphNode) => {
         if (node.type === "ref") {
-          console.error("Cannot add children to a ref node.");
+          error(
+            parentRefError({
+              source: parentId,
+              caller: "createRef",
+              child: id,
+            })
+          );
           return node;
         }
 
@@ -432,19 +471,14 @@ the align node.
     bbox: BBox,
     transform: Transform
   ) => {
+    const error = useError();
     // TODO: should I untrack this?
     // const { id: resolvedId, transform: accumulatedTransform } = resolveRef(id);
 
     // if any of the bbox values are NaN (undefined is ok), console.error and skip
     for (const key of Object.keys(bbox) as Array<Dim>) {
       if (bbox[key] !== undefined && isNaN(bbox[key]!)) {
-        console.error(
-          `setBBox: ${resolveName(owner)} tried to update ${resolveName(
-            id
-          )}'s bbox with ${JSON.stringify(
-            bbox
-          )}, but the bbox contains NaN values. Skipping...`
-        );
+        error(dimNaNError({ source: owner, name: id, dim: key }));
         return;
       }
     }
@@ -594,6 +628,8 @@ the align node.
   };
 
   const setBBox = (owner: Id, id: Id, bbox: BBox) => {
+    const error = useError();
+
     const { id: resolvedId, transform: accumulatedTransform } = resolveRef(
       id,
       "write"
@@ -602,14 +638,7 @@ the align node.
     // if any of the bbox values are NaN (undefined is ok), console.error and skip
     for (const key of Object.keys(bbox) as Array<Dim>) {
       if (bbox[key] !== undefined && isNaN(bbox[key]!)) {
-        // error message should include id, bbox, owner
-        console.error(
-          `setBBox: ${resolveName(owner)} tried to update ${resolveName(
-            resolvedId
-          )}'s bbox with ${JSON.stringify(
-            bbox
-          )}, but the bbox contains NaN values. Skipping...`
-        );
+        error(dimNaNError({ source: owner, name: id, dim: key }));
         return;
       }
     }
@@ -742,6 +771,8 @@ the align node.
   };
 
   const createChildRepr = (owner: Id, childId: Id): ChildNode => {
+    const error = useError();
+
     return {
       name: childId,
       bbox: {
@@ -750,10 +781,12 @@ the align node.
         },
         set left(left: number | undefined) {
           if (left === undefined) {
-            console.error(
-              `${resolveName(owner)} tried to set ${resolveName(
-                childId
-              )}'s left to undefined. Skipping...`
+            error(
+              dimSetUndefinedError({
+                source: owner,
+                name: childId,
+                dim: "left",
+              })
             );
             return;
           }
@@ -765,10 +798,12 @@ the align node.
         },
         set centerX(centerX: number | undefined) {
           if (centerX === undefined) {
-            console.error(
-              `${resolveName(owner)} tried to set ${resolveName(
-                childId
-              )}'s centerX to undefined. Skipping...`
+            error(
+              dimSetUndefinedError({
+                source: owner,
+                name: childId,
+                dim: "centerX",
+              })
             );
             return;
           }
@@ -780,10 +815,12 @@ the align node.
         },
         set right(right: number | undefined) {
           if (right === undefined) {
-            console.error(
-              `${resolveName(owner)} tried to set ${resolveName(
-                childId
-              )}'s right to undefined. Skipping...`
+            error(
+              dimSetUndefinedError({
+                source: owner,
+                name: childId,
+                dim: "right",
+              })
             );
             return;
           }
@@ -795,10 +832,12 @@ the align node.
         },
         set top(top: number | undefined) {
           if (top === undefined) {
-            console.error(
-              `${resolveName(owner)} tried to set ${resolveName(
-                childId
-              )}'s top to undefined. Skipping...`
+            error(
+              dimSetUndefinedError({
+                source: owner,
+                name: childId,
+                dim: "top",
+              })
             );
             return;
           }
@@ -810,10 +849,12 @@ the align node.
         },
         set centerY(centerY: number | undefined) {
           if (centerY === undefined) {
-            console.error(
-              `${resolveName(owner)} tried to set ${resolveName(
-                childId
-              )}'s centerY to undefined. Skipping...`
+            error(
+              dimSetUndefinedError({
+                source: owner,
+                name: childId,
+                dim: "centerY",
+              })
             );
             return;
           }
@@ -825,10 +866,12 @@ the align node.
         },
         set bottom(bottom: number | undefined) {
           if (bottom === undefined) {
-            console.error(
-              `${resolveName(owner)} tried to set ${resolveName(
-                childId
-              )}'s bottom to undefined. Skipping...`
+            error(
+              dimSetUndefinedError({
+                source: owner,
+                name: childId,
+                dim: "bottom",
+              })
             );
             return;
           }
@@ -840,10 +883,12 @@ the align node.
         },
         set width(width: number | undefined) {
           if (width === undefined) {
-            console.error(
-              `${resolveName(owner)} tried to set ${resolveName(
-                childId
-              )}'s width to undefined. Skipping...`
+            error(
+              dimSetUndefinedError({
+                source: owner,
+                name: childId,
+                dim: "width",
+              })
             );
             return;
           }
@@ -855,10 +900,12 @@ the align node.
         },
         set height(height: number | undefined) {
           if (height === undefined) {
-            console.error(
-              `${resolveName(owner)} tried to set ${resolveName(
-                childId
-              )}'s height to undefined. Skipping...`
+            error(
+              dimSetUndefinedError({
+                source: owner,
+                name: childId,
+                dim: "height",
+              })
             );
             return;
           }
