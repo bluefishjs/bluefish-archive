@@ -20,7 +20,7 @@ export default defineConfig(({ command }) => ({
       entry: resolve(__dirname, "src/index.ts"),
       formats: ["es", "cjs", "umd"],
       name: "bluefish",
-      fileName: "bluefish",
+      fileName: "index",
     },
     target: "esnext",
     rollupOptions: {
