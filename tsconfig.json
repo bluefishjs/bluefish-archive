@@ -1,13 +1,5 @@
 {
-  "exclude": [
-    "node_modules",
-    "dist",
-    "examples",
-    "experiments",
-    "public",
-    "src/stories",
-    "vite.config.ts"
-  ],
+  "exclude": ["node_modules", "dist"],
   "compilerOptions": {
     "strict": true,
     "target": "ESNext",
