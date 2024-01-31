@@ -5,16 +5,16 @@ import { BBox, Id } from "./scenegraph";
 export type BluefishError = {
   type: string;
   source: Id;
-  toString: () => string;
+  display: (resolveScopeName: (name: Id) => Id) => string;
 };
 
-export type UnownedError = {
-  type: "UnownedError";
+export type DimUnownedError = {
+  type: "DimUnownedError";
   name: Id;
   dim: keyof BBox;
 } & BluefishError;
 
-export const unownedError = ({
+export const dimUnownedError = ({
   source,
   name,
   dim,
@@ -22,12 +22,13 @@ export const unownedError = ({
   source: Id;
   name: Id;
   dim: keyof BBox;
-}): UnownedError => {
+}): DimUnownedError => {
   return {
-    type: "UnownedError",
+    type: "DimUnownedError",
     source,
     name,
     dim,
-    toString: () => `${source}: ${name}'s ${dim} is undefined (UnownedError)`,
+    display: (resolveScopeName) =>
+      `${resolveScopeName(name)}'s ${dim} is undefined (DimUnownedError)`,
   };
 };

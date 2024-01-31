@@ -78,31 +78,34 @@ export const resolveSelection = (
   return layoutId;
 };
 
-export const Ref = withBluefish((props: RefProps) => {
-  const parentId = useContext(ParentIDContext);
-  const [scope] = useContext(ScopeContext);
-  const { createRef, deleteRef } = UNSAFE_useScenegraph();
+export const Ref = withBluefish(
+  (props: RefProps) => {
+    const parentId = useContext(ParentIDContext);
+    const [scope] = useContext(ScopeContext);
+    const { createRef, deleteRef } = UNSAFE_useScenegraph();
 
-  if (parentId === null) {
-    throw new Error("Ref must be a child of a Layout");
-  }
+    if (parentId === null) {
+      throw new Error("Ref must be a child of a Layout");
+    }
 
-  // TODO: what do we do if the layout node isn't defined?
-  createRenderEffect(() => {
-    const normalizedSelection = normalizeSelection(props.select);
+    // TODO: what do we do if the layout node isn't defined?
+    createRenderEffect(() => {
+      const normalizedSelection = normalizeSelection(props.select);
 
-    createRef(
-      props.name,
-      resolveSelection(scope, normalizedSelection),
-      parentId
-    );
+      createRef(
+        props.name,
+        resolveSelection(scope, normalizedSelection),
+        parentId
+      );
 
-    onCleanup(() => {
-      deleteRef(props.name);
+      onCleanup(() => {
+        deleteRef(props.name);
+      });
     });
-  });
 
-  return <></>;
-});
+    return <></>;
+  },
+  { displayName: "Ref" }
+);
 
 export default Ref;

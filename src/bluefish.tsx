@@ -24,6 +24,7 @@ import { createStore } from "solid-js/store";
 import { ErrorContext, createErrorContext } from "./errorContext";
 import { BluefishError } from "./errors";
 import { getAncestorChain } from "./util/lca";
+import toast, { Toaster } from "solid-toast";
 
 export type BluefishProps = ParentProps<{
   width?: number;
@@ -40,12 +41,31 @@ declare global {
   }
 }
 
-const createOnError = (scenegraph: Scenegraph) => (error: BluefishError) => {
-  console.error(`${error.toString()}
-Error Location: ${getAncestorChain(scenegraph, error.source)
-    .concat([error.source])
-    .join(" >> ")}`);
+const createResolveScopeName = (scope: Scope) => (id: Id) => {
+  for (const [name, value] of Object.entries(scope)) {
+    if (value.layoutNode === id) {
+      return name;
+    }
+  }
+
+  return id;
 };
+
+const createOnError =
+  (scenegraph: Scenegraph, scope: Scope) => (error: BluefishError) => {
+    const resolveScopeName = createResolveScopeName(scope);
+    const errorMessage = `Error in ${resolveScopeName(error.source)}:
+    ${error.display(resolveScopeName)}
+
+Error path from root:
+  ${getAncestorChain(scenegraph, error.source)
+    .concat([error.source])
+    .map((id) => resolveScopeName(id))
+    .join(" >>\n  ")}`;
+
+    console.error(errorMessage);
+    // toast.error(errorMessage);
+  };
 
 export function Bluefish(props: BluefishProps) {
   props = mergeProps(
@@ -59,10 +79,10 @@ export function Bluefish(props: BluefishProps) {
   const scenegraphContext = createScenegraph();
   const { scenegraph, createNode } = scenegraphContext;
   const [scope, setScope] = createStore<Scope>({});
-  const errorContext = createErrorContext(createOnError(scenegraph));
+  const errorContext = createErrorContext(createOnError(scenegraph, scope));
 
-  const autoGenId = createUniqueId();
-  const autoGenScopeId = createUniqueId();
+  const autoGenId = `Bluefish(${createUniqueId()})`;
+  const autoGenScopeId = `Bluefish(${createUniqueId()})`;
   const id = autoGenId;
   const scopeId = props.id ?? autoGenScopeId;
 
@@ -152,6 +172,13 @@ export function Bluefish(props: BluefishProps) {
           </ScopeContext.Provider>
         </ScenegraphContext.Provider>
       </ErrorContext.Provider>
+      <Toaster
+        position="top-left"
+        containerStyle={{
+          position: "relative",
+          width: "500px",
+        }}
+      />
       <Show when={props.debug === true}>
         <br />
         <div style={{ float: "left", "margin-right": "40px" }}>
