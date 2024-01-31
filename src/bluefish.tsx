@@ -9,6 +9,7 @@ import {
   Id,
   BBox,
   ChildNode,
+  Scenegraph,
 } from "./scenegraph";
 import {
   JSX,
@@ -20,6 +21,9 @@ import {
 } from "solid-js";
 import { ParentScopeIdContext, Scope, ScopeContext } from "./createName";
 import { createStore } from "solid-js/store";
+import { ErrorContext, createErrorContext } from "./errorContext";
+import { BluefishError } from "./errors";
+import { getAncestorChain } from "./util/lca";
 
 export type BluefishProps = ParentProps<{
   width?: number;
@@ -36,6 +40,13 @@ declare global {
   }
 }
 
+const createOnError = (scenegraph: Scenegraph) => (error: BluefishError) => {
+  console.error(`${error.toString()}
+Error Location: ${getAncestorChain(scenegraph, error.source)
+    .concat([error.source])
+    .join(" >> ")}`);
+};
+
 export function Bluefish(props: BluefishProps) {
   props = mergeProps(
     {
@@ -48,6 +59,7 @@ export function Bluefish(props: BluefishProps) {
   const scenegraphContext = createScenegraph();
   const { scenegraph, createNode } = scenegraphContext;
   const [scope, setScope] = createStore<Scope>({});
+  const errorContext = createErrorContext(createOnError(scenegraph));
 
   const autoGenId = createUniqueId();
   const autoGenScopeId = createUniqueId();
@@ -127,17 +139,19 @@ export function Bluefish(props: BluefishProps) {
 
   return (
     <>
-      <ScenegraphContext.Provider value={scenegraphContext}>
-        <ScopeContext.Provider value={[scope, setScope]}>
-          <Layout name={id} layout={layout} paint={paint}>
-            <ParentScopeIdContext.Provider value={() => scopeId}>
-              <ParentIDContext.Provider value={id}>
-                {props.children}
-              </ParentIDContext.Provider>
-            </ParentScopeIdContext.Provider>
-          </Layout>
-        </ScopeContext.Provider>
-      </ScenegraphContext.Provider>
+      <ErrorContext.Provider value={errorContext}>
+        <ScenegraphContext.Provider value={scenegraphContext}>
+          <ScopeContext.Provider value={[scope, setScope]}>
+            <Layout name={id} layout={layout} paint={paint}>
+              <ParentScopeIdContext.Provider value={() => scopeId}>
+                <ParentIDContext.Provider value={id}>
+                  {props.children}
+                </ParentIDContext.Provider>
+              </ParentScopeIdContext.Provider>
+            </Layout>
+          </ScopeContext.Provider>
+        </ScenegraphContext.Provider>
+      </ErrorContext.Provider>
       <Show when={props.debug === true}>
         <br />
         <div style={{ float: "left", "margin-right": "40px" }}>

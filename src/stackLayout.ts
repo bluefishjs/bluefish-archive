@@ -8,6 +8,8 @@ import {
 import { ChildNode, Id, LayoutFn } from "./scenegraph";
 import { maybe, maybeMax, maybeSub } from "./util/maybe";
 import * as BBox from "./util/bbox";
+import { useError } from "./errorContext";
+import { unownedError } from "./errors";
 
 export type StackArgs = {
   name: Id;
@@ -22,6 +24,8 @@ export type StackArgs = {
 export const stackLayout =
   (args: StackArgs): LayoutFn =>
   (childNodes: ChildNode[]) => {
+    const error = useError();
+
     if (args.name.endsWith("DEBUG")) {
       debugger;
     }
@@ -187,7 +191,14 @@ export const stackLayout =
         for (const childId of childNodes) {
           if (!childId.owned.width) {
             // throw new Error(`${childId}'s width is undefined`);
-            console.error(`Distribute: ${childId}'s width is undefined`);
+            // console.error(`Distribute: ${childId}'s width is undefined`);
+            error(
+              unownedError({
+                source: args.name,
+                name: childId.name,
+                dim: "width",
+              })
+            );
             return { bbox: {}, transform: { translate: {} } };
           }
         }
@@ -201,7 +212,14 @@ export const stackLayout =
         for (const childId of childNodes) {
           if (!childId.owned.width) {
             // throw new Error(`${childId}'s width is undefined`);
-            console.error(`Distribute: ${childId}'s width is undefined`);
+            // console.error(`Distribute: ${childId}'s width is undefined`);
+            error(
+              unownedError({
+                source: args.name,
+                name: childId.name,
+                dim: "width",
+              })
+            );
             return { bbox: {}, transform: { translate: {} } };
           }
         }
