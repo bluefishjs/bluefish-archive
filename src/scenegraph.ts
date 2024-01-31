@@ -9,6 +9,7 @@ import { useError } from "./errorContext";
 import {
   deleteNodeRefError,
   deleteRefNodeError,
+  dimAlreadyOwnedError,
   dimNaNError,
   dimSetUndefinedError,
   idNotFoundError,
@@ -475,7 +476,7 @@ the align node.
     // TODO: should I untrack this?
     // const { id: resolvedId, transform: accumulatedTransform } = resolveRef(id);
 
-    // if any of the bbox values are NaN (undefined is ok), console.error and skip
+    // if any of the bbox values are NaN (undefined is ok), error and skip
     for (const key of Object.keys(bbox) as Array<Dim>) {
       if (bbox[key] !== undefined && isNaN(bbox[key]!)) {
         error(dimNaNError({ source: owner, name: id, dim: key }));
@@ -495,14 +496,14 @@ the align node.
             node.bboxOwners[key] !== undefined &&
             node.bboxOwners[key] !== owner
           ) {
-            console.error(
-              `${resolveName(owner)} tried to set ${resolveName(
-                id
-              )}'s ${key} to ${
-                bbox[key]
-              } but it was already set by ${resolveName(
-                node.bboxOwners[key]! as any /* TODO: handle inferred case */
-              )}. Only one component can set a bbox property. We skipped this update.`
+            error(
+              dimAlreadyOwnedError({
+                source: owner,
+                name: id,
+                owner: node.bboxOwners[key]!,
+                dim: key,
+                value: bbox[key]!,
+              })
             );
             return node;
           }
@@ -635,7 +636,7 @@ the align node.
       "write"
     );
 
-    // if any of the bbox values are NaN (undefined is ok), console.error and skip
+    // if any of the bbox values are NaN (undefined is ok), error and skip
     for (const key of Object.keys(bbox) as Array<Dim>) {
       if (bbox[key] !== undefined && isNaN(bbox[key]!)) {
         error(dimNaNError({ source: owner, name: id, dim: key }));
@@ -691,14 +692,14 @@ the align node.
       ) {
         proposedTransform.translate[axis] = bbox[dim]! - node.bbox[dim]!;
       } else {
-        console.error(
-          `setBBox: ${resolveName(owner)} tried to update ${resolveName(
-            resolvedId
-          )}'s bbox.${dim} with ${
-            bbox[dim]
-          }, but it was already set by ${resolveName(
-            node.bboxOwners[dim]! as any /* TODO: handle inferred case */
-          )}. Only one component can set a bbox property. We skipped this update.`
+        error(
+          dimAlreadyOwnedError({
+            source: owner,
+            name: resolvedId,
+            owner: node.bboxOwners[dim]!,
+            dim,
+            value: bbox[dim]!,
+          })
         );
         return;
       }

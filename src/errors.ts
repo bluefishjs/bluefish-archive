@@ -1,4 +1,4 @@
-import { BBox, Id } from "./scenegraph";
+import { BBox, Id, Inferred } from "./scenegraph";
 
 /* A collection of common Bluefish Error types */
 
@@ -30,6 +30,43 @@ export const dimUnownedError = ({
     dim,
     display: (resolveScopeName) =>
       `${resolveScopeName(name)}'s ${dim} is undefined`,
+  };
+};
+
+export type DimAlreadyOwnedError = {
+  type: "DimAlreadyOwnedError";
+  name: Id;
+  owner: Id | Inferred;
+  dim: keyof BBox;
+  value: number;
+} & BluefishError;
+
+export const dimAlreadyOwnedError = ({
+  source,
+  name,
+  owner,
+  dim,
+  value,
+}: {
+  source: Id;
+  name: Id;
+  owner: Id | Inferred;
+  dim: keyof BBox;
+  value: number;
+}): DimAlreadyOwnedError => {
+  return {
+    type: "DimAlreadyOwnedError",
+    source,
+    name,
+    owner,
+    dim,
+    value,
+    display: (resolveScopeName) =>
+      `tried to set ${resolveScopeName(
+        name
+      )}'s ${dim} to ${value}, but it is already owned by ${
+        typeof owner === "object" ? "<inferred>" : resolveScopeName(owner)
+      }. A dimension cannot be set if it is already owned by another node.`,
   };
 };
 
