@@ -1,4 +1,4 @@
-import { BBox, Id, Inferred } from "./scenegraph";
+import { BBox, Id, Inferred, Transform } from "./scenegraph";
 
 /* A collection of common Bluefish Error types */
 
@@ -67,6 +67,78 @@ export const dimAlreadyOwnedError = ({
       )}'s ${dim} to ${value}, but it is already owned by ${
         typeof owner === "object" ? "<inferred>" : resolveScopeName(owner)
       }. A dimension cannot be set if it is already owned by another node.`,
+  };
+};
+
+export type TranslateAlreadyOwnedError = {
+  type: "TranslateAlreadyOwnedError";
+  name: Id;
+  owner: Id | Inferred;
+  axis: keyof Transform["translate"];
+  value: number;
+} & BluefishError;
+
+export const translateAlreadyOwnedError = ({
+  source,
+  name,
+  owner,
+  axis,
+  value,
+}: {
+  source: Id;
+  name: Id;
+  owner: Id | Inferred;
+  axis: keyof Transform["translate"];
+  value: number;
+}): TranslateAlreadyOwnedError => {
+  return {
+    type: "TranslateAlreadyOwnedError",
+    source,
+    name,
+    owner,
+    axis,
+    value,
+    display: (resolveScopeName) =>
+      `tried to set ${resolveScopeName(
+        name
+      )}'s transform.translate.${axis} to ${value}, but it is already owned by ${
+        typeof owner === "object" ? "<inferred>" : resolveScopeName(owner)
+      }. A dimension cannot be set if it is already owned by another node.`,
+  };
+};
+
+export type AccumulatedTransformUndefinedError = {
+  type: "AccumulatedTransformUndefinedError";
+  name: Id;
+  dim: keyof BBox;
+  axis: keyof Transform["translate"];
+  value: number;
+} & BluefishError;
+
+export const accumulatedTransformUndefinedError = ({
+  source,
+  name,
+  dim,
+  axis,
+  value,
+}: {
+  source: Id;
+  name: Id;
+  dim: keyof BBox;
+  axis: keyof Transform["translate"];
+  value: number;
+}): AccumulatedTransformUndefinedError => {
+  return {
+    type: "AccumulatedTransformUndefinedError",
+    source,
+    name,
+    dim,
+    axis,
+    value,
+    display: (resolveScopeName) =>
+      `tried to set ${resolveScopeName(
+        name
+      )}'s ${dim} to ${value}, but the accumulated transform.translate.${axis} is undefined. We are skipping this operation`,
   };
 };
 

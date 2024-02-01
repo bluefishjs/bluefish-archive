@@ -7,6 +7,7 @@ import { BBox, Dim, Axis, axisMap, inferenceRules } from "./util/bbox";
 import { Scope, resolveName } from "./createName";
 import { useError } from "./errorContext";
 import {
+  accumulatedTransformUndefinedError,
   deleteNodeRefError,
   deleteRefNodeError,
   dimAlreadyOwnedError,
@@ -14,6 +15,7 @@ import {
   dimSetUndefinedError,
   idNotFoundError,
   parentRefError,
+  translateAlreadyOwnedError,
 } from "./errors";
 
 export type Id = string;
@@ -518,16 +520,14 @@ the align node.
             node.transformOwners.translate[key] !== undefined &&
             node.transformOwners.translate[key] !== owner
           ) {
-            console.error(
-              `${resolveName(owner)} tried to set ${resolveName(
-                id
-              )}'s translate.${key} to ${
-                transform?.translate[key]
-              } but it was already set by ${resolveName(
-                node.transformOwners.translate[
-                  key
-                ]! as any /* TODO: handle inferred case */
-              )}. Only one component can set a transform property. We skipped this update.`
+            error(
+              translateAlreadyOwnedError({
+                source: owner,
+                name: id,
+                owner: node.transformOwners.translate[key]!,
+                axis: key,
+                value: transform.translate[key]!,
+              })
             );
             return node;
           }
@@ -663,12 +663,14 @@ the align node.
 
       const axis = axisMap[dim];
       if (accumulatedTransform.translate[axis] === undefined) {
-        console.error(
-          `setBBox: ${resolveName(owner)} tried to update ${resolveName(
-            resolvedId
-          )}'s bbox.${dim} with ${
-            bbox[dim]
-          }, but the accumulated transform.translate.${axis} is undefined. Skipping...`
+        error(
+          accumulatedTransformUndefinedError({
+            source: owner,
+            name: resolvedId,
+            dim,
+            axis,
+            value: bbox[dim]!,
+          })
         );
         continue;
       }
@@ -714,14 +716,14 @@ the align node.
       ) {
         proposedBBox[dim] = bbox[dim]!;
       } else {
-        console.error(
-          `setBBox: ${resolveName(owner)} tried to update ${resolveName(
-            resolvedId
-          )}'s bbox.${dim} with ${
-            bbox[dim]
-          }, but it was already set by ${resolveName(
-            node.bboxOwners[dim]! as any /* TODO: handle inferred case */
-          )}. Only one component can set a bbox property. We skipped this update.`
+        error(
+          dimAlreadyOwnedError({
+            source: owner,
+            name: resolvedId,
+            owner: node.bboxOwners[dim]!,
+            dim,
+            value: bbox[dim]!,
+          })
         );
         return;
       }
