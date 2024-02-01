@@ -8,6 +8,7 @@ import {
 import { Id, UNSAFE_useScenegraph, ParentIDContext } from "./scenegraph";
 import withBluefish from "./withBluefish";
 import { Name, Scope, ScopeContext } from "./createName";
+import { useError } from "./errorContext";
 
 // The properties we want:
 // every time the refId's bbox is updated, it should be propagated to the id
@@ -80,6 +81,7 @@ export const resolveSelection = (
 
 export const Ref = withBluefish(
   (props: RefProps) => {
+    const error = useError();
     const parentId = useContext(ParentIDContext);
     const [scope] = useContext(ScopeContext);
     const { createRef, deleteRef } = UNSAFE_useScenegraph();
@@ -99,7 +101,7 @@ export const Ref = withBluefish(
       );
 
       onCleanup(() => {
-        deleteRef(props.name);
+        deleteRef(error, props.name);
       });
     });
 

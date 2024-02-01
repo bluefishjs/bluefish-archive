@@ -7,6 +7,7 @@ import { BBox, Dim, Axis, axisMap, inferenceRules } from "./util/bbox";
 import { Scope, resolveName } from "./createName";
 import { useError } from "./errorContext";
 import {
+  BluefishError,
   accumulatedTransformUndefinedError,
   deleteNodeRefError,
   deleteRefNodeError,
@@ -186,9 +187,9 @@ export const createScenegraph = (): ScenegraphContextType => {
     setScenegraph({ ...scenegraph, [id]: undefined });
   };
 
-  const deleteRef = (id: Id) => {
-    const error = useError();
-
+  // unlike the other functions, we have to pass `error` explicitly, because the error context is
+  // not accessible from `onCleanup`.
+  const deleteRef = (error: (error: BluefishError) => void, id: Id) => {
     const node = scenegraph[id];
 
     if (node === undefined) {
@@ -970,7 +971,7 @@ export type ScenegraphContextType = {
   createNode: (id: Id, parentId: Id | null) => void;
   deleteNode: (id: Id, setScope: SetStoreFunction<Scope>) => void;
   createRef: (id: Id, refId: Id, parentId: Id) => void;
-  deleteRef: (id: Id) => void;
+  deleteRef: (error: (error: BluefishError) => void, id: Id) => void;
   resolveRef: (
     id: Id,
     mode: "read" | "write" | "check"
