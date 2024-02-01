@@ -8,6 +8,8 @@ import {
 import { ChildNode, Id, LayoutFn } from "./scenegraph";
 import { maybe, maybeMax, maybeSub } from "./util/maybe";
 import * as BBox from "./util/bbox";
+import { useError } from "./errorContext";
+import { dimUnownedError } from "./errors";
 
 export type StackArgs = {
   name: Id;
@@ -22,6 +24,8 @@ export type StackArgs = {
 export const stackLayout =
   (args: StackArgs): LayoutFn =>
   (childNodes: ChildNode[]) => {
+    const error = useError();
+
     if (args.name.endsWith("DEBUG")) {
       debugger;
     }
@@ -83,8 +87,13 @@ export const stackLayout =
         // we expect all heights to be owned by other
         for (const childId of childNodes) {
           if (!childId.owned.height) {
-            // throw new Error(`${childId}'s height is undefined`);
-            console.error(`Distribute: ${childId}'s height is undefined`);
+            error(
+              dimUnownedError({
+                source: args.name,
+                name: childId.name,
+                dim: "height",
+              })
+            );
             return { bbox: {}, transform: { translate: {} } };
           }
         }
@@ -97,8 +106,13 @@ export const stackLayout =
         // we expect all heights to be owned by other
         for (const childId of childNodes) {
           if (!childId.owned.height) {
-            // throw new Error(`${childId}'s height is undefined`);
-            console.error(`Distribute: ${childId}'s height is undefined`);
+            error(
+              dimUnownedError({
+                source: args.name,
+                name: childId.name,
+                dim: "height",
+              })
+            );
             return { bbox: {}, transform: { translate: {} } };
           }
         }
@@ -186,8 +200,13 @@ export const stackLayout =
         // we expect all widths to be owned by other
         for (const childId of childNodes) {
           if (!childId.owned.width) {
-            // throw new Error(`${childId}'s width is undefined`);
-            console.error(`Distribute: ${childId}'s width is undefined`);
+            error(
+              dimUnownedError({
+                source: args.name,
+                name: childId.name,
+                dim: "width",
+              })
+            );
             return { bbox: {}, transform: { translate: {} } };
           }
         }
@@ -200,8 +219,13 @@ export const stackLayout =
         // we expect all widths to be owned by other
         for (const childId of childNodes) {
           if (!childId.owned.width) {
-            // throw new Error(`${childId}'s width is undefined`);
-            console.error(`Distribute: ${childId}'s width is undefined`);
+            error(
+              dimUnownedError({
+                source: args.name,
+                name: childId.name,
+                dim: "width",
+              })
+            );
             return { bbox: {}, transform: { translate: {} } };
           }
         }

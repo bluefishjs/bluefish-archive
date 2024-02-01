@@ -5,6 +5,19 @@ import { maybeAdd, maybeAddAll } from "./util/maybe";
 import { createContext, createMemo, useContext } from "solid-js";
 import { BBox, Dim, Axis, axisMap, inferenceRules } from "./util/bbox";
 import { Scope, resolveName } from "./createName";
+import { useError } from "./errorContext";
+import {
+  BluefishError,
+  accumulatedTransformUndefinedError,
+  deleteNodeRefError,
+  deleteRefNodeError,
+  dimAlreadyOwnedError,
+  dimNaNError,
+  dimSetUndefinedError,
+  idNotFoundError,
+  parentRefError,
+  translateAlreadyOwnedError,
+} from "./errors";
 
 export type Id = string;
 export type Inferred = { inferred: true };
@@ -84,6 +97,8 @@ export const createScenegraph = (): ScenegraphContextType => {
 
   // constructors //
   const createNode = (id: Id, parentId: Id | null) => {
+    const error = useError();
+
     setScenegraph(id, {
       type: "node",
       bbox: {},
@@ -99,7 +114,13 @@ export const createScenegraph = (): ScenegraphContextType => {
     if (parentId !== null) {
       setScenegraph(parentId, (node: ScenegraphNode) => {
         if (node.type === "ref") {
-          console.error("Cannot add children to a ref node.");
+          error(
+            parentRefError({
+              source: parentId,
+              caller: "createNode",
+              child: id,
+            })
+          );
           return node;
         }
 
@@ -112,23 +133,30 @@ export const createScenegraph = (): ScenegraphContextType => {
   };
 
   const deleteNode = (id: Id, setScope: SetStoreFunction<Scope>) => {
+    const error = useError();
+
     const node = scenegraph[id];
 
     if (node === undefined) {
-      console.error(`deleteNode: node ${id} not found`);
+      error(idNotFoundError({ source: id, caller: "deleteNode" }));
       return;
     }
 
     if (node.type === "ref") {
-      console.error(`deleteNode: cannot delete ref node ${id}`);
+      error(deleteNodeRefError(id));
       return;
     }
 
     if (node.parent !== null) {
+      const nodeParent = node.parent;
       setScenegraph(node.parent, (node: ScenegraphNode) => {
         if (node.type === "ref") {
-          console.error(
-            `deleteNode: cannot delete layout node ${id}, parent is a ref`
+          error(
+            parentRefError({
+              source: nodeParent,
+              caller: "deleteNode",
+              child: id,
+            })
           );
           return node;
         }
@@ -159,24 +187,31 @@ export const createScenegraph = (): ScenegraphContextType => {
     setScenegraph({ ...scenegraph, [id]: undefined });
   };
 
-  const deleteRef = (id: Id) => {
+  // unlike the other functions, we have to pass `error` explicitly, because the error context is
+  // not accessible from `onCleanup`.
+  const deleteRef = (error: (error: BluefishError) => void, id: Id) => {
     const node = scenegraph[id];
 
     if (node === undefined) {
-      console.error(`deleteRef: node ${id} not found`);
+      error(idNotFoundError({ source: id, caller: "deleteRef" }));
       return;
     }
 
     if (node.type === "node") {
-      console.error(`deleteRef: cannot delete layout node ${id}`);
+      error(deleteRefNodeError(id));
       return;
     }
 
     if (node.parent !== null) {
+      const nodeParent = node.parent;
       setScenegraph(node.parent, (node: ScenegraphNode) => {
         if (node.type === "ref") {
-          console.error(
-            `deleteRef: cannot delete ref node ${id}, parent is a ref`
+          error(
+            parentRefError({
+              source: nodeParent,
+              caller: "deleteRef",
+              child: id,
+            })
           );
           return node;
         }
@@ -192,6 +227,8 @@ export const createScenegraph = (): ScenegraphContextType => {
   };
 
   const createRef = (id: Id, refId: Id, parentId: Id) => {
+    const error = useError();
+
     setScenegraph(id, {
       type: "ref",
       refId,
@@ -201,7 +238,13 @@ export const createScenegraph = (): ScenegraphContextType => {
     if (parentId !== null) {
       setScenegraph(parentId, (node: ScenegraphNode) => {
         if (node.type === "ref") {
-          console.error("Cannot add children to a ref node.");
+          error(
+            parentRefError({
+              source: parentId,
+              caller: "createRef",
+              child: id,
+            })
+          );
           return node;
         }
 
@@ -432,19 +475,14 @@ the align node.
     bbox: BBox,
     transform: Transform
   ) => {
+    const error = useError();
     // TODO: should I untrack this?
     // const { id: resolvedId, transform: accumulatedTransform } = resolveRef(id);
 
-    // if any of the bbox values are NaN (undefined is ok), console.error and skip
+    // if any of the bbox values are NaN (undefined is ok), error and skip
     for (const key of Object.keys(bbox) as Array<Dim>) {
       if (bbox[key] !== undefined && isNaN(bbox[key]!)) {
-        console.error(
-          `setBBox: ${resolveName(owner)} tried to update ${resolveName(
-            id
-          )}'s bbox with ${JSON.stringify(
-            bbox
-          )}, but the bbox contains NaN values. Skipping...`
-        );
+        error(dimNaNError({ source: owner, name: id, dim: key }));
         return;
       }
     }
@@ -461,14 +499,14 @@ the align node.
             node.bboxOwners[key] !== undefined &&
             node.bboxOwners[key] !== owner
           ) {
-            console.error(
-              `${resolveName(owner)} tried to set ${resolveName(
-                id
-              )}'s ${key} to ${
-                bbox[key]
-              } but it was already set by ${resolveName(
-                node.bboxOwners[key]! as any /* TODO: handle inferred case */
-              )}. Only one component can set a bbox property. We skipped this update.`
+            error(
+              dimAlreadyOwnedError({
+                source: owner,
+                name: id,
+                owner: node.bboxOwners[key]!,
+                dim: key,
+                value: bbox[key]!,
+              })
             );
             return node;
           }
@@ -483,16 +521,14 @@ the align node.
             node.transformOwners.translate[key] !== undefined &&
             node.transformOwners.translate[key] !== owner
           ) {
-            console.error(
-              `${resolveName(owner)} tried to set ${resolveName(
-                id
-              )}'s translate.${key} to ${
-                transform?.translate[key]
-              } but it was already set by ${resolveName(
-                node.transformOwners.translate[
-                  key
-                ]! as any /* TODO: handle inferred case */
-              )}. Only one component can set a transform property. We skipped this update.`
+            error(
+              translateAlreadyOwnedError({
+                source: owner,
+                name: id,
+                owner: node.transformOwners.translate[key]!,
+                axis: key,
+                value: transform.translate[key]!,
+              })
             );
             return node;
           }
@@ -594,22 +630,17 @@ the align node.
   };
 
   const setBBox = (owner: Id, id: Id, bbox: BBox) => {
+    const error = useError();
+
     const { id: resolvedId, transform: accumulatedTransform } = resolveRef(
       id,
       "write"
     );
 
-    // if any of the bbox values are NaN (undefined is ok), console.error and skip
+    // if any of the bbox values are NaN (undefined is ok), error and skip
     for (const key of Object.keys(bbox) as Array<Dim>) {
       if (bbox[key] !== undefined && isNaN(bbox[key]!)) {
-        // error message should include id, bbox, owner
-        console.error(
-          `setBBox: ${resolveName(owner)} tried to update ${resolveName(
-            resolvedId
-          )}'s bbox with ${JSON.stringify(
-            bbox
-          )}, but the bbox contains NaN values. Skipping...`
-        );
+        error(dimNaNError({ source: owner, name: id, dim: key }));
         return;
       }
     }
@@ -633,12 +664,14 @@ the align node.
 
       const axis = axisMap[dim];
       if (accumulatedTransform.translate[axis] === undefined) {
-        console.error(
-          `setBBox: ${resolveName(owner)} tried to update ${resolveName(
-            resolvedId
-          )}'s bbox.${dim} with ${
-            bbox[dim]
-          }, but the accumulated transform.translate.${axis} is undefined. Skipping...`
+        error(
+          accumulatedTransformUndefinedError({
+            source: owner,
+            name: resolvedId,
+            dim,
+            axis,
+            value: bbox[dim]!,
+          })
         );
         continue;
       }
@@ -662,14 +695,14 @@ the align node.
       ) {
         proposedTransform.translate[axis] = bbox[dim]! - node.bbox[dim]!;
       } else {
-        console.error(
-          `setBBox: ${resolveName(owner)} tried to update ${resolveName(
-            resolvedId
-          )}'s bbox.${dim} with ${
-            bbox[dim]
-          }, but it was already set by ${resolveName(
-            node.bboxOwners[dim]! as any /* TODO: handle inferred case */
-          )}. Only one component can set a bbox property. We skipped this update.`
+        error(
+          dimAlreadyOwnedError({
+            source: owner,
+            name: resolvedId,
+            owner: node.bboxOwners[dim]!,
+            dim,
+            value: bbox[dim]!,
+          })
         );
         return;
       }
@@ -684,14 +717,14 @@ the align node.
       ) {
         proposedBBox[dim] = bbox[dim]!;
       } else {
-        console.error(
-          `setBBox: ${resolveName(owner)} tried to update ${resolveName(
-            resolvedId
-          )}'s bbox.${dim} with ${
-            bbox[dim]
-          }, but it was already set by ${resolveName(
-            node.bboxOwners[dim]! as any /* TODO: handle inferred case */
-          )}. Only one component can set a bbox property. We skipped this update.`
+        error(
+          dimAlreadyOwnedError({
+            source: owner,
+            name: resolvedId,
+            owner: node.bboxOwners[dim]!,
+            dim,
+            value: bbox[dim]!,
+          })
         );
         return;
       }
@@ -742,6 +775,8 @@ the align node.
   };
 
   const createChildRepr = (owner: Id, childId: Id): ChildNode => {
+    const error = useError();
+
     return {
       name: childId,
       bbox: {
@@ -750,10 +785,12 @@ the align node.
         },
         set left(left: number | undefined) {
           if (left === undefined) {
-            console.error(
-              `${resolveName(owner)} tried to set ${resolveName(
-                childId
-              )}'s left to undefined. Skipping...`
+            error(
+              dimSetUndefinedError({
+                source: owner,
+                name: childId,
+                dim: "left",
+              })
             );
             return;
           }
@@ -765,10 +802,12 @@ the align node.
         },
         set centerX(centerX: number | undefined) {
           if (centerX === undefined) {
-            console.error(
-              `${resolveName(owner)} tried to set ${resolveName(
-                childId
-              )}'s centerX to undefined. Skipping...`
+            error(
+              dimSetUndefinedError({
+                source: owner,
+                name: childId,
+                dim: "centerX",
+              })
             );
             return;
           }
@@ -780,10 +819,12 @@ the align node.
         },
         set right(right: number | undefined) {
           if (right === undefined) {
-            console.error(
-              `${resolveName(owner)} tried to set ${resolveName(
-                childId
-              )}'s right to undefined. Skipping...`
+            error(
+              dimSetUndefinedError({
+                source: owner,
+                name: childId,
+                dim: "right",
+              })
             );
             return;
           }
@@ -795,10 +836,12 @@ the align node.
         },
         set top(top: number | undefined) {
           if (top === undefined) {
-            console.error(
-              `${resolveName(owner)} tried to set ${resolveName(
-                childId
-              )}'s top to undefined. Skipping...`
+            error(
+              dimSetUndefinedError({
+                source: owner,
+                name: childId,
+                dim: "top",
+              })
             );
             return;
           }
@@ -810,10 +853,12 @@ the align node.
         },
         set centerY(centerY: number | undefined) {
           if (centerY === undefined) {
-            console.error(
-              `${resolveName(owner)} tried to set ${resolveName(
-                childId
-              )}'s centerY to undefined. Skipping...`
+            error(
+              dimSetUndefinedError({
+                source: owner,
+                name: childId,
+                dim: "centerY",
+              })
             );
             return;
           }
@@ -825,10 +870,12 @@ the align node.
         },
         set bottom(bottom: number | undefined) {
           if (bottom === undefined) {
-            console.error(
-              `${resolveName(owner)} tried to set ${resolveName(
-                childId
-              )}'s bottom to undefined. Skipping...`
+            error(
+              dimSetUndefinedError({
+                source: owner,
+                name: childId,
+                dim: "bottom",
+              })
             );
             return;
           }
@@ -840,10 +887,12 @@ the align node.
         },
         set width(width: number | undefined) {
           if (width === undefined) {
-            console.error(
-              `${resolveName(owner)} tried to set ${resolveName(
-                childId
-              )}'s width to undefined. Skipping...`
+            error(
+              dimSetUndefinedError({
+                source: owner,
+                name: childId,
+                dim: "width",
+              })
             );
             return;
           }
@@ -855,10 +904,12 @@ the align node.
         },
         set height(height: number | undefined) {
           if (height === undefined) {
-            console.error(
-              `${resolveName(owner)} tried to set ${resolveName(
-                childId
-              )}'s height to undefined. Skipping...`
+            error(
+              dimSetUndefinedError({
+                source: owner,
+                name: childId,
+                dim: "height",
+              })
             );
             return;
           }
@@ -920,7 +971,7 @@ export type ScenegraphContextType = {
   createNode: (id: Id, parentId: Id | null) => void;
   deleteNode: (id: Id, setScope: SetStoreFunction<Scope>) => void;
   createRef: (id: Id, refId: Id, parentId: Id) => void;
-  deleteRef: (id: Id) => void;
+  deleteRef: (error: (error: BluefishError) => void, id: Id) => void;
   resolveRef: (
     id: Id,
     mode: "read" | "write" | "check"

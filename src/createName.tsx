@@ -26,7 +26,7 @@ export const ScopeContext = createContext<
 export const ParentScopeIdContext = createContext<Accessor<Name>>(() => "");
 
 export const createName = (name: string) => {
-  const genId = `${name}-${createUniqueId()}`;
+  const genId = `${name}(${createUniqueId()})`;
 
   const [scope, setScope] = useContext(ScopeContext);
   const parentId = useContext(ParentScopeIdContext);

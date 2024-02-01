@@ -99,116 +99,119 @@ export type AlignProps = ParentProps<{
   alignment: Alignment2D | Alignment1D;
 }>;
 
-export const Align = withBluefish((props: AlignProps) => {
-  // const { children, id } = props;
-  const layout = (childNodes: ChildNode[]) => {
-    childNodes = Array.from(childNodes);
+export const Align = withBluefish(
+  (props: AlignProps) => {
+    // const { children, id } = props;
+    const layout = (childNodes: ChildNode[]) => {
+      childNodes = Array.from(childNodes);
 
-    if (props.name.endsWith("DEBUG")) {
-      debugger;
-    }
+      if (props.name.endsWith("DEBUG")) {
+        debugger;
+      }
 
-    const alignments = childNodes
-      .map((m) => /* m.guidePrimary ?? */ props.alignment)
-      .map((alignment) => splitAlignment(alignment));
+      const alignments = childNodes
+        .map((m) => /* m.guidePrimary ?? */ props.alignment)
+        .map((alignment) => splitAlignment(alignment));
 
-    // horizontal
-    const horizontalPlaceables = _.zip(childNodes, alignments)
-      .filter(([placeable, alignment]) => alignment![0] !== undefined)
-      .map(([placeable, alignment]) => [placeable, alignment![0]]) as [
-      ChildNode,
-      AlignmentVertical
-    ][];
+      // horizontal
+      const horizontalPlaceables = _.zip(childNodes, alignments)
+        .filter(([placeable, alignment]) => alignment![0] !== undefined)
+        .map(([placeable, alignment]) => [placeable, alignment![0]]) as [
+        ChildNode,
+        AlignmentVertical
+      ][];
 
-    const existingHorizontalPositions = horizontalPlaceables
-      .filter(
-        ([placeable, alignment]) => placeable!.owned[alignment as BBox.Dim]
-      )
-      .map(([placeable, alignment]) => {
-        return [placeable!, placeable!.bbox[alignment as BBox.Dim]!];
-      }) satisfies [ChildNode, number][];
+      const existingHorizontalPositions = horizontalPlaceables
+        .filter(
+          ([placeable, alignment]) => placeable!.owned[alignment as BBox.Dim]
+        )
+        .map(([placeable, alignment]) => {
+          return [placeable!, placeable!.bbox[alignment as BBox.Dim]!];
+        }) satisfies [ChildNode, number][];
 
-    const defaultHorizontalValue = existingHorizontalPositions[0]?.[1] ?? 0;
+      const defaultHorizontalValue = existingHorizontalPositions[0]?.[1] ?? 0;
 
-    for (const [placeable, alignment] of horizontalPlaceables) {
-      if (placeable!.owned[alignment as BBox.Dim]) continue;
-      placeable!.bbox[alignment as BBox.Dim] = defaultHorizontalValue;
-    }
+      for (const [placeable, alignment] of horizontalPlaceables) {
+        if (placeable!.owned[alignment as BBox.Dim]) continue;
+        placeable!.bbox[alignment as BBox.Dim] = defaultHorizontalValue;
+      }
 
-    // vertical
-    const verticalPlaceables = _.zip(childNodes, alignments)
-      .filter(([placeable, alignment]) => alignment![1] !== undefined)
-      .map(([placeable, alignment]) => [placeable, alignment![1]]) as [
-      ChildNode,
-      AlignmentHorizontal
-    ][];
+      // vertical
+      const verticalPlaceables = _.zip(childNodes, alignments)
+        .filter(([placeable, alignment]) => alignment![1] !== undefined)
+        .map(([placeable, alignment]) => [placeable, alignment![1]]) as [
+        ChildNode,
+        AlignmentHorizontal
+      ][];
 
-    const existingVerticalPositions = verticalPlaceables
-      .filter(
-        ([placeable, alignment]) => placeable!.owned[alignment as BBox.Dim]
-      )
-      .map(([placeable, alignment]) => {
-        return [placeable!, placeable!.bbox[alignment as BBox.Dim]!];
-      }) satisfies [ChildNode, number][];
+      const existingVerticalPositions = verticalPlaceables
+        .filter(
+          ([placeable, alignment]) => placeable!.owned[alignment as BBox.Dim]
+        )
+        .map(([placeable, alignment]) => {
+          return [placeable!, placeable!.bbox[alignment as BBox.Dim]!];
+        }) satisfies [ChildNode, number][];
 
-    const defaultVerticalValue = existingVerticalPositions[0]?.[1] ?? 0;
+      const defaultVerticalValue = existingVerticalPositions[0]?.[1] ?? 0;
 
-    for (const [placeable, alignment] of verticalPlaceables) {
-      if (placeable!.owned[alignment as BBox.Dim]) continue;
-      placeable!.bbox[alignment as BBox.Dim] = defaultVerticalValue;
-    }
+      for (const [placeable, alignment] of verticalPlaceables) {
+        if (placeable!.owned[alignment as BBox.Dim]) continue;
+        placeable!.bbox[alignment as BBox.Dim] = defaultVerticalValue;
+      }
 
-    const bbox = BBox.from(childNodes.map((childNode) => childNode.bbox));
+      const bbox = BBox.from(childNodes.map((childNode) => childNode.bbox));
 
-    return {
-      transform: {
-        translate: {
-          x: maybeSub(props.x, bbox.left),
-          y: maybeSub(props.y, bbox.top),
+      return {
+        transform: {
+          translate: {
+            x: maybeSub(props.x, bbox.left),
+            y: maybeSub(props.y, bbox.top),
+          },
         },
-      },
-      bbox: {
-        left:
-          horizontalAlignment(props.alignment) !== undefined
-            ? bbox.left
-            : undefined,
-        width:
-          horizontalAlignment(props.alignment) !== undefined
-            ? bbox.width
-            : undefined,
-        top:
-          verticalAlignment(props.alignment) !== undefined
-            ? bbox.top
-            : undefined,
-        height:
-          verticalAlignment(props.alignment) !== undefined
-            ? bbox.height
-            : undefined,
-      },
+        bbox: {
+          left:
+            horizontalAlignment(props.alignment) !== undefined
+              ? bbox.left
+              : undefined,
+          width:
+            horizontalAlignment(props.alignment) !== undefined
+              ? bbox.width
+              : undefined,
+          top:
+            verticalAlignment(props.alignment) !== undefined
+              ? bbox.top
+              : undefined,
+          height:
+            verticalAlignment(props.alignment) !== undefined
+              ? bbox.height
+              : undefined,
+        },
+      };
     };
-  };
 
-  const paint = (paintProps: {
-    bbox: BBox.BBox;
-    transform: Transform;
-    children: JSX.Element;
-  }) => {
+    const paint = (paintProps: {
+      bbox: BBox.BBox;
+      transform: Transform;
+      children: JSX.Element;
+    }) => {
+      return (
+        <g
+          transform={`translate(${paintProps.transform.translate.x ?? 0}, ${
+            paintProps.transform.translate.y ?? 0
+          })`}
+        >
+          {paintProps.children}
+        </g>
+      );
+    };
+
     return (
-      <g
-        transform={`translate(${paintProps.transform.translate.x ?? 0}, ${
-          paintProps.transform.translate.y ?? 0
-        })`}
-      >
-        {paintProps.children}
-      </g>
+      <Layout name={props.name} layout={layout} paint={paint}>
+        {props.children}
+      </Layout>
     );
-  };
-
-  return (
-    <Layout name={props.name} layout={layout} paint={paint}>
-      {props.children}
-    </Layout>
-  );
-});
+  },
+  { displayName: "Align" }
+);
 
 export default Align;
