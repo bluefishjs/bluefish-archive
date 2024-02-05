@@ -18,14 +18,18 @@ export const IdContext = createContext<Accessor<Id | undefined>>(
 );
 
 export function withBluefish<ComponentProps>(
-  WrappedComponent: Component<WithBluefishProps<ComponentProps>>
+  WrappedComponent: Component<WithBluefishProps<ComponentProps>>,
+  options?: { displayName?: string }
 ) {
   return function (props: Omit<ComponentProps, "name"> & { name?: Id }) {
     // scenegraph id
     const contextId = useContext(IdContext);
     const parentScopeId = useContext(ParentScopeIdContext);
-    const genId = createUniqueId();
-    const genScopeId = createUniqueId();
+    const displayNamePrefix =
+      options?.displayName !== undefined ? `${options?.displayName}(` : "";
+    const displayNameSuffix = options?.displayName !== undefined ? ")" : "";
+    const genId = `${displayNamePrefix}${createUniqueId()}${displayNameSuffix}`;
+    const genScopeId = `${displayNamePrefix}${createUniqueId()}${displayNameSuffix}`;
     // const id = () => props.name ?? contextId() ?? genId;
     const id = () => contextId() ?? genId;
     const scopeId = () => props.name ?? genScopeId;

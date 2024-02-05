@@ -9,6 +9,7 @@ import {
   Id,
   BBox,
   ChildNode,
+  Scenegraph,
 } from "./scenegraph";
 import {
   JSX,
@@ -20,6 +21,10 @@ import {
 } from "solid-js";
 import { ParentScopeIdContext, Scope, ScopeContext } from "./createName";
 import { createStore } from "solid-js/store";
+import { ErrorContext, createErrorContext } from "./errorContext";
+import { BluefishError } from "./errors";
+import { getAncestorChain } from "./util/lca";
+import toast, { Toaster } from "solid-toast";
 
 export type BluefishProps = ParentProps<{
   width?: number;
@@ -36,6 +41,32 @@ declare global {
   }
 }
 
+const createResolveScopeName = (scope: Scope) => (id: Id) => {
+  for (const [name, value] of Object.entries(scope)) {
+    if (value.layoutNode === id) {
+      return name;
+    }
+  }
+
+  return id;
+};
+
+const createOnError =
+  (scenegraph: Scenegraph, scope: Scope) => (error: BluefishError) => {
+    const resolveScopeName = createResolveScopeName(scope);
+    const errorMessage = `Error in ${resolveScopeName(error.source)}:
+    ${error.display(resolveScopeName)} (${error.type})
+
+Error path from root:
+  ${getAncestorChain(scenegraph, error.source)
+    .concat([error.source])
+    .map((id) => resolveScopeName(id))
+    .join(" >>\n  ")}`;
+
+    console.error(errorMessage);
+    // toast.error(errorMessage);
+  };
+
 export function Bluefish(props: BluefishProps) {
   props = mergeProps(
     {
@@ -48,9 +79,10 @@ export function Bluefish(props: BluefishProps) {
   const scenegraphContext = createScenegraph();
   const { scenegraph, createNode } = scenegraphContext;
   const [scope, setScope] = createStore<Scope>({});
+  const errorContext = createErrorContext(createOnError(scenegraph, scope));
 
-  const autoGenId = createUniqueId();
-  const autoGenScopeId = createUniqueId();
+  const autoGenId = `Bluefish(${createUniqueId()})`;
+  const autoGenScopeId = `Bluefish(${createUniqueId()})`;
   const id = autoGenId;
   const scopeId = props.id ?? autoGenScopeId;
 
@@ -127,17 +159,26 @@ export function Bluefish(props: BluefishProps) {
 
   return (
     <>
-      <ScenegraphContext.Provider value={scenegraphContext}>
-        <ScopeContext.Provider value={[scope, setScope]}>
-          <Layout name={id} layout={layout} paint={paint}>
-            <ParentScopeIdContext.Provider value={() => scopeId}>
-              <ParentIDContext.Provider value={id}>
-                {props.children}
-              </ParentIDContext.Provider>
-            </ParentScopeIdContext.Provider>
-          </Layout>
-        </ScopeContext.Provider>
-      </ScenegraphContext.Provider>
+      <ErrorContext.Provider value={errorContext}>
+        <ScenegraphContext.Provider value={scenegraphContext}>
+          <ScopeContext.Provider value={[scope, setScope]}>
+            <Layout name={id} layout={layout} paint={paint}>
+              <ParentScopeIdContext.Provider value={() => scopeId}>
+                <ParentIDContext.Provider value={id}>
+                  {props.children}
+                </ParentIDContext.Provider>
+              </ParentScopeIdContext.Provider>
+            </Layout>
+          </ScopeContext.Provider>
+        </ScenegraphContext.Provider>
+      </ErrorContext.Provider>
+      <Toaster
+        position="top-left"
+        containerStyle={{
+          position: "relative",
+          width: "500px",
+        }}
+      />
       <Show when={props.debug === true}>
         <br />
         <div style={{ float: "left", "margin-right": "40px" }}>

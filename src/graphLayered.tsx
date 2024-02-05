@@ -59,109 +59,112 @@ export const Edge = withBluefish((props: EdgeProps) => {
   return props as unknown as JSX.Element;
 });
 
-export const GraphLayered = withBluefish((props: GraphLayeredProps) => {
-  props = mergeProps(
-    {
-      direction: "top-bottom" as const,
-    },
-    props
-  );
+export const GraphLayered = withBluefish(
+  (props: GraphLayeredProps) => {
+    props = mergeProps(
+      {
+        direction: "top-bottom" as const,
+      },
+      props
+    );
 
-  const nodesAndEdges = children(() => props.children) as unknown as () => (
-    | NodeProps
-    | EdgeProps
-  )[];
+    const nodesAndEdges = children(() => props.children) as unknown as () => (
+      | NodeProps
+      | EdgeProps
+    )[];
 
-  const nodes = () =>
-    nodesAndEdges().filter((node) => node.type === "node") as NodeProps[];
-  const edges = () =>
-    nodesAndEdges().filter((node) => node.type === "edge") as EdgeProps[];
+    const nodes = () =>
+      nodesAndEdges().filter((node) => node.type === "node") as NodeProps[];
+    const edges = () =>
+      nodesAndEdges().filter((node) => node.type === "edge") as EdgeProps[];
 
-  const layout = (childNodes: ChildNode[]) => {
-    // Create a new directed graph
-    const g = new dagre.graphlib.Graph();
+    const layout = (childNodes: ChildNode[]) => {
+      // Create a new directed graph
+      const g = new dagre.graphlib.Graph();
 
-    // Set an object for the graph label
-    g.setGraph({
-      rankdir: convertDirection[props.direction!],
-    });
-
-    // Default to assigning a new object as a label for each new edge.
-    g.setDefaultEdgeLabel(function () {
-      return {};
-    });
-
-    const nodesSnapshot = nodes();
-
-    for (const nodeIdx in childNodes) {
-      g.setNode(nodesSnapshot[nodeIdx].id, {
-        width: childNodes[nodeIdx].bbox.width,
-        height: childNodes[nodeIdx].bbox.height,
+      // Set an object for the graph label
+      g.setGraph({
+        rankdir: convertDirection[props.direction!],
       });
-    }
 
-    // TODO: add code that asserts that the positions aren't fixed and the widths and heights are known
+      // Default to assigning a new object as a label for each new edge.
+      g.setDefaultEdgeLabel(function () {
+        return {};
+      });
 
-    const edgesSnapshot = edges();
+      const nodesSnapshot = nodes();
 
-    // Add edges to the graph.
-    for (const edge of edgesSnapshot) {
-      g.setEdge(edge.source, edge.target);
-    }
-
-    dagre.layout(g);
-
-    for (const node of g.nodes()) {
-      // to find the childNode, we have to find the index of the id in the nodesSnapshot, then use
-      // that in the childNodes array
-      const childNode =
-        childNodes[
-          nodesSnapshot.findIndex((childNode) => childNode.id === node)
-        ];
-      if (!childNode) {
-        throw new Error(`Couldn't find node ${node}`);
+      for (const nodeIdx in childNodes) {
+        g.setNode(nodesSnapshot[nodeIdx].id, {
+          width: childNodes[nodeIdx].bbox.width,
+          height: childNodes[nodeIdx].bbox.height,
+        });
       }
 
-      childNode.bbox.left = g.node(node).x;
-      childNode.bbox.top = g.node(node).y;
-    }
+      // TODO: add code that asserts that the positions aren't fixed and the widths and heights are known
 
-    /* 
+      const edgesSnapshot = edges();
+
+      // Add edges to the graph.
+      for (const edge of edgesSnapshot) {
+        g.setEdge(edge.source, edge.target);
+      }
+
+      dagre.layout(g);
+
+      for (const node of g.nodes()) {
+        // to find the childNode, we have to find the index of the id in the nodesSnapshot, then use
+        // that in the childNodes array
+        const childNode =
+          childNodes[
+            nodesSnapshot.findIndex((childNode) => childNode.id === node)
+          ];
+        if (!childNode) {
+          throw new Error(`Couldn't find node ${node}`);
+        }
+
+        childNode.bbox.left = g.node(node).x;
+        childNode.bbox.top = g.node(node).y;
+      }
+
+      /* 
     TODO: draw arrows???
      */
 
-    const bbox = BBoxUtil.from(childNodes.map((childId) => childId.bbox));
+      const bbox = BBoxUtil.from(childNodes.map((childId) => childId.bbox));
 
-    return {
-      bbox,
-      transform: {
-        translate: {
-          x: maybeSub(props.x, bbox.left),
-          y: maybeSub(props.y, bbox.top),
+      return {
+        bbox,
+        transform: {
+          translate: {
+            x: maybeSub(props.x, bbox.left),
+            y: maybeSub(props.y, bbox.top),
+          },
         },
-      },
+      };
     };
-  };
 
-  const paint = (paintProps: {
-    bbox: BBox;
-    transform: Transform;
-    children: JSX.Element;
-  }) => {
+    const paint = (paintProps: {
+      bbox: BBox;
+      transform: Transform;
+      children: JSX.Element;
+    }) => {
+      return (
+        <g
+          transform={`translate(${paintProps.transform.translate.x ?? 0}, ${
+            paintProps.transform.translate.y ?? 0
+          })`}
+        >
+          {paintProps.children}
+        </g>
+      );
+    };
+
     return (
-      <g
-        transform={`translate(${paintProps.transform.translate.x ?? 0}, ${
-          paintProps.transform.translate.y ?? 0
-        })`}
-      >
-        {paintProps.children}
-      </g>
+      <Layout name={props.name} layout={layout} paint={paint}>
+        <For each={nodes()}>{(node) => node.children}</For>
+      </Layout>
     );
-  };
-
-  return (
-    <Layout name={props.name} layout={layout} paint={paint}>
-      <For each={nodes()}>{(node) => node.children}</For>
-    </Layout>
-  );
-});
+  },
+  { displayName: "GraphLayered" }
+);

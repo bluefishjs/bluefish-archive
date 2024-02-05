@@ -1,6 +1,6 @@
 {
   "name": "@bluefish-js/solid",
-  "version": "0.0.22",
+  "version": "0.0.23",
   "description": "A SolidJS diagramming library",
   "type": "module",
   "files": [
@@ -64,7 +64,8 @@
     "paper": "^0.12.17",
     "perfect-arrows": "^0.3.7",
     "reduce-css-calc": "^2.1.8",
-    "smiles-drawer": "^2.1.7"
+    "smiles-drawer": "^2.1.7",
+    "solid-toast": "^0.5.0"
   },
   "peerDependencies": {
     "solid-js": "^1.7.7"
