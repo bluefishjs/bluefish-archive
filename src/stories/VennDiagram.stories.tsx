@@ -25,7 +25,6 @@ const VennDiagram = withBluefish((props: VennDiagramProps) => {
         <>
           <Background
             padding={20}
-            name="b1"
             background={() => <Circle r={55} fill="none" stroke="black" />}
           >
             <Ref select="objOne" />
@@ -33,7 +32,6 @@ const VennDiagram = withBluefish((props: VennDiagramProps) => {
           </Background>
           <Background
             padding={20}
-            name="b2"
             background={() => <Circle r={55} fill="none" stroke="black" />}
           >
             <Ref select="objTwo" />
