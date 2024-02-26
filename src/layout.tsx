@@ -18,6 +18,7 @@ import {
 } from "./scenegraph";
 import { IdContext } from "./withBluefish";
 import { ScopeContext } from "./createName";
+import { useError } from "./errorContext";
 
 export type LayoutProps = ParentProps<{
   name: Id;
@@ -34,6 +35,7 @@ export type LayoutProps = ParentProps<{
 export const Layout: Component<LayoutProps> = (props) => {
   const parentId = useContext(ParentIDContext);
   const [_scope, setScope] = useContext(ScopeContext);
+  const error = useError();
 
   const { scenegraph, createNode, deleteNode, setLayout } =
     UNSAFE_useScenegraph();
@@ -43,7 +45,7 @@ export const Layout: Component<LayoutProps> = (props) => {
   });
 
   onCleanup(() => {
-    deleteNode(props.name, setScope);
+    deleteNode(error, props.name, setScope);
   });
 
   // evaluate the child props before running the effect so that children's layout functions are
