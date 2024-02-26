@@ -132,9 +132,11 @@ export const createScenegraph = (): ScenegraphContextType => {
     }
   };
 
-  const deleteNode = (id: Id, setScope: SetStoreFunction<Scope>) => {
-    const error = useError();
-
+  const deleteNode = (
+    error: (error: BluefishError) => void,
+    id: Id,
+    setScope: SetStoreFunction<Scope>
+  ) => {
     const node = scenegraph[id];
 
     if (node === undefined) {
@@ -969,7 +971,11 @@ the align node.
 export type ScenegraphContextType = {
   scenegraph: Scenegraph;
   createNode: (id: Id, parentId: Id | null) => void;
-  deleteNode: (id: Id, setScope: SetStoreFunction<Scope>) => void;
+  deleteNode: (
+    error: (error: BluefishError) => void,
+    id: Id,
+    setScope: SetStoreFunction<Scope>
+  ) => void;
   createRef: (id: Id, refId: Id, parentId: Id) => void;
   deleteRef: (error: (error: BluefishError) => void, id: Id) => void;
   resolveRef: (
