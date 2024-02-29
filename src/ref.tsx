@@ -8,6 +8,7 @@ import {
 import { Id, UNSAFE_useScenegraph, ParentIDContext } from "./scenegraph";
 import withBluefish from "./withBluefish";
 import { Name, Scope, ScopeContext } from "./createName";
+import { useError } from "./errorContext";
 
 // The properties we want:
 // every time the refId's bbox is updated, it should be propagated to the id
@@ -78,29 +79,35 @@ export const resolveSelection = (
   return layoutId;
 };
 
-export const Ref = withBluefish((props: RefProps) => {
-  const parentId = useContext(ParentIDContext);
-  const [scope] = useContext(ScopeContext);
-  const { createRef } = UNSAFE_useScenegraph();
+export const Ref = withBluefish(
+  (props: RefProps) => {
+    const error = useError();
+    const parentId = useContext(ParentIDContext);
+    const [scope] = useContext(ScopeContext);
+    const { createRef, deleteRef } = UNSAFE_useScenegraph();
 
-  if (parentId === null) {
-    throw new Error("Ref must be a child of a Layout");
-  }
+    if (parentId === null) {
+      throw new Error("Ref must be a child of a Layout");
+    }
 
-  // TODO: what do we do if the layout node isn't defined?
-  createRenderEffect(() => {
-    const normalizedSelection = normalizeSelection(props.select);
+    // TODO: what do we do if the layout node isn't defined?
+    createRenderEffect(() => {
+      const normalizedSelection = normalizeSelection(props.select);
 
-    createRef(
-      props.name,
-      resolveSelection(scope, normalizedSelection),
-      parentId
-    );
+      createRef(
+        props.name,
+        resolveSelection(scope, normalizedSelection),
+        parentId
+      );
 
-    // TODO: cleanup
-  });
+      onCleanup(() => {
+        deleteRef(error, props.name);
+      });
+    });
 
-  return <></>;
-});
+    return <></>;
+  },
+  { displayName: "Ref" }
+);
 
 export default Ref;

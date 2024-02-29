@@ -44,7 +44,44 @@ const PythonTutor = withBluefish((props: PythonTutorProps) => {
   });
 
   return (
-    <Group>
+    <Group
+      rels={() => (
+        <>
+          {/* Make arrows from stack slots to heap objects */}
+          <For each={props.stack}>
+            {(stackSlot, stackSlotIndex) =>
+              typeof stackSlot.value === "object" &&
+              "type" in stackSlot.value &&
+              stackSlot.value.type === "pointer" ? (
+                <Arrow
+                  bow={0}
+                  stretch={0}
+                  flip
+                  stroke="#1A5683"
+                  padStart={0}
+                  start
+                >
+                  <Ref
+                    select={[
+                      globalFrameName,
+                      `stackSlot-${stackSlotIndex()}`,
+                      "value",
+                    ]}
+                  />
+                  <Ref
+                    select={[
+                      heapName,
+                      `address-${stackSlot.value.value}`,
+                      "elm-0",
+                    ]}
+                  />
+                </Arrow>
+              ) : null
+            }
+          </For>
+        </>
+      )}
+    >
       <StackH alignment="top" spacing={60}>
         <GlobalFrame name={globalFrameName} variables={props.stack} />
         <Heap
@@ -53,28 +90,6 @@ const PythonTutor = withBluefish((props: PythonTutorProps) => {
           heapArrangement={props.heapArrangement}
         />
       </StackH>
-
-      {/* Make arrows from stack slots to heap objects */}
-      <For each={props.stack}>
-        {(stackSlot, stackSlotIndex) =>
-          typeof stackSlot.value === "object" &&
-          "type" in stackSlot.value &&
-          stackSlot.value.type === "pointer" ? (
-            <Arrow bow={0} stretch={0} flip stroke="#1A5683" padStart={0} start>
-              <Ref
-                select={[
-                  globalFrameName,
-                  `stackSlot-${stackSlotIndex()}`,
-                  "value",
-                ]}
-              />
-              <Ref
-                select={[heapName, `address-${stackSlot.value.value}`, "elm-0"]}
-              />
-            </Arrow>
-          ) : null
-        }
-      </For>
     </Group>
   );
 });

@@ -1,15 +1,13 @@
 import {
   Accessor,
   Component,
-  JSX,
   createContext,
-  createMemo,
   createUniqueId,
-  mergeProps,
   useContext,
 } from "solid-js";
 import { Id } from "./scenegraph";
 import { ParentScopeIdContext, ScopeContext } from "./createName";
+import { Dynamic } from "solid-js/web";
 
 export type WithBluefishProps<T = object> = T & {
   name: Id;
@@ -20,14 +18,18 @@ export const IdContext = createContext<Accessor<Id | undefined>>(
 );
 
 export function withBluefish<ComponentProps>(
-  WrappedComponent: Component<WithBluefishProps<ComponentProps>>
+  WrappedComponent: Component<WithBluefishProps<ComponentProps>>,
+  options?: { displayName?: string }
 ) {
   return function (props: Omit<ComponentProps, "name"> & { name?: Id }) {
     // scenegraph id
     const contextId = useContext(IdContext);
     const parentScopeId = useContext(ParentScopeIdContext);
-    const genId = createUniqueId();
-    const genScopeId = createUniqueId();
+    const displayNamePrefix =
+      options?.displayName !== undefined ? `${options?.displayName}(` : "";
+    const displayNameSuffix = options?.displayName !== undefined ? ")" : "";
+    const genId = `${displayNamePrefix}${createUniqueId()}${displayNameSuffix}`;
+    const genScopeId = `${displayNamePrefix}${createUniqueId()}${displayNameSuffix}`;
     // const id = () => props.name ?? contextId() ?? genId;
     const id = () => contextId() ?? genId;
     const scopeId = () => props.name ?? genScopeId;
@@ -49,7 +51,8 @@ export function withBluefish<ComponentProps>(
     return (
       <ParentScopeIdContext.Provider value={scopeId}>
         <IdContext.Provider value={id}>
-          <WrappedComponent
+          <Dynamic
+            component={WrappedComponent}
             {...(props as WithBluefishProps<ComponentProps>)}
             name={id()}
           />

@@ -1,4 +1,5 @@
 {
+  "exclude": ["node_modules", "dist"],
   "compilerOptions": {
     "strict": true,
     "target": "ESNext",
@@ -9,7 +10,10 @@
     "jsx": "preserve",
     "jsxImportSource": "solid-js",
     "types": ["vite/client"],
-    "noEmit": true,
-    "isolatedModules": true
+    "emitDeclarationOnly": true,
+    "isolatedModules": true,
+    "declaration": true,
+    "declarationDir": "dist",
+    "declarationMap": true
   }
 }

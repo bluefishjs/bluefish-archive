@@ -9,10 +9,22 @@ import {
   Id,
   BBox,
   ChildNode,
+  Scenegraph,
 } from "./scenegraph";
-import { JSX, ParentProps, Show, createUniqueId, mergeProps } from "solid-js";
+import {
+  JSX,
+  ParentProps,
+  Show,
+  createEffect,
+  createUniqueId,
+  mergeProps,
+} from "solid-js";
 import { ParentScopeIdContext, Scope, ScopeContext } from "./createName";
 import { createStore } from "solid-js/store";
+import { ErrorContext, createErrorContext } from "./errorContext";
+import { BluefishError } from "./errors";
+import { getAncestorChain } from "./util/lca";
+import toast, { Toaster } from "solid-toast";
 
 export type BluefishProps = ParentProps<{
   width?: number;
@@ -29,6 +41,32 @@ declare global {
   }
 }
 
+const createResolveScopeName = (scope: Scope) => (id: Id) => {
+  for (const [name, value] of Object.entries(scope)) {
+    if (value.layoutNode === id) {
+      return name;
+    }
+  }
+
+  return id;
+};
+
+const createOnError =
+  (scenegraph: Scenegraph, scope: Scope) => (error: BluefishError) => {
+    const resolveScopeName = createResolveScopeName(scope);
+    const errorMessage = `Error in ${resolveScopeName(error.source)}:
+    ${error.display(resolveScopeName)} (${error.type})
+
+Error path from root:
+  ${getAncestorChain(scenegraph, error.source)
+    .concat([error.source])
+    .map((id) => resolveScopeName(id))
+    .join(" >>\n  ")}`;
+
+    console.error(errorMessage);
+    // toast.error(errorMessage);
+  };
+
 export function Bluefish(props: BluefishProps) {
   props = mergeProps(
     {
@@ -38,43 +76,16 @@ export function Bluefish(props: BluefishProps) {
     props
   );
 
-  // const bboxStore = useMemo(() => observable.map(), []);
-  // const bboxStore = useMemo(() => createScenegraph(), []);
-  // const bboxStore = createScenegraph();
   const scenegraphContext = createScenegraph();
   const { scenegraph, createNode } = scenegraphContext;
   const [scope, setScope] = createStore<Scope>({});
+  const errorContext = createErrorContext(createOnError(scenegraph, scope));
 
-  // const autoGenId = useId();
-  const autoGenId = createUniqueId();
-  const autoGenScopeId = createUniqueId();
+  const autoGenId = `Bluefish(${createUniqueId()})`;
+  const autoGenScopeId = `Bluefish(${createUniqueId()})`;
   const id = autoGenId;
   const scopeId = props.id ?? autoGenScopeId;
-  // const wroteToWindow = useRef(false);
 
-  // useEffect(() => {
-  //   if (window.bluefish === undefined) {
-  //     window.bluefish = {};
-  //   }
-
-  //   if (window.bluefish[id] !== undefined) {
-  //     console.error(`Duplicate id ${id}. Not writing to window.bluefish`);
-  //   } else {
-  //     window.bluefish[id] = scenegraph;
-  //     wroteToWindow.current = true;
-  //   }
-
-  //   return () => {
-  //     if (window.bluefish !== undefined && wroteToWindow.current) {
-  //       delete window.bluefish[id];
-  //       wroteToWindow.current = false;
-  //     }
-  //   };
-  // });
-
-  if (scenegraph[id] === undefined) {
-    createNode(id, null);
-  }
   const layout = (childNodes: ChildNode[]) => {
     for (const childNode of childNodes) {
       if (!childNode.owned.left) {
@@ -141,24 +152,33 @@ export function Bluefish(props: BluefishProps) {
           (props.positioning === "absolute" ? 0 : paintProps.bbox.top ?? 0)
         } ${width()} ${height()}`}
       >
-        {props.children}
+        {paintProps.children}
       </svg>
     );
   };
 
   return (
     <>
-      <ScenegraphContext.Provider value={scenegraphContext}>
-        <ScopeContext.Provider value={[scope, setScope]}>
-          <Layout name={id} layout={layout} paint={paint}>
-            <ParentScopeIdContext.Provider value={() => scopeId}>
-              <ParentIDContext.Provider value={id}>
-                {props.children}
-              </ParentIDContext.Provider>
-            </ParentScopeIdContext.Provider>
-          </Layout>
-        </ScopeContext.Provider>
-      </ScenegraphContext.Provider>
+      <ErrorContext.Provider value={errorContext}>
+        <ScenegraphContext.Provider value={scenegraphContext}>
+          <ScopeContext.Provider value={[scope, setScope]}>
+            <Layout name={id} layout={layout} paint={paint}>
+              <ParentScopeIdContext.Provider value={() => scopeId}>
+                <ParentIDContext.Provider value={id}>
+                  {props.children}
+                </ParentIDContext.Provider>
+              </ParentScopeIdContext.Provider>
+            </Layout>
+          </ScopeContext.Provider>
+        </ScenegraphContext.Provider>
+      </ErrorContext.Provider>
+      <Toaster
+        position="top-left"
+        containerStyle={{
+          position: "relative",
+          width: "500px",
+        }}
+      />
       <Show when={props.debug === true}>
         <br />
         <div style={{ float: "left", "margin-right": "40px" }}>

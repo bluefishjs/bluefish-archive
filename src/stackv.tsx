@@ -10,14 +10,17 @@ export type StackVProps = ParentProps<
   Omit<StackArgs, "direction"> & { alignment?: AlignmentHorizontal }
 >;
 
-export const StackV = withBluefish((props: StackVProps) => {
-  const stackProps = mergeProps(
-    {
-      direction: "vertical" as const,
-      alignment: "centerX" as const,
-    },
-    props
-  );
+export const StackV = withBluefish(
+  (props: StackVProps) => {
+    const stackProps = mergeProps(
+      {
+        direction: "vertical" as const,
+        alignment: "centerX" as const,
+      },
+      props
+    );
 
-  return <Stack {...stackProps} />;
-});
+    return <Stack {...stackProps} />;
+  },
+  { displayName: "StackV" }
+);

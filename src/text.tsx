@@ -9,83 +9,84 @@ import splitAtDelimiters from "./text/splitAtDelimiters";
 
 const SVG_STYLE = { overflow: "visible" };
 
-export const Text = withBluefish((props: TextProps) => {
-  props = mergeProps(
-    {
-      // dx: 0,
-      // dy: 0,
-      "text-anchor": "start" as const,
-      "vertical-anchor": "end" as const,
-      "line-height": "1em",
-      "cap-height": "0.71em", // Magic number from d3
-      "font-family": "Alegreya Sans, sans-serif",
-      "font-weight": 700,
-      "font-size": "14",
-      x: 0,
-      y: 0,
-      delimiters: [
-        { left: "$$", right: "$$", display: true },
-        { left: "\\(", right: "\\)", display: false },
-        { left: "$", right: "$", display: false },
-        { left: "\\[", right: "\\]", display: true },
-      ],
-    },
-    props
-  );
-
-  const [_, textProps] = splitProps(props, [
-    "name",
-    "dx",
-    "dy",
-    "innerRef",
-    "innerTextRef",
-    "vertical-anchor",
-    "angle",
-    "line-height",
-    "scaleToFit",
-    "cap-height",
-    "width",
-    "delimiters",
-  ]);
-
-  // const textAndMathRegions = () =>
-  //   splitAtDelimiters(
-  //     props.children !== undefined ? `${props.children}` : "",
-  //     props.delimiters!
-  //   );
-
-  const { wordsByLines, startDy, transform } = useText(props);
-
-  const layout = () => {
-    const mergedProps = mergeProps(props, {
-      get wordsByLines() {
-        return wordsByLines();
+export const Text = withBluefish(
+  (props: TextProps) => {
+    props = mergeProps(
+      {
+        // dx: 0,
+        // dy: 0,
+        "text-anchor": "start" as const,
+        "vertical-anchor": "end" as const,
+        "line-height": "1em",
+        "cap-height": "0.71em", // Magic number from d3
+        "font-family": "Alegreya Sans, sans-serif",
+        "font-weight": 700,
+        "font-size": "14",
+        x: 0,
+        y: 0,
+        delimiters: [
+          { left: "$$", right: "$$", display: true },
+          { left: "\\(", right: "\\)", display: false },
+          { left: "$", right: "$", display: false },
+          { left: "\\[", right: "\\]", display: true },
+        ],
       },
-      get startDy() {
-        return startDy();
-      },
-      get transform() {
-        return transform();
-      },
-    });
+      props
+    );
 
-    const bbox = computeBoundingBox(mergedProps);
+    const [_, textProps] = splitProps(props, [
+      "name",
+      "dx",
+      "dy",
+      "innerRef",
+      "innerTextRef",
+      "vertical-anchor",
+      "angle",
+      "line-height",
+      "scaleToFit",
+      "cap-height",
+      "width",
+      "delimiters",
+    ]);
 
-    return {
-      bbox: {
-        left: bbox.x,
-        top: bbox.y,
-        width: bbox.width,
-        height: bbox.height,
-      },
-      transform: {
-        translate: {
-          x: props.dx !== undefined ? parseFloat(`${props.dx}`) : undefined,
-          y: props.dy !== undefined ? parseFloat(`${props.dy}`) : undefined,
+    // const textAndMathRegions = () =>
+    //   splitAtDelimiters(
+    //     props.children !== undefined ? `${props.children}` : "",
+    //     props.delimiters!
+    //   );
+
+    const { wordsByLines, startDy, transform } = useText(props);
+
+    const layout = () => {
+      const mergedProps = mergeProps(props, {
+        get wordsByLines() {
+          return wordsByLines();
         },
-      },
+        get startDy() {
+          return startDy();
+        },
+        get transform() {
+          return transform();
+        },
+      });
+
+      const bbox = computeBoundingBox(mergedProps);
+
+      return {
+        bbox: {
+          left: bbox.x,
+          top: bbox.y,
+          width: bbox.width,
+          height: bbox.height,
+        },
+        transform: {
+          translate: {
+            x: props.dx !== undefined ? parseFloat(`${props.dx}`) : undefined,
+            y: props.dy !== undefined ? parseFloat(`${props.dy}`) : undefined,
+          },
+        },
+      };
     };
-  };
 
   const paint = (paintProps: { bbox: BBox; transform: Transform }) => {
     const horizontalAnchorOffset = () => {
@@ -125,8 +126,9 @@ export const Text = withBluefish((props: TextProps) => {
       </g>
     );
   };
-
-  return <Layout name={props.name} layout={layout} paint={paint} />;
-});
+    return <Layout name={props.name} layout={layout} paint={paint} />;
+  },
+  { displayName: "Text" }
+);
 
 export default Text;
