@@ -44,9 +44,9 @@ export const Layout: Component<LayoutProps> = (props) => {
     createNode(props.name, parentId);
   });
 
-  onCleanup(() => {
-    deleteNode(error, props.name, setScope);
-  });
+  // onCleanup(() => {
+  //   deleteNode(error, props.name, setScope);
+  // });
 
   // evaluate the child props before running the effect so that children's layout functions are
   // called before the parent's layout function

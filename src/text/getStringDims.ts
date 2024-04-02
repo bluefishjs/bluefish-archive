@@ -34,7 +34,7 @@ function getStringDims(str: string, style?: TextProps) {
       height: style !== undefined ? parseFloat(`${style["font-size"]}`) : 0,
     };
   } catch (e) {
-    console.error(e);
+    // console.error(e);
     return null;
   }
 }

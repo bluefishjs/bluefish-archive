@@ -63,7 +63,7 @@ Error path from root:
     .map((id) => resolveScopeName(id))
     .join(" >>\n  ")}`;
 
-    console.error(errorMessage);
+    // console.error(errorMessage);
     // toast.error(errorMessage);
   };
 

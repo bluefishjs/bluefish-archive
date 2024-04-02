@@ -78,20 +78,48 @@ export type Scenegraph = {
 };
 
 // Propagates bbox dims to other dims that can be inferred
+// export function propagateBBoxValues(bbox: BBox, owners: BBoxOwners): void {
+//   // const inferredBBox = { ...bbox };
+
+//   inferenceRules.forEach((rule) => {
+//     if (
+//       rule.from.every((key) => bbox[key] !== undefined) &&
+//       bbox[rule.to] === undefined
+//     ) {
+//       bbox[rule.to] = rule.calculate(rule.from.map((key) => bbox[key]!));
+//       owners[rule.to] = inferred;
+//     }
+//   });
+// }
 export function propagateBBoxValues(bbox: BBox, owners: BBoxOwners): void {
-  // const inferredBBox = { ...bbox };
+  // Pre-caching the bbox keys can sometimes speed up access in some JS engines.
+  const bboxKeys = new Set(Object.keys(bbox));
 
   inferenceRules.forEach((rule) => {
-    if (
-      rule.from.every((key) => bbox[key] !== undefined) &&
-      bbox[rule.to] === undefined
-    ) {
-      bbox[rule.to] = rule.calculate(rule.from.map((key) => bbox[key]!));
+    // Check if 'to' key is already defined to avoid unnecessary work.
+    if (bboxKeys.has(rule.to)) {
+      return;
+    }
+
+    // Check if all 'from' keys are in bbox and cache values to avoid mapping later.
+    const fromValues: any[] = [];
+    let allFromKeysPresent = true;
+    for (const key of rule.from) {
+      if (!bboxKeys.has(key)) {
+        allFromKeysPresent = false;
+        break;
+      }
+      fromValues.push(bbox[key]);
+    }
+
+    if (allFromKeysPresent) {
+      bbox[rule.to] = rule.calculate(fromValues);
       owners[rule.to] = inferred;
+      // Add the newly added key to bboxKeys to avoid recalculating it.
+      bboxKeys.add(rule.to);
     }
   });
 }
-
 export const createScenegraph = (): ScenegraphContextType => {
   const [scenegraph, setScenegraph] = createStore<Scenegraph>({});
 

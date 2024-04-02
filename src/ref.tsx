@@ -100,9 +100,9 @@ export const Ref = withBluefish(
         parentId
       );
 
-      onCleanup(() => {
-        deleteRef(error, props.name);
-      });
+      // onCleanup(() => {
+      //   deleteRef(error, props.name);
+      // });
     });
 
     return <></>;

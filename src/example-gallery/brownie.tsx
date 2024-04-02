@@ -62,10 +62,11 @@ const CellBorder = withBluefish((props: {name?: Id; strokeWidth?: number; horizo
 
 export const Brownies = () => {
   return (
-    <Bluefish x={0} y={0}>
+    <Bluefish>
       <Background
         padding={100}
         background={() => <Rect fill="#7CD4AC" opacity={0.3} />}
+        x={0} y={0}
       >
          <Background
           padding={0}
