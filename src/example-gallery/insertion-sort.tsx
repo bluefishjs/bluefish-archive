@@ -14,6 +14,7 @@ import { StackV } from "../stackv";
 import withBluefish from "../withBluefish";
 import Text from "../text";
 import Align from "../align";
+import { sortProps } from "./testing/insertionSortProps";
 
 // so that colors in this diagram match the colors of the original diagram
 const color = (t) => {
@@ -196,8 +197,10 @@ const InsertionSortDiagram = withBluefish((props) => {
 
 export const InsertionSort = () => {
   return (
-    <Bluefish>
-      <InsertionSortDiagram unsortedArray={[43, 9, 15, 95, 5, 23, 75]} />
+    <Bluefish debug={false}>
+      {/* <InsertionSortDiagram unsortedArray={[43, 9, 15, 95, 5, 23, 75]} /> */}
+
+      <InsertionSortDiagram unsortedArray={sortProps} />
     </Bluefish>
   );
 };

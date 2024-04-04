@@ -100,7 +100,7 @@ def generate_program_and_props(num_variables, min_size, max_size, max_depth):
     return program, props, total_size
 
 # Variables
-num_variables = 750 # controls how many variables are generated in global frame
+num_variables = 125 # controls how many variables are generated in global frame
 min_size = 1 # controls min size of tuples
 max_size = 3 # controls max size of tuples
 max_depth = 5 # controls max level of nesting (level for array of arrays)
