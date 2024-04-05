@@ -1,14 +1,10 @@
 import {
-    JSX,
-    ParentProps,
     Show,
-    createEffect,
     mergeProps,
-    untrack,
   } from "solid-js";
   import Layout from "../layout";
   import withBluefish from "../withBluefish";
-  import _, { get, startsWith } from "lodash";
+  import _ from "lodash";
   
   const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
   const lerp = (num, min, max) => min + (max - min) * num;
@@ -46,7 +42,7 @@ import {
   
         const fromBBox = childIds[0].bbox;
         const toBBox = childIds[1].bbox;
-  
+        
         const data = {
           fromX: fromBBox.left + fromBBox.width / 2,
           fromY: fromBBox.top + fromBBox.height / 2,
@@ -82,10 +78,10 @@ import {
           };
         } else {
           customData = {
-            fromX: maybeLerp(0.5, fromBBox.left, fromBBox.right),
-            fromY: maybeLerp(0.5, fromBBox.top, fromBBox.bottom),
-            toX: maybeLerp(0.5, toBBox.left, toBBox.right),
-            toY: maybeLerp(0.5, toBBox.top, toBBox.bottom),
+            fromX: maybeClamp(data.toX, fromBBox.left, fromBBox.right),
+            fromY: maybeClamp(data.toY, fromBBox.top, fromBBox.bottom),
+            toX: maybeClamp(data.fromX, toBBox.left, toBBox.right),
+            toY: maybeClamp(data.fromY, toBBox.top, toBBox.bottom),
           };
         }
   
@@ -96,7 +92,7 @@ import {
         const bottom = maybeMax(customData.fromY, customData.toY);
         const width = maybeSub(right, left);
         const height = maybeSub(bottom, top);
-  
+        
         return {
           transform: {
             translate: {
@@ -105,18 +101,18 @@ import {
             },
           },
           bbox: { left, top, right, bottom, width, height },
-          customData,
+          customData: customData,
         };
       };
   
       /*
-            {
-              bbox: BBox;
-              transform: Transform;
-              children: JSX.Element;
-              customData?: any;
-            }
-            */
+          {
+            bbox: BBox;
+            transform: Transform;
+            children: JSX.Element;
+            customData?: any;
+          }
+          */
       const paint = (paintProps) => {
         return (
           <Show

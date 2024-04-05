@@ -13,7 +13,6 @@ import { SetHorizontalLayout } from "./setWidth";
 import Text from "../text";
 import Align from "../align";
 import * as ohm from "ohm-js";
-import { expression } from "./testing/ohm_expression";
 
 const myGrammar = ohm.grammar(String.raw`
   Arithmetic {
@@ -281,13 +280,16 @@ const RenderTrace = withBluefish((props) => {
   }
 });
 
+type OhmParserProps = {
+  expression: string;
+}
 // TODO: synced text box
 // TODO: check if parse succeeds
 // TODO:
 //  - format RenderText chars differently if they are a symbol or char
 //  - OR (prob better): set with of chars based on the tree node's contents width
 
-export const OhmParser = () => {
+export const OhmParser = ({expression}: OhmParserProps) => {
   // const text = "3+(4*5)";
   const text = expression;
   const charAndNames = text.split("").map((char) => [char, createName(char)]);

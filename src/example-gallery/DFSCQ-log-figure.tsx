@@ -1,6 +1,6 @@
 import { SetHorizontalLayout } from "./setLayout";
 import { Path } from "./path";
-import { Line } from "./line";
+import { Line } from "./QCLine";
 import { For } from "solid-js";
 import Arrow from "../arrow";
 import Background from "../background";
