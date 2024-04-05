@@ -1,5 +1,5 @@
 import { Path } from "./path.js";
-import { Line } from "./QCLine.jsx";
+import { Line } from "./line.jsx";
 import Background from "../background.jsx";
 import Bluefish from "../bluefish.jsx";
 import Circle from "../circle.jsx";
