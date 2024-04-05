@@ -9,6 +9,16 @@ import { pointer } from "../python-tutor/types";
 import { Pulley } from "../example-gallery/pulley";
 import { QCText } from "../example-gallery/qc-text";
 import { Topology } from "../example-gallery/topology";
+import Arrow from "../arrow";
+import Background from "../background";
+import Circle from "../circle";
+import Distribute from "../distribute";
+import Rect from "../rect";
+import Ref from "../ref";
+import { StackH } from "../stackh";
+import { StackV } from "../stackv";
+import { Text } from "../text";
+import { Align } from "../align";
 
 const meta: Meta = {
   title: "Example/UIST Example Gallery",
@@ -16,6 +26,219 @@ const meta: Meta = {
 
 export default meta;
 type Story = StoryObj;
+
+export const PlanetsUIST: Story = {
+  render: () => {
+    return (
+      <>
+        {/* original */}
+        <Bluefish>
+          <Background padding={80} background={() => <Rect fill="#859fc9" />}>
+            <StackH spacing={50}>
+              <Circle
+                name="mercury"
+                r={15}
+                fill="#EBE3CF"
+                stroke-width={3}
+                stroke="black"
+              />
+              <Circle r={36} fill="#DC933C" stroke-width={3} stroke="black" />
+              <Circle r={38} fill="#179DD7" stroke-width={3} stroke="black" />
+              <Circle r={21} fill="#F1CF8E" stroke-width={3} stroke="black" />
+            </StackH>
+          </Background>
+          <Background
+            background={() => (
+              <Rect stroke="black" stroke-width={3} fill="none" rx={10} />
+            )}
+          >
+            <StackV spacing={30}>
+              <Text name="label">Mercury</Text>
+              <Ref select="mercury" />
+            </StackV>
+          </Background>
+        </Bluefish>
+
+        {/* change 1 */}
+        <Bluefish>
+          <Background padding={80} background={() => <Rect fill="#859fc9" />}>
+            <StackH spacing={50}>
+              <Circle
+                name="mercury"
+                r={15}
+                fill="#EBE3CF"
+                stroke-width={3}
+                stroke="black"
+              />
+              <Circle r={36} fill="#DC933C" stroke-width={3} stroke="black" />
+              <Circle r={38} fill="#179DD7" stroke-width={3} stroke="black" />
+              <Circle r={21} fill="#F1CF8E" stroke-width={3} stroke="black" />
+            </StackH>
+          </Background>
+          <Background
+            background={() => (
+              <Rect stroke="black" stroke-width={3} fill="none" rx={10} />
+            )}
+          >
+            <StackV spacing={30}>
+              <Ref select="mercury" />
+              <Text name="label">Mercury</Text>
+            </StackV>
+          </Background>
+        </Bluefish>
+
+        {/* change 2 */}
+        <Bluefish>
+          <Background padding={80} background={() => <Rect fill="#859fc9" />}>
+            <StackH spacing={50}>
+              <Circle
+                name="mercury"
+                r={15}
+                fill="#EBE3CF"
+                stroke-width={3}
+                stroke="black"
+              />
+              <Circle r={36} fill="#DC933C" stroke-width={3} stroke="black" />
+              <Circle r={38} fill="#179DD7" stroke-width={3} stroke="black" />
+              <Circle r={21} fill="#F1CF8E" stroke-width={3} stroke="black" />
+            </StackH>
+          </Background>
+          <StackV spacing={30} name="stack">
+            <Ref select="mercury" />
+            <Text name="label">Mercury</Text>
+          </StackV>
+          <Background
+            background={() => (
+              <Rect stroke="black" stroke-width={3} fill="none" rx={10} />
+            )}
+          >
+            <Ref select="stack" />
+          </Background>
+        </Bluefish>
+
+        {/* change 3 */}
+        <Bluefish>
+          <Background padding={80} background={() => <Rect fill="#859fc9" />}>
+            <StackH spacing={50}>
+              <Circle
+                name="mercury"
+                r={15}
+                fill="#EBE3CF"
+                stroke-width={3}
+                stroke="black"
+              />
+              <Circle r={36} fill="#DC933C" stroke-width={3} stroke="black" />
+              <Circle r={38} fill="#179DD7" stroke-width={3} stroke="black" />
+              <Circle r={21} fill="#F1CF8E" stroke-width={3} stroke="black" />
+            </StackH>
+          </Background>
+          <StackV spacing={30} name="stack">
+            <Ref select="mercury" />
+            <Text name="label">Mercury</Text>
+          </StackV>
+          <Background
+            background={() => (
+              <Rect stroke="black" stroke-width={3} fill="none" rx={10} />
+            )}
+          >
+            <Ref select="mercury" />
+            <Ref select="label" />
+          </Background>
+        </Bluefish>
+
+        {/* change 4 */}
+        <Bluefish>
+          <Background padding={80} background={() => <Rect fill="#859fc9" />}>
+            <StackH spacing={50}>
+              <Circle
+                name="mercury"
+                r={15}
+                fill="#EBE3CF"
+                stroke-width={3}
+                stroke="black"
+              />
+              <Circle r={36} fill="#DC933C" stroke-width={3} stroke="black" />
+              <Circle r={38} fill="#179DD7" stroke-width={3} stroke="black" />
+              <Circle r={21} fill="#F1CF8E" stroke-width={3} stroke="black" />
+            </StackH>
+          </Background>
+          <StackV spacing={30} name="stack">
+            <Ref select="mercury" />
+            <Text name="label">Mercury</Text>
+          </StackV>
+          <Arrow>
+            <Ref select="label" />
+            <Ref select="mercury" />
+          </Arrow>
+        </Bluefish>
+
+        {/* change 5 */}
+        <Bluefish>
+          <Background padding={80} background={() => <Rect fill="#859fc9" />}>
+            <StackH spacing={50}>
+              <Circle
+                name="mercury"
+                r={15}
+                fill="#EBE3CF"
+                stroke-width={3}
+                stroke="black"
+              />
+              <Circle r={36} fill="#DC933C" stroke-width={3} stroke="black" />
+              <Circle r={38} fill="#179DD7" stroke-width={3} stroke="black" />
+              <Circle r={21} fill="#F1CF8E" stroke-width={3} stroke="black" />
+            </StackH>
+          </Background>
+          <Distribute direction="vertical" spacing={30}>
+            <Ref select="mercury" />
+            <Text name="label">Mercury</Text>
+          </Distribute>
+          <Align alignment="centerX">
+            <Ref select="mercury" />
+            <Ref select="label" />
+          </Align>
+          <Arrow>
+            <Ref select="label" />
+            <Ref select="mercury" />
+          </Arrow>
+        </Bluefish>
+
+        {/* change 6 */}
+        <Bluefish>
+          <Background
+            padding={80}
+            name="planets"
+            background={() => <Rect fill="#859fc9" />}
+          >
+            <StackH spacing={50}>
+              <Circle
+                name="mercury"
+                r={15}
+                fill="#EBE3CF"
+                stroke-width={3}
+                stroke="black"
+              />
+              <Circle r={36} fill="#DC933C" stroke-width={3} stroke="black" />
+              <Circle r={38} fill="#179DD7" stroke-width={3} stroke="black" />
+              <Circle r={21} fill="#F1CF8E" stroke-width={3} stroke="black" />
+            </StackH>
+          </Background>
+          <Distribute direction="vertical" spacing={30}>
+            <Ref select="planets" />
+            <Text name="label">Mercury</Text>
+          </Distribute>
+          <Align alignment="centerX">
+            <Ref select="mercury" />
+            <Ref select="label" />
+          </Align>
+          <Arrow>
+            <Ref select="label" />
+            <Ref select="mercury" />
+          </Arrow>
+        </Bluefish>
+      </>
+    );
+  },
+};
 
 export const InsertionSortDiagram: Story = {
   args: {
@@ -53,14 +276,16 @@ export const PythonTutorDiagram: Story = {
     heap: [
       {
         type: "tuple",
-        values: ["1", pointer(1), pointer(2)],
+        values: ["12", pointer(1), "1", "0", pointer(2), pointer(3)],
       },
       { type: "tuple", values: ["1", "4"] },
-      { type: "tuple", values: ["3", "10"] },
+      { type: "tuple", values: ["3", "10", "7", "8", pointer(4)] },
+      { type: "tuple", values: ["2", pointer(4)] },
+      { type: "tuple", values: ["3"] },
     ],
     heapArrangement: [
-      [0, null, null],
-      [null, 1, 2],
+      [0, 3, null, null],
+      [null, 1, 2, 4],
     ],
   },
   render: (props) => (
@@ -101,11 +326,13 @@ export const ThreePointSetTopologiesDiagram: Story = {
 
 export const OhmParserDiagram: Story = {
   args: {
-    expression: "3 + 4 * 5",
+    expression: "3 + (4 * 5)",
   },
   render: (args) => {
     return (
+      <Bluefish>
         <OhmParser expression={args.expression} />
+      </Bluefish>
     );
   },
 };

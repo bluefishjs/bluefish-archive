@@ -6,7 +6,7 @@ import Rect from "../rect.jsx";
 import Ref from "../ref.jsx";
 import { StackH } from "../stackh.jsx";
 import withBluefish from "../withBluefish.jsx";
-import { Line } from "./line.jsx";
+import { Line } from "../line.jsx";
 import { Path } from "./path.js";
 import Text from "../text.jsx";
 import Align from "../align.jsx";
