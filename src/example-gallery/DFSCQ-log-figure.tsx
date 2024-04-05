@@ -1,4 +1,3 @@
-import { SetHorizontalLayout } from "./setLayout";
 import { Path } from "./path";
 import { Line } from "../line";
 import { For } from "solid-js";
@@ -15,6 +14,7 @@ import { StackV } from "../stackv";
 import Text from "../text";
 import Align from "../align";
 import withBluefish from "../withBluefish";
+import LayoutFunction from "./layoutfunction";
 
 const BoxedAlign = withBluefish((props) => (
   <Align alignment={props.alignment}>
@@ -290,10 +290,13 @@ export const DFSCQLogFigure = () => {
                 <Ref select="mem" />
                 <Ref select="line" />
               </Distribute>
-              <SetHorizontalLayout>
+
+              <LayoutFunction
+                f={({ left, width, right }) => ({ left, width, right })}
+              >
                 <Ref select="mem" />
                 <Ref select="line" />
-              </SetHorizontalLayout>
+              </LayoutFunction>
             </Group>
           </StackH>
         </TitledBackground>

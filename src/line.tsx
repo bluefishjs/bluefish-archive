@@ -21,6 +21,13 @@ const maybeMin = (a, b) =>
 const maybeMax = (a, b) =>
   a !== undefined && b !== undefined ? Math.max(a, b) : undefined;
 
+type LineProps = {
+  "stroke-width"?: number;
+  "stroke-dasharray"?: string;
+  stroke?: string;
+  source?: number[];
+  target?: number[];
+};
 export const Line = withBluefish(
   (props) => {
     props = mergeProps(

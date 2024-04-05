@@ -3,7 +3,6 @@ import Background from "../background";
 import Bluefish from "../bluefish";
 import { createName } from "../createName";
 import Distribute from "../distribute";
-import LayoutFunction from "./layoutfunction";
 import { StackV } from "../stackv";
 import withBluefish from "../withBluefish";
 import { Align } from "../../src/align";
@@ -13,52 +12,57 @@ import { Ref } from "../../src/ref";
 import { Id } from "../../src/scenegraph";
 import { Text } from "../../src/text";
 import { Selection } from "../../src/ref";
+import { LayoutFunction } from "./layoutfunction";
 
-const Pad = withBluefish((props: ParentProps<{
+const Pad = withBluefish(
+  (
+    props: ParentProps<{
+      name?: Id;
+      padding: number;
+      fill?: string;
+    }>
+  ) => (
+    <Background
+      padding={props.padding}
+      background={() => <Rect fill={props.fill || "transparent"} />}
+    >
+      {props.children}
+    </Background>
+  )
+);
+
+const CellBorder = withBluefish(
+  (props: {
     name?: Id;
-    padding: number;
-    fill?: string;
-}> ) => (
-  <Background
-    padding={props.padding}
-    background={() => <Rect fill={props.fill || "transparent"} />}
-  >
-    {props.children}
-  </Background>
-));
-
-const SetHorizontalLayout = withBluefish((props: ParentProps<{name?: Id}>) => (
-  <LayoutFunction f={({ left, width, right }) => ({ left, width, right })}>
-    {props.children}
-  </LayoutFunction>
-));
-const SetVerticalLayout = withBluefish((props: ParentProps<{name?: Id}>) => (
-  <LayoutFunction f={({ top, height, bottom }) => ({ top, height, bottom })}>
-    {props.children}
-  </LayoutFunction>
-));
-
-const CellBorder = withBluefish((props: {name?: Id; strokeWidth?: number; horizontal: Selection; vertical: Selection;}) => {
-  const rect = createName("rect");
-  return (
-    <Group>
-      <Rect
-        name={rect}
-        fill="transparent"
-        stroke="#40A03F"
-        stroke-width={props.strokeWidth || 1}
-      />
-      <SetHorizontalLayout>
-        <Ref select={props.horizontal} />
-        <Ref select={rect} />
-      </SetHorizontalLayout>
-      <SetVerticalLayout>
-        <Ref select={props.vertical} />
-        <Ref select={rect} />
-      </SetVerticalLayout>
-    </Group>
-  );
-});
+    strokeWidth?: number;
+    horizontal: Selection;
+    vertical: Selection;
+  }) => {
+    const rect = createName("rect");
+    return (
+      <Group>
+        <Rect
+          name={rect}
+          fill="transparent"
+          stroke="#40A03F"
+          stroke-width={props.strokeWidth || 1}
+        />
+        <LayoutFunction
+          f={({ left, width, right }) => ({ left, width, right })}
+        >
+          <Ref select={props.horizontal} />
+          <Ref select={rect} />
+        </LayoutFunction>
+        <LayoutFunction
+          f={({ top, height, bottom }) => ({ top, height, bottom })}
+        >
+          <Ref select={props.vertical} />
+          <Ref select={rect} />
+        </LayoutFunction>
+      </Group>
+    );
+  }
+);
 
 export const Brownies = () => {
   return (
@@ -66,9 +70,10 @@ export const Brownies = () => {
       <Background
         padding={100}
         background={() => <Rect fill="#7CD4AC" opacity={0.3} />}
-        x={0} y={0}
+        x={0}
+        y={0}
       >
-         <Background
+        <Background
           padding={0}
           name="recipeTable"
           background={() => (
@@ -80,7 +85,7 @@ export const Brownies = () => {
               Preheat oven to 325°F (160°C) and butter a 9x13-in. baking pan
             </Text>
           </Pad>
-           <Pad padding={10} name="col0-row0">
+          <Pad padding={10} name="col0-row0">
             <Text>6 oz. (170 g) 70% cacao chocolate</Text>
           </Pad>
           <Pad padding={10} name="col0-row1">
@@ -135,18 +140,18 @@ export const Brownies = () => {
             <Ref select="col0-row4" />
             <Ref select="col0-row5" />
           </Group>
-         <Distribute direction="horizontal" spacing={0}>
+          <Distribute direction="horizontal" spacing={0}>
             <Ref select="col0" />
             <Ref select="col1-row0_1" />
           </Distribute>
-           <Align alignment="centerY">
+          <Align alignment="centerY">
             <Group>
               <Ref select="col0-row0" />
               <Ref select="col0-row1" />
             </Group>
             <Ref select="col1-row0_1" />
           </Align>
-         <Distribute direction="horizontal" spacing={0}>
+          <Distribute direction="horizontal" spacing={0}>
             <Ref select="col1-row0_1" />
             <Ref select="col1_2-row0_2" />
           </Distribute>
@@ -214,14 +219,14 @@ export const Brownies = () => {
             <Ref select="col5-row0_5" />
           </Align>
 
-         <CellBorder horizontal="col0" vertical="col0-row0" />
+          <CellBorder horizontal="col0" vertical="col0-row0" />
           <CellBorder horizontal="col0" vertical="col0-row1" />
           <CellBorder horizontal="col0" vertical="col0-row2" />
           <CellBorder horizontal="col0" vertical="col0-row3" />
           <CellBorder horizontal="col0" vertical="col0-row4" />
           <CellBorder horizontal="col0" vertical="col0-row5" />
 
-           <Group name="col1_2">
+          <Group name="col1_2">
             <Ref select="col1-row0_1" />
             <Ref select="col1_2-row0_2" />
             <Ref select="col1_2-row3_4" />
@@ -265,7 +270,7 @@ export const Brownies = () => {
         </Background>
       </Background>
 
-     <Text name="recipeName">Dark Chocolate Brownies (makes 24 squares)</Text>
+      <Text name="recipeName">Dark Chocolate Brownies (makes 24 squares)</Text>
 
       <StackV spacing={10} alignment="left">
         <Ref select="recipeName" />
@@ -274,4 +279,3 @@ export const Brownies = () => {
     </Bluefish>
   );
 };
-

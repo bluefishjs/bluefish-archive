@@ -8,10 +8,10 @@ import Ref from "../ref";
 import { StackH } from "../stackh";
 import { StackV } from "../stackv";
 import withBluefish from "../withBluefish";
-import { SetHorizontalLayout } from "./setWidth";
 import Text from "../text";
 import Align from "../align";
 import * as ohm from "ohm-js";
+import LayoutFunction from "./layoutfunction";
 
 const myGrammar = ohm.grammar(String.raw`
   Arithmetic {
@@ -101,10 +101,10 @@ const Label = withBluefish((props) => {
         <Ref select={props.below} />
         <Ref select={rect} />
       </Distribute>
-      <SetHorizontalLayout>
+      <LayoutFunction f={({ left, width, right }) => ({ left, width, right })}>
         <Ref select={g} />
         <Ref select={rect} />
-      </SetHorizontalLayout>
+      </LayoutFunction>
       <Align alignment="center">
         <Ref select={rect} />
         {props.children}
@@ -116,10 +116,12 @@ const Label = withBluefish((props) => {
           name={underline}
           fill={LABEL_UNDERLINE_COLOR}
         ></Rect>
-        <SetHorizontalLayout>
+        <LayoutFunction
+          f={({ left, width, right }) => ({ left, width, right })}
+        >
           <Ref select={g} />
           <Ref select={underline} />
-        </SetHorizontalLayout>
+        </LayoutFunction>
         <StackV spacing={-LABEL_UNDERLINE_HEIGHT}>
           <Ref select={rect} />
           <Ref select={underline} />
@@ -189,10 +191,13 @@ const RenderText = withBluefish((props) => {
         </StackH>
         <Rect name={lineName} height={1} fill="gray"></Rect>
       </StackV>
-      <SetHorizontalLayout>
-        <Ref select={charsStackName} />
+      {/* <SetHorizontalLayout>
+        
+      </SetHorizontalLayout> */}
+      {/* <LayoutFunction f={({ left, width, right }) => ({ left, width, right })}> */}
+      <Ref select={charsStackName} />
         <Ref select={lineName} />
-      </SetHorizontalLayout>
+      {/* </LayoutFunction> */}
     </Group>
   );
 });
