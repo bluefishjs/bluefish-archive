@@ -198,5 +198,9 @@ type InsertionSortProps = {
   unsortedArray: number[];
 };
 export const InsertionSort = ({ unsortedArray }: InsertionSortProps) => {
-  return <InsertionSortDiagram unsortedArray={unsortedArray} />;
+  return (
+    <Bluefish>
+      <InsertionSortDiagram unsortedArray={unsortedArray} />
+    </Bluefish>
+  );
 };

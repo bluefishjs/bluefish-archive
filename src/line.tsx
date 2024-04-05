@@ -1,6 +1,6 @@
 import { Show, mergeProps } from "solid-js";
-import Layout from "../layout";
-import withBluefish from "../withBluefish";
+import Layout from "./layout";
+import withBluefish from "./withBluefish";
 import _ from "lodash";
 
 const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
