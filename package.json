@@ -1,5 +1,5 @@
 {
-  "name": "@bluefish-js/solid",
+  "name": "anonymous",
   "version": "0.0.23",
   "description": "A SolidJS diagramming library",
   "type": "module",
@@ -72,5 +72,5 @@
     "solid-js": "^1.7.7"
   },
   "readme": "ERROR: No README data found!",
-  "_id": "@bluefish-js/solid@0.0.9"
+  "_id": "anonymous"
 }
