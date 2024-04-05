@@ -2,18 +2,7 @@
 
 import type { Meta, StoryObj } from "storybook-solidjs";
 import { Bluefish } from "../bluefish";
-import { Align } from "../align";
-import { Arrow } from "../arrow";
-import { Distribute } from "../distribute";
-import { Group } from "../group";
-import { Ref } from "../ref";
-import { withBluefish, WithBluefishProps } from "../withBluefish";
-import { GlobalFrame } from "../python-tutor/global-frame";
-import { Heap } from "../python-tutor/heap";
 import { Address, HeapObject, StackSlot, pointer } from "../python-tutor/types";
-import { For } from "solid-js";
-import { createName } from "../createName";
-import { StackH } from "../stackh";
 import { PythonTutor } from "../python-tutor/python-tutor";
 
 const meta: Meta = {
