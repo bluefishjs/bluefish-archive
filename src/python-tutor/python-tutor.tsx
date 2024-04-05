@@ -13,6 +13,7 @@ type PythonTutorProps = WithBluefishProps<{
     stack: StackSlot[];
     heap: HeapObject[];
     heapArrangement: (Address | null)[][];
+    debug?: boolean;
   }>;
   
   export const PythonTutor = withBluefish((props: PythonTutorProps) => {

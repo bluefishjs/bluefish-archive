@@ -1,4 +1,3 @@
-
 import { Show, For } from "solid-js";
 import Bluefish from "../bluefish";
 import { createName } from "../createName";
@@ -282,35 +281,38 @@ const RenderTrace = withBluefish((props) => {
 
 type OhmParserProps = {
   expression: string;
-}
+  debug?: boolean;
+};
 // TODO: synced text box
 // TODO: check if parse succeeds
 // TODO:
 //  - format RenderText chars differently if they are a symbol or char
 //  - OR (prob better): set with of chars based on the tree node's contents width
 
-export const OhmParser = ({expression}: OhmParserProps) => {
-  // const text = "3+(4*5)";
-  const text = expression;
-  const charAndNames = text.split("").map((char) => [char, createName(char)]);
-  const charNames = charAndNames.map(([c, n]) => n);
-  const endName = createName("end");
+export const OhmParser = withBluefish(
+  ({ expression, debug }: OhmParserProps) => {
+    // const text = "3+(4*5)";
+    const text = expression;
+    const charAndNames = text.split("").map((char) => [char, createName(char)]);
+    const charNames = charAndNames.map(([c, n]) => n);
+    const endName = createName("end");
 
-  const traces = myGrammar.trace(text).bindings;
-  // console.log(1, traces);
-  return (
-    <Bluefish debug={false} x={0} y={0}>
-      <RenderText name="top" charAndNames={charAndNames} endName={endName} />
-      <RenderTrace
-        trace={traces[0]}
-        offset={0}
-        text={text}
-        charNames={charNames}
-        parentName="top"
-      />
-      <Label from={endName} below="top" textOnLabel="end">
-        <LabelText text="end" />
-      </Label>
-    </Bluefish>
-  );
-};
+    const traces = myGrammar.trace(text).bindings;
+    // console.log(1, traces);
+    return (
+      <Group x={0} y={0}>
+        <RenderText name="top" charAndNames={charAndNames} endName={endName} />
+        <RenderTrace
+          trace={traces[0]}
+          offset={0}
+          text={text}
+          charNames={charNames}
+          parentName="top"
+        />
+        <Label from={endName} below="top" textOnLabel="end">
+          <LabelText text="end" />
+        </Label>
+      </Group>
+    );
+  }
+);

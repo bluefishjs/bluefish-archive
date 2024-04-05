@@ -2,9 +2,9 @@ import Bluefish from "../../bluefish";
 import { PythonTutor } from "../../python-tutor/python-tutor";
 import { pythonProps } from "./pythonTutorProps";
 
-export const pythonTutorTest = () => {
+export const PythonTutorTest = () => {
   return (
-    <Bluefish>
+    <Bluefish debug={false}>
       <PythonTutor {...pythonProps} />
     </Bluefish>
   );

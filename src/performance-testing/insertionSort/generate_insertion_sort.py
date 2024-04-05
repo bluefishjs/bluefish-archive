@@ -8,6 +8,9 @@ def generate_random_array_and_write_to_ts(size):
     with open("insertionSortProps.ts", "w") as file:
         file.write(f"export const sortProps = {random_array};\n")
 
-# Example usage: generate an array of 10 integers
-num_elements = 25
+
+# -------------- PARAMETERS --------------
+num_elements = 10 # number of elements in array to generate
+# ----------------------------------------
+
 generate_random_array_and_write_to_ts(num_elements)
