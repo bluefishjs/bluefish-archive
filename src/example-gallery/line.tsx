@@ -77,11 +77,30 @@ import {
             toY,
           };
         } else {
+            // does not necessarily produce the shortest line between two boxes.
+            // produces a line from the boundary of one box to the other, biased
+            // towards the center of each box's x and y axis.
           customData = {
-            fromX: maybeClamp(data.toX, fromBBox.left, fromBBox.right),
-            fromY: maybeClamp(data.toY, fromBBox.top, fromBBox.bottom),
-            toX: maybeClamp(data.fromX, toBBox.left, toBBox.right),
-            toY: maybeClamp(data.fromY, toBBox.top, toBBox.bottom),
+            fromX: maybeClamp(
+                maybeClamp(data.fromX, toBBox.left, toBBox.right),
+                fromBBox.left,
+                fromBBox.right
+              ),
+              fromY: maybeClamp(
+                maybeClamp(data.fromY, toBBox.top, toBBox.bottom),
+                fromBBox.top,
+                fromBBox.bottom
+              ),
+              toX: maybeClamp(
+                maybeClamp(data.toX, fromBBox.left, fromBBox.right),
+                toBBox.left,
+                toBBox.right
+              ),
+              toY: maybeClamp(
+                maybeClamp(data.toY, fromBBox.top, fromBBox.bottom),
+                toBBox.top,
+                toBBox.bottom
+              ),
           };
         }
   
