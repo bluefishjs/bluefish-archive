@@ -15,7 +15,7 @@ After you have installed `pnpm`, open a new terminal window and navigate to proj
 
 ## Available Scripts
 
-There are three commands you can run in the project directory.
+You can run the following commands inside the project directory:
 
 ### `pnpm start`
 
