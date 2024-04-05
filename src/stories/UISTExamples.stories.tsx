@@ -27,7 +27,7 @@ const meta: Meta = {
 export default meta;
 type Story = StoryObj;
 
-export const PlanetsUIST: Story = {
+export const PlanetsDiagram: Story = {
   render: () => {
     return (
       <>
