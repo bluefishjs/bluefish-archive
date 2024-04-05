@@ -31,19 +31,21 @@ const meta: Meta<typeof Line> = {
 
     source: {
       description:
-        "Either an array of 2 numbers [x, y] or undefined. \
-        If an array, the start point of the line will be bound to the point x · width left of the \
-        leftmost point of the source shape and y · height below the topmost point of the source shape. Otherwise, \
-        the line will infer a starting point based on the positions of the two children.",
+        "Either an array of two numbers, `[a, b]`, between 0 and 1, or `undefined`. If an array is specified, the start point of the line's x-coordinate \
+        is a linear interpolation between the left and right edges of the source box. For example, if `a` is 0.25, then the \
+        x-coordinate is a quarter of the way from the left edge. Similarly, its y-coordinate is a linear interpolation between \
+        the top and bottom edges of the source box. For example, if `b` is 0.25, then the y-coordinate is a quarter of the way from the top edge.\
+        If `undefined`, the start point of the line is inferred.",
       control: {
         type: "array" || "undefined",
       },
     },
     target: {
-        description: "Either an array of 2 numbers [x, y] or undefined. \
-        If an array, the endpoint of the line will be bound to the point x · width left of the \
-        leftmost point of the target shape and y · height below the topmost point of the target shape. Otherwise, \
-        the line will infer a endpoint based on the positions of the two children.",
+        description:  "Either an array of two numbers, `[a, b]`, between 0 and 1, or `undefined`. If an array is specified, the end point of the line's x-coordinate \
+        is a linear interpolation between the left and right edges of the source box. For example, if `a` is 0.25, then the \
+        x-coordinate is a quarter of the way from the left edge. Similarly, its y-coordinate is a linear interpolation between \
+        the top and bottom edges of the source box. For example, if `b` is 0.25, then the y-coordinate is a quarter of the way from the top edge.\
+        If `undefined`, the end point of the line is inferred.",
       control: {
         type: "array" || "undefined",
       },
