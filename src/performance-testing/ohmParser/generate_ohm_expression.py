@@ -27,12 +27,12 @@ def generate_string_expression(num_constants, max_open_parens, open_parens_thres
     
     return expression
     
-# ----- PARAMETERS -----
-num_constants = 60         # number of constants in expression
-max_open_parens = 0      # maximum number of open parentheses at a time
-open_parens_thresh = 0.3   # probability that a opening parenthesis will appear before a constant in the expression
-close_parens_thresh = 0.3  # probability that a closing parenthesis will appear after a constant in the expression (given there are open parentheses)
-# ----------------------
+# -------------- PARAMETERS --------------
+num_constants = 10         # number of constants in expression
+max_open_parens = 5      # maximum number of open parentheses at a time
+open_parens_thresh = 0.66   # probability that a opening parenthesis will appear before a constant in the expression
+close_parens_thresh = 0.66  # probability that a closing parenthesis will appear after a constant in the expression (given there are open parentheses)
+# ----------------------------------------
 
 expression = generate_string_expression(num_constants, max_open_parens, open_parens_thresh, close_parens_thresh)
 print("Expression Length:", len(expression))

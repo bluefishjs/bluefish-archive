@@ -196,11 +196,7 @@ const InsertionSortDiagram = withBluefish((props) => {
 
 type InsertionSortProps = {
   unsortedArray: number[];
-}
-export const InsertionSort = ({unsortedArray}: InsertionSortProps) => {
-  return (
-    <Bluefish debug={false}>
-      <InsertionSortDiagram unsortedArray={unsortedArray} />
-    </Bluefish>
-  );
+};
+export const InsertionSort = ({ unsortedArray }: InsertionSortProps) => {
+  return <InsertionSortDiagram unsortedArray={unsortedArray} />;
 };

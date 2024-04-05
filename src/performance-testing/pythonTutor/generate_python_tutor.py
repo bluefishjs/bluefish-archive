@@ -99,13 +99,15 @@ def generate_program_and_props(num_variables, min_size, max_size, max_depth):
 
     return program, props, total_size
 
-# Variables
-num_variables = 125 # controls how many variables are generated in global frame
+# -------------- PARAMETERS --------------
+num_variables = 5 # controls how many variables are generated in global frame
 min_size = 1 # controls min size of tuples
 max_size = 3 # controls max size of tuples
 max_depth = 5 # controls max level of nesting (level for array of arrays)
-program, props, total_size = generate_program_and_props(num_variables, min_size, max_size, max_depth)
+# ----------------------------------------
 
+
+program, props, total_size = generate_program_and_props(num_variables, min_size, max_size, max_depth)
 print(total_size)
 # Write the generated Python program to a file
 with open("pythonTutorProgram.py", "w") as python_file:
