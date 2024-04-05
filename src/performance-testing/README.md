@@ -34,4 +34,4 @@ In order to performance test the diagrams, there are a few steps to take:
 
 5. [Optional] To find the number of nodes in the scenegraph of the diagram that you're generating, you should go into the relevant `.tsx` file and change the `debug={false}` parameter in to `debug={true}`. This will cause Bluefish to print out the total length of the scenegraph. After you find this number, to get more accurate performance results, make sure to change it back to `debug={false}`
 
-6. Run `pnpm dev` at the top-level folder (`bluefish`) to start a localhost server. Navigate to `http://localhost:3000/public/index.html` to see the rendered diagram. You should then be able to use browser tools or other means to measure the time it takes Bluefish to render the diagram.
+6. Run `pnpm dev` to start a localhost server. Navigate to `http://localhost:3000/public/index.html` to see the rendered diagram. You should then be able to use browser tools or other means to measure the time it takes Bluefish to render the diagram.
