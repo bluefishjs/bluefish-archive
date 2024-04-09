@@ -14,10 +14,19 @@ export const Stack = withBluefish(
       return props.spacing;
     });
 
+    const alignment = createMemo(() => {
+      if (props.direction === "vertical") return "centerX";
+      if (props.direction === "horizontal") return "centerY";
+      return undefined;
+    });
+
     props = mergeProps(
       {
         get spacing() {
           return spacing();
+        },
+        get alignment() {
+          return alignment();
         },
       },
       props

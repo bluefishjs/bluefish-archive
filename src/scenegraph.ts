@@ -1,9 +1,16 @@
 import { SetStoreFunction, createStore, produce } from "solid-js/store";
 import { getLCAChainSuffixes } from "./util/lca";
 import _ from "lodash";
-import { maybeAdd, maybeAddAll } from "./util/maybe";
+import { maybe, maybeAdd, maybeAddAll } from "./util/maybe";
 import { createContext, createMemo, useContext } from "solid-js";
-import { BBox, Dim, Axis, axisMap, inferenceRules } from "./util/bbox";
+import {
+  BBox,
+  Dim,
+  Axis,
+  axisMap,
+  inferenceRules,
+  createLinSysBBox,
+} from "./util/bbox";
 import { Scope, resolveName } from "./createName";
 import { useError } from "./errorContext";
 import {
@@ -77,21 +84,6 @@ export type Scenegraph = {
   [key: Id]: ScenegraphNode;
 };
 
-// Propagates bbox dims to other dims that can be inferred
-export function propagateBBoxValues(bbox: BBox, owners: BBoxOwners): void {
-  // const inferredBBox = { ...bbox };
-
-  inferenceRules.forEach((rule) => {
-    if (
-      rule.from.every((key) => bbox[key] !== undefined) &&
-      bbox[rule.to] === undefined
-    ) {
-      bbox[rule.to] = rule.calculate(rule.from.map((key) => bbox[key]!));
-      owners[rule.to] = inferred;
-    }
-  });
-}
-
 export const createScenegraph = (): ScenegraphContextType => {
   const [scenegraph, setScenegraph] = createStore<Scenegraph>({});
 
@@ -99,10 +91,12 @@ export const createScenegraph = (): ScenegraphContextType => {
   const createNode = (id: Id, parentId: Id | null) => {
     const error = useError();
 
+    const { bbox, owners: bboxOwners } = createLinSysBBox();
+
     setScenegraph(id, {
       type: "node",
-      bbox: {},
-      bboxOwners: {},
+      bbox,
+      bboxOwners,
       transform: { translate: {} },
       transformOwners: { translate: {} },
       children: [],
@@ -585,8 +579,6 @@ the align node.
         if (newTransformOwners.translate.y !== undefined) {
           node.transformOwners.translate.y = newTransformOwners.translate.y;
         }
-
-        propagateBBoxValues(node.bbox, node.bboxOwners);
       })
     );
   };
@@ -612,11 +604,44 @@ the align node.
         }
       }
 
+      // scan children of layout and clear all of id's ownership
+      // TODO: this does not support lazy materialization...
+      // for (const childId of scenegraph[id]?.children ?? []) {
+      //   // inspect ownership bbox
+      //   const childNode = scenegraph[childId];
+      //   if (childNode.type === "node") {
+      //     for (const dim of Object.keys(childNode.bboxOwners) as Array<Dim>) {
+      //       if (childNode.bboxOwners[dim] === id) {
+      //         childNode.bboxOwners[dim] = undefined;
+      //       }
+      //     }
+      //   }
+      // }
+
+      // // scan our own ownership and clear anything that's owned by our parent
+      // // let clearId = id;
+      // let node = scenegraph[id];
+      // // while (node.parent !== null) {
+      // setScenegraph(
+      //   clearId,
+      //   "bboxOwners",
+      //   produce((bboxOwners: BBoxOwners) => {
+      //     for (const dim of Object.keys(bboxOwners) as Array<Dim>) {
+      //       console.log(bboxOwners[dim], node.parent);
+      //       if (bboxOwners[dim] === node.parent) {
+      //         console.log("clearing", clearId, dim);
+      //         bboxOwners[dim] = undefined;
+      //       }
+      //     }
+      //   })
+      // );
+
       const { bbox, transform, customData } = layout(
         (scenegraph[id]?.children ?? []).map((childId: Id) =>
           createChildRepr(id, childId)
         )
       );
+
       // setBBox(props.id, bbox, props.id, transform);
       mergeBBoxAndTransform(id, id, bbox, transform);
       setCustomData(id, customData);
@@ -830,7 +855,6 @@ the align node.
             );
             return;
           }
-
           setBBox(owner, childId, { right });
         },
         get top() {
