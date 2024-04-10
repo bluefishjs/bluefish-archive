@@ -105,6 +105,7 @@ export const Align = withBluefish(
     const layout = (childNodes: ChildNode[]) => {
       childNodes = Array.from(childNodes);
 
+      debugger;
       if (props.name.endsWith("DEBUG")) {
         debugger;
       }
@@ -169,17 +170,17 @@ export const Align = withBluefish(
           },
         },
         bbox: {
-          left:
+          centerX:
             horizontalAlignment(props.alignment) !== undefined
-              ? bbox.left
+              ? bbox.centerX
               : undefined,
           width:
             horizontalAlignment(props.alignment) !== undefined
               ? bbox.width
               : undefined,
-          top:
+          centerY:
             verticalAlignment(props.alignment) !== undefined
-              ? bbox.top
+              ? bbox.centerY
               : undefined,
           height:
             verticalAlignment(props.alignment) !== undefined

@@ -102,10 +102,10 @@ export const Layout: Component<LayoutProps> = (props) => {
     on(
       () => layoutUID(),
       () => {
-        // console.log(
-        //   `setting layout for ${props.name} to`,
-        //   JSON.parse(JSON.stringify(scenegraph[props.name]))
-        // );
+        console.log(
+          `setting layout for ${props.name} to`,
+          JSON.parse(JSON.stringify(scenegraph[props.name]))
+        );
         setScenegraphInfo({
           bbox: scenegraph[props.name]?.bbox ?? {},
           transform: {

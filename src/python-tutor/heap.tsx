@@ -55,7 +55,7 @@ export const Heap = withBluefish((props: HeapProps) => {
       </StackV>
 
       {/* Add arrows between heap objects */}
-      {/*  <For each={props.heap}>
+      <For each={props.heap}>
         {(heapObject, address) => (
           <For each={heapObject.values}>
             {(elmTupleValue, elmTupleIndex) => {
@@ -88,7 +88,7 @@ export const Heap = withBluefish((props: HeapProps) => {
             }}
           </For>
         )}
-      </For> */}
+      </For>
     </Group>
   );
 });
