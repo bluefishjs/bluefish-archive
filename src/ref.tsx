@@ -83,7 +83,7 @@ export const Ref = withBluefish(
   (props: RefProps) => {
     const error = useError();
     const parentId = useContext(ParentIDContext);
-    const [scope] = useContext(ScopeContext);
+    const [scope, setScope] = useContext(ScopeContext);
     const { createRef, deleteRef } = UNSAFE_useScenegraph();
 
     if (parentId === null) {
@@ -101,7 +101,7 @@ export const Ref = withBluefish(
       );
 
       onCleanup(() => {
-        deleteRef(error, props.name);
+        deleteRef(error, props.name, setScope);
       });
     });
 

@@ -146,20 +146,38 @@ export const createLinSysBBox = (): {
   const centerXAndWidth = createMemo(() => {
     const xEqs = Object.values(equations.x);
     if (xEqs.length < 2) return undefined;
-    else if (xEqs.length > 2)
-      throw new Error(`too many equations ${JSON.stringify(equations.x)}`);
     else {
-      return solveSystem(xEqs[0], xEqs[1]);
+      const [centerX, width] = solveSystem(xEqs[0], xEqs[1]);
+      if (xEqs.length > 2) {
+        // check the other equations
+        for (const eq of xEqs.slice(2)) {
+          if (Math.abs(eq[0][0] * centerX + eq[0][1] * width - eq[1]) > 1e-6) {
+            throw new Error(
+              `System is not solvable. Equations: ${JSON.stringify(xEqs)}`
+            );
+          }
+        }
+      }
+      return [centerX, width];
     }
   });
 
   const centerYAndHeight = createMemo(() => {
     const yEqs = Object.values(equations.y);
     if (yEqs.length < 2) return undefined;
-    else if (yEqs.length > 2)
-      throw new Error(`too many equations ${JSON.stringify(equations.y)}`);
     else {
-      return solveSystem(yEqs[0], yEqs[1]);
+      const [centerY, height] = solveSystem(yEqs[0], yEqs[1]);
+      if (yEqs.length > 2) {
+        // check the other equations
+        for (const eq of yEqs.slice(2)) {
+          if (Math.abs(eq[0][0] * centerY + eq[0][1] * height - eq[1]) > 1e-6) {
+            throw new Error(
+              `System is not solvable. Equations: ${JSON.stringify(yEqs)}`
+            );
+          }
+        }
+      }
+      return [centerY, height];
     }
   });
 

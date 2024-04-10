@@ -195,7 +195,11 @@ export const createScenegraph = (): ScenegraphContextType => {
 
   // unlike the other functions, we have to pass `error` explicitly, because the error context is
   // not accessible from `onCleanup`.
-  const deleteRef = (error: (error: BluefishError) => void, id: Id) => {
+  const deleteRef = (
+    error: (error: BluefishError) => void,
+    id: Id,
+    setScope: SetStoreFunction<Scope>
+  ) => {
     const node = scenegraph[id];
 
     if (node === undefined) {
@@ -231,6 +235,17 @@ export const createScenegraph = (): ScenegraphContextType => {
         (c) => c !== id
       );
     }
+
+    // filter out scopes that have this id as their layoutNode
+    setScope(
+      produce((scope) => {
+        for (const key of Object.keys(scope) as Array<Id>) {
+          if (scope[key].layoutNode === id) {
+            delete scope[key];
+          }
+        }
+      })
+    );
 
     // setScenegraph({ ...scenegraph, [id]: undefined });
     delete scenegraph[id];
@@ -359,8 +374,10 @@ the align node.
           //     }
           //   })
           // );
-          scenegraph[idSf].transform.translate.x = 0;
-          scenegraph[idSf].transformOwners.translate.x = id;
+          if (scenegraph[idSf].transform.translate.x === undefined) {
+            scenegraph[idSf].transform.translate.x = 0;
+            scenegraph[idSf].transformOwners.translate.x = id;
+          }
 
           accumulatedTransform.translate.x -= (
             scenegraph[idSf] as ScenegraphNode & { type: "node" }
@@ -378,8 +395,10 @@ the align node.
           //     }
           //   })
           // );
-          scenegraph[refIdSf].transform.translate.x = 0;
-          scenegraph[refIdSf].transformOwners.translate.x = id;
+          if (scenegraph[refIdSf].transform.translate.x === undefined) {
+            scenegraph[refIdSf].transform.translate.x = 0;
+            scenegraph[refIdSf].transformOwners.translate.x = id;
+          }
 
           accumulatedTransform.translate.x += (
             scenegraph[refIdSf] as ScenegraphNode & { type: "node" }
@@ -407,8 +426,10 @@ the align node.
           //     }
           //   })
           // );
-          scenegraph[idSf].transform.translate.y = 0;
-          scenegraph[idSf].transformOwners.translate.y = id;
+          if (scenegraph[idSf].transform.translate.y === undefined) {
+            scenegraph[idSf].transform.translate.y = 0;
+            scenegraph[idSf].transformOwners.translate.y = id;
+          }
 
           accumulatedTransform.translate.y -= (
             scenegraph[idSf] as ScenegraphNode & { type: "node" }
@@ -426,8 +447,10 @@ the align node.
           //     }
           //   })
           // );
-          scenegraph[refIdSf].transform.translate.y = 0;
-          scenegraph[refIdSf].transformOwners.translate.y = id;
+          if (scenegraph[refIdSf].transform.translate.y === undefined) {
+            scenegraph[refIdSf].transform.translate.y = 0;
+            scenegraph[refIdSf].transformOwners.translate.y = id;
+          }
 
           accumulatedTransform.translate.y += (
             scenegraph[refIdSf] as ScenegraphNode & { type: "node" }
@@ -993,7 +1016,11 @@ export type ScenegraphContextType = {
     setScope: SetStoreFunction<Scope>
   ) => void;
   createRef: (id: Id, refId: Id, parentId: Id) => void;
-  deleteRef: (error: (error: BluefishError) => void, id: Id) => void;
+  deleteRef: (
+    error: (error: BluefishError) => void,
+    id: Id,
+    setScope: SetStoreFunction<Scope>
+  ) => void;
   resolveRef: (
     id: Id,
     mode: "read" | "write" | "check"

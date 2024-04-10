@@ -102,6 +102,10 @@ export function Bluefish(props: BluefishProps) {
 
   const [layoutIsDirty, setLayoutIsDirty] = createSignal(true);
   const [layoutUID, setLayoutUID] = createSignal(createUniqueId());
+  const [scenegraphSignal, setScenegraphSignal] = createSignal({
+    scenegraph,
+    uid: createUniqueId(),
+  });
 
   const layout = (childNodes: ChildNode[]) => {
     untrack(() => {
@@ -224,7 +228,9 @@ export function Bluefish(props: BluefishProps) {
     //   );
     // });
     setLayoutIsDirty(false);
-    setLayoutUID(createUniqueId());
+    const uid = createUniqueId();
+    setLayoutUID(uid);
+    setScenegraphSignal({ scenegraph, uid });
     // }
   });
 
@@ -242,7 +248,7 @@ export function Bluefish(props: BluefishProps) {
         <br />
         <div style={{ float: "left", "margin-right": "40px" }}>
           <h1>Scenegraph</h1>
-          <pre>{JSON.stringify(scenegraph, null, 2)}</pre>
+          <pre>{JSON.stringify(scenegraphSignal().scenegraph, null, 2)}</pre>
         </div>
         <div style={{ float: "left" }}>
           <h1>Scope</h1>

@@ -1,4 +1,4 @@
-import { JSX, ParentProps } from "solid-js";
+import { JSX, ParentProps, untrack } from "solid-js";
 import { BBox, ChildNode, Id, Transform, useScenegraph } from "./scenegraph";
 import Layout from "./layout";
 import {
@@ -31,15 +31,17 @@ export const Group = withBluefish(
         debugger;
       }
 
-      for (const childNode of childNodes) {
-        if (!childNode.owned.left) {
-          childNode.bbox.left = 0;
-        }
+      untrack(() => {
+        for (const childNode of childNodes) {
+          if (!childNode.owned.left) {
+            childNode.bbox.left = 0;
+          }
 
-        if (!childNode.owned.top) {
-          childNode.bbox.top = 0;
+          if (!childNode.owned.top) {
+            childNode.bbox.top = 0;
+          }
         }
-      }
+      });
 
       const bboxes = {
         left: childNodes.map((childNode) => childNode.bbox.left),
@@ -70,7 +72,7 @@ export const Group = withBluefish(
             y: maybeSub(props.y, top),
           },
         },
-        bbox: { left, top, right, bottom, width, height },
+        bbox: { left, top, width, height },
       };
     };
 
