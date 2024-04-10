@@ -12,12 +12,17 @@ import {
   Scenegraph,
 } from "./scenegraph";
 import {
+  Accessor,
   JSX,
   ParentProps,
   Show,
+  createContext,
   createEffect,
+  createRenderEffect,
+  createSignal,
   createUniqueId,
   mergeProps,
+  untrack,
 } from "solid-js";
 import { ParentScopeIdContext, Scope, ScopeContext } from "./createName";
 import { createStore } from "solid-js/store";
@@ -25,6 +30,7 @@ import { ErrorContext, createErrorContext } from "./errorContext";
 import { BluefishError } from "./errors";
 import { getAncestorChain } from "./util/lca";
 import toast, { Toaster } from "solid-toast";
+import { createLinSysBBox } from "./util/bbox";
 
 export type BluefishProps = ParentProps<{
   width?: number;
@@ -67,6 +73,14 @@ Error path from root:
     // toast.error(errorMessage);
   };
 
+export const LayoutIsDirtyContext = createContext<
+  [Accessor<boolean>, (dirty: boolean) => void]
+>([() => false, () => {}]);
+
+export const LayoutUIDContext = createContext<Accessor<string>>(() =>
+  createUniqueId()
+);
+
 export function Bluefish(props: BluefishProps) {
   props = mergeProps(
     {
@@ -86,16 +100,20 @@ export function Bluefish(props: BluefishProps) {
   const id = autoGenId;
   const scopeId = props.id ?? autoGenScopeId;
 
-  const layout = (childNodes: ChildNode[]) => {
-    for (const childNode of childNodes) {
-      if (!childNode.owned.left) {
-        childNode.bbox.left = 0;
-      }
+  const [layoutIsDirty, setLayoutIsDirty] = createSignal(true);
+  const [layoutUID, setLayoutUID] = createSignal(createUniqueId());
 
-      if (!childNode.owned.top) {
-        childNode.bbox.top = 0;
+  const layout = (childNodes: ChildNode[]) => {
+    untrack(() => {
+      for (const childNode of childNodes) {
+        if (!childNode.owned.left) {
+          childNode.bbox.left = 0;
+        }
+        if (!childNode.owned.top) {
+          childNode.bbox.top = 0;
+        }
       }
-    }
+    });
 
     const bboxes = {
       left: childNodes.map((childNode) => childNode.bbox.left),
@@ -157,21 +175,62 @@ export function Bluefish(props: BluefishProps) {
     );
   };
 
+  const jsx = (
+    <LayoutUIDContext.Provider value={layoutUID}>
+      <LayoutIsDirtyContext.Provider value={[layoutIsDirty, setLayoutIsDirty]}>
+        <ErrorContext.Provider value={errorContext}>
+          <ScenegraphContext.Provider value={scenegraphContext}>
+            <ScopeContext.Provider value={[scope, setScope]}>
+              <Layout name={id} layout={layout} paint={paint}>
+                <ParentScopeIdContext.Provider value={() => scopeId}>
+                  <ParentIDContext.Provider value={id}>
+                    {props.children}
+                  </ParentIDContext.Provider>
+                </ParentScopeIdContext.Provider>
+              </Layout>
+            </ScopeContext.Provider>
+          </ScenegraphContext.Provider>
+        </ErrorContext.Provider>
+      </LayoutIsDirtyContext.Provider>
+    </LayoutUIDContext.Provider>
+  );
+
+  createRenderEffect(() => {
+    // debugger;
+    // console.log("running bluefish render effect");
+    // if (layoutIsDirty()) {
+    //   scenegraph[id]?.layout();
+    //   setLayoutIsDirty(false);
+    // }
+    // reset all scenegraph layout information to their default values
+    // if (layoutIsDirty()) {
+    untrack(() => {
+      for (const id in scenegraph) {
+        if (scenegraph[id].type === "node") {
+          const { bbox, owners: bboxOwners } = createLinSysBBox();
+          scenegraph[id].bbox = bbox;
+          scenegraph[id].bboxOwners = bboxOwners;
+          scenegraph[id].transform = { translate: {} };
+          scenegraph[id].transformOwners = { translate: {} };
+          scenegraph[id].customData = { customData: {} };
+        }
+      }
+    });
+    scenegraph[id]?.layout();
+    // untrack(() => {
+    //   console.log(
+    //     "scenegraph after layout",
+    //     JSON.parse(JSON.stringify(scenegraph))
+    //   );
+    // });
+    setLayoutIsDirty(false);
+    setLayoutUID(createUniqueId());
+    // }
+  });
+
   return (
     <>
-      <ErrorContext.Provider value={errorContext}>
-        <ScenegraphContext.Provider value={scenegraphContext}>
-          <ScopeContext.Provider value={[scope, setScope]}>
-            <Layout name={id} layout={layout} paint={paint}>
-              <ParentScopeIdContext.Provider value={() => scopeId}>
-                <ParentIDContext.Provider value={id}>
-                  {props.children}
-                </ParentIDContext.Provider>
-              </ParentScopeIdContext.Provider>
-            </Layout>
-          </ScopeContext.Provider>
-        </ScenegraphContext.Provider>
-      </ErrorContext.Provider>
+      {jsx}
       <Toaster
         position="top-left"
         containerStyle={{

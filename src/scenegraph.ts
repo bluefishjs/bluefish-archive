@@ -2,15 +2,8 @@ import { SetStoreFunction, createStore, produce } from "solid-js/store";
 import { getLCAChainSuffixes } from "./util/lca";
 import _ from "lodash";
 import { maybe, maybeAdd, maybeAddAll } from "./util/maybe";
-import { createContext, createMemo, useContext } from "solid-js";
-import {
-  BBox,
-  Dim,
-  Axis,
-  axisMap,
-  inferenceRules,
-  createLinSysBBox,
-} from "./util/bbox";
+import { createContext, createMemo, untrack, useContext } from "solid-js";
+import { BBox, Dim, Axis, axisMap, createLinSysBBox } from "./util/bbox";
 import { Scope, resolveName } from "./createName";
 import { useError } from "./errorContext";
 import {
@@ -85,7 +78,8 @@ export type Scenegraph = {
 };
 
 export const createScenegraph = (): ScenegraphContextType => {
-  const [scenegraph, setScenegraph] = createStore<Scenegraph>({});
+  // const [scenegraph, setScenegraph] = createStore<Scenegraph>({});
+  const scenegraph: Scenegraph = {};
 
   // constructors //
   const createNode = (id: Id, parentId: Id | null) => {
@@ -93,7 +87,18 @@ export const createScenegraph = (): ScenegraphContextType => {
 
     const { bbox, owners: bboxOwners } = createLinSysBBox();
 
-    setScenegraph(id, {
+    // setScenegraph(id, {
+    //   type: "node",
+    //   bbox,
+    //   bboxOwners,
+    //   transform: { translate: {} },
+    //   transformOwners: { translate: {} },
+    //   children: [],
+    //   parent: parentId,
+    //   customData: { customData: {} },
+    //   layout: () => {},
+    // });
+    scenegraph[id] = {
       type: "node",
       bbox,
       bboxOwners,
@@ -103,26 +108,27 @@ export const createScenegraph = (): ScenegraphContextType => {
       parent: parentId,
       customData: { customData: {} },
       layout: () => {},
-    });
+    };
 
     if (parentId !== null) {
-      setScenegraph(parentId, (node: ScenegraphNode) => {
-        if (node.type === "ref") {
-          error(
-            parentRefError({
-              source: parentId,
-              caller: "createNode",
-              child: id,
-            })
-          );
-          return node;
-        }
+      // setScenegraph(parentId, (node: ScenegraphNode) => {
+      //   if (node.type === "ref") {
+      //     error(
+      //       parentRefError({
+      //         source: parentId,
+      //         caller: "createNode",
+      //         child: id,
+      //       })
+      //     );
+      //     return node;
+      //   }
 
-        return {
-          ...node,
-          children: [...node.children, id],
-        };
-      });
+      //   return {
+      //     ...node,
+      //     children: [...node.children, id],
+      //   };
+      // });
+      scenegraph[parentId].children.push(id);
     }
   };
 
@@ -145,23 +151,26 @@ export const createScenegraph = (): ScenegraphContextType => {
 
     if (node.parent !== null) {
       const nodeParent = node.parent;
-      setScenegraph(node.parent, (node: ScenegraphNode) => {
-        if (node.type === "ref") {
-          error(
-            parentRefError({
-              source: nodeParent,
-              caller: "deleteNode",
-              child: id,
-            })
-          );
-          return node;
-        }
+      // setScenegraph(node.parent, (node: ScenegraphNode) => {
+      //   if (node.type === "ref") {
+      //     error(
+      //       parentRefError({
+      //         source: nodeParent,
+      //         caller: "deleteNode",
+      //         child: id,
+      //       })
+      //     );
+      //     return node;
+      //   }
 
-        return {
-          ...node,
-          children: node.children.filter((c) => c !== id),
-        };
-      });
+      //   return {
+      //     ...node,
+      //     children: node.children.filter((c) => c !== id),
+      //   };
+      // });
+      scenegraph[nodeParent].children = scenegraph[nodeParent].children.filter(
+        (c) => c !== id
+      );
     }
 
     // COMBAK: it's not yet clear whether nodes should be recursively deleted
@@ -180,7 +189,8 @@ export const createScenegraph = (): ScenegraphContextType => {
       })
     );
 
-    setScenegraph({ ...scenegraph, [id]: undefined });
+    // setScenegraph({ ...scenegraph, [id]: undefined });
+    delete scenegraph[id];
   };
 
   // unlike the other functions, we have to pass `error` explicitly, because the error context is
@@ -200,55 +210,65 @@ export const createScenegraph = (): ScenegraphContextType => {
 
     if (node.parent !== null) {
       const nodeParent = node.parent;
-      setScenegraph(node.parent, (node: ScenegraphNode) => {
-        if (node.type === "ref") {
-          error(
-            parentRefError({
-              source: nodeParent,
-              caller: "deleteRef",
-              child: id,
-            })
-          );
-          return node;
-        }
+      // setScenegraph(node.parent, (node: ScenegraphNode) => {
+      //   if (node.type === "ref") {
+      //     error(
+      //       parentRefError({
+      //         source: nodeParent,
+      //         caller: "deleteRef",
+      //         child: id,
+      //       })
+      //     );
+      //     return node;
+      //   }
 
-        return {
-          ...node,
-          children: node.children.filter((c) => c !== id),
-        };
-      });
+      //   return {
+      //     ...node,
+      //     children: node.children.filter((c) => c !== id),
+      //   };
+      // });
+      scenegraph[nodeParent].children = scenegraph[nodeParent].children.filter(
+        (c) => c !== id
+      );
     }
 
-    setScenegraph({ ...scenegraph, [id]: undefined });
+    // setScenegraph({ ...scenegraph, [id]: undefined });
+    delete scenegraph[id];
   };
 
   const createRef = (id: Id, refId: Id, parentId: Id) => {
     const error = useError();
 
-    setScenegraph(id, {
+    // setScenegraph(id, {
+    //   type: "ref",
+    //   refId,
+    //   parent: parentId,
+    // });
+    scenegraph[id] = {
       type: "ref",
       refId,
       parent: parentId,
-    });
+    };
 
     if (parentId !== null) {
-      setScenegraph(parentId, (node: ScenegraphNode) => {
-        if (node.type === "ref") {
-          error(
-            parentRefError({
-              source: parentId,
-              caller: "createRef",
-              child: id,
-            })
-          );
-          return node;
-        }
+      // setScenegraph(parentId, (node: ScenegraphNode) => {
+      //   if (node.type === "ref") {
+      //     error(
+      //       parentRefError({
+      //         source: parentId,
+      //         caller: "createRef",
+      //         child: id,
+      //       })
+      //     );
+      //     return node;
+      //   }
 
-        return {
-          ...node,
-          children: [...node.children, id],
-        };
-      });
+      //   return {
+      //     ...node,
+      //     children: [...node.children, id],
+      //   };
+      // });
+      scenegraph[parentId].children.push(id);
     }
   };
 
@@ -265,38 +285,39 @@ export const createScenegraph = (): ScenegraphContextType => {
     id: Id;
     transform: RequiredTransform;
   } => {
-    const node = scenegraph[id];
+    return untrack(() => {
+      const node = scenegraph[id];
 
-    // base case
-    if (node.type === "node") {
-      return {
-        id,
-        transform: accumulatedTransform,
-      };
-    }
+      // base case
+      if (node.type === "node") {
+        return {
+          id,
+          transform: accumulatedTransform,
+        };
+      }
 
-    const refNode = scenegraph[node.refId];
+      const refNode = scenegraph[node.refId];
 
-    if (refNode === undefined) {
-      throw new Error(`Ref node ${node.refId} not found`);
-    }
+      if (refNode === undefined) {
+        throw new Error(`Ref node ${node.refId} not found`);
+      }
 
-    if (refNode.type === "ref") {
-      throw new Error("Ref of ref not supported");
-    }
+      if (refNode.type === "ref") {
+        throw new Error("Ref of ref not supported");
+      }
 
-    if (mode === "check") {
-      // skip materialization
-      return {
-        id: node.refId,
-        transform: accumulatedTransform,
-      };
-    }
+      if (mode === "check") {
+        // skip materialization
+        return {
+          id: node.refId,
+          transform: accumulatedTransform,
+        };
+      }
 
-    // To resolve a reference we have to do two things:
-    // 1. If the node side's transform is fully resolved, we default transforms on the ref side to 0
-    // 2. Accumulate the transform from the node to the ref
-    /* 
+      // To resolve a reference we have to do two things:
+      // 1. If the node side's transform is fully resolved, we default transforms on the ref side to 0
+      // 2. Accumulate the transform from the node to the ref
+      /* 
 Suppose we have the following graph:
 Example {x: ...}
   Circle {x: 50} #circle
@@ -312,100 +333,109 @@ Example {x: ...}
 The accumulated transform will be {x: 50}, which is the transform of the circle as it appears to
 the align node.
 */
-    const [idSuffix, refIdSuffix] = getLCAChainSuffixes(
-      scenegraph,
-      id,
-      node.refId
-    );
+      const [idSuffix, refIdSuffix] = getLCAChainSuffixes(
+        scenegraph,
+        id,
+        node.refId
+      );
 
-    if (
-      // if mode is read and the ref node's left is undefined, then we don't want to materialize
-      // transforms b/c we can't resolve the ref node's left anyway
-      !(
-        mode === "read" &&
-        (refNode as ScenegraphNode & { type: "node" }).bbox.left === undefined
-      )
-    ) {
-      // default all undefined transforms to 0 on the id side
-      for (const idSf of idSuffix) {
-        setScenegraph(
-          idSf,
-          produce((n: ScenegraphNode) => {
-            const node = n as ScenegraphNode & { type: "node" };
-            if (node.transform.translate.x === undefined) {
-              node.transform.translate.x = 0;
-              node.transformOwners.translate.x = id;
-            }
-          })
-        );
+      if (
+        // if mode is read and the ref node's left is undefined, then we don't want to materialize
+        // transforms b/c we can't resolve the ref node's left anyway
+        !(
+          mode === "read" &&
+          (refNode as ScenegraphNode & { type: "node" }).bbox.left === undefined
+        )
+      ) {
+        // default all undefined transforms to 0 on the id side
+        for (const idSf of idSuffix) {
+          // setScenegraph(
+          //   idSf,
+          //   produce((n: ScenegraphNode) => {
+          //     const node = n as ScenegraphNode & { type: "node" };
+          //     if (node.transform.translate.x === undefined) {
+          //       node.transform.translate.x = 0;
+          //       node.transformOwners.translate.x = id;
+          //     }
+          //   })
+          // );
+          scenegraph[idSf].transform.translate.x = 0;
+          scenegraph[idSf].transformOwners.translate.x = id;
 
-        accumulatedTransform.translate.x -= (
-          scenegraph[idSf] as ScenegraphNode & { type: "node" }
-        ).transform.translate.x!;
+          accumulatedTransform.translate.x -= (
+            scenegraph[idSf] as ScenegraphNode & { type: "node" }
+          ).transform.translate.x!;
+        }
+
+        for (const refIdSf of refIdSuffix) {
+          // setScenegraph(
+          //   refIdSf,
+          //   produce((n: ScenegraphNode) => {
+          //     const node = n as ScenegraphNode & { type: "node" };
+          //     if (node.transform.translate.x === undefined) {
+          //       node.transform.translate.x = 0;
+          //       node.transformOwners.translate.x = id;
+          //     }
+          //   })
+          // );
+          scenegraph[refIdSf].transform.translate.x = 0;
+          scenegraph[refIdSf].transformOwners.translate.x = id;
+
+          accumulatedTransform.translate.x += (
+            scenegraph[refIdSf] as ScenegraphNode & { type: "node" }
+          ).transform.translate.x!;
+        }
       }
 
-      for (const refIdSf of refIdSuffix) {
-        setScenegraph(
-          refIdSf,
-          produce((n: ScenegraphNode) => {
-            const node = n as ScenegraphNode & { type: "node" };
-            if (node.transform.translate.x === undefined) {
-              node.transform.translate.x = 0;
-              node.transformOwners.translate.x = id;
-            }
-          })
-        );
+      if (
+        // if mode is read and the ref node's top is undefined, then we don't want to materialize
+        // transforms b/c we can't resolve the ref node's top anyway
+        !(
+          mode === "read" &&
+          (refNode as ScenegraphNode & { type: "node" }).bbox.top === undefined
+        )
+      ) {
+        // default all undefined transforms to 0 on the id side
+        for (const idSf of idSuffix) {
+          // setScenegraph(
+          //   idSf,
+          //   produce((n: ScenegraphNode) => {
+          //     const node = n as ScenegraphNode & { type: "node" };
+          //     if (node.transform.translate.y === undefined) {
+          //       node.transform.translate.y = 0;
+          //       node.transformOwners.translate.y = id;
+          //     }
+          //   })
+          // );
+          scenegraph[idSf].transform.translate.y = 0;
+          scenegraph[idSf].transformOwners.translate.y = id;
 
-        accumulatedTransform.translate.x += (
-          scenegraph[refIdSf] as ScenegraphNode & { type: "node" }
-        ).transform.translate.x!;
+          accumulatedTransform.translate.y -= (
+            scenegraph[idSf] as ScenegraphNode & { type: "node" }
+          ).transform.translate.y!;
+        }
+
+        for (const refIdSf of refIdSuffix) {
+          // setScenegraph(
+          //   refIdSf,
+          //   produce((n: ScenegraphNode) => {
+          //     const node = n as ScenegraphNode & { type: "node" };
+          //     if (node.transform.translate.y === undefined) {
+          //       node.transform.translate.y = 0;
+          //       node.transformOwners.translate.y = id;
+          //     }
+          //   })
+          // );
+          scenegraph[refIdSf].transform.translate.y = 0;
+          scenegraph[refIdSf].transformOwners.translate.y = id;
+
+          accumulatedTransform.translate.y += (
+            scenegraph[refIdSf] as ScenegraphNode & { type: "node" }
+          ).transform.translate.y!;
+        }
       }
-    }
-
-    if (
-      // if mode is read and the ref node's top is undefined, then we don't want to materialize
-      // transforms b/c we can't resolve the ref node's top anyway
-      !(
-        mode === "read" &&
-        (refNode as ScenegraphNode & { type: "node" }).bbox.top === undefined
-      )
-    ) {
-      // default all undefined transforms to 0 on the id side
-      for (const idSf of idSuffix) {
-        setScenegraph(
-          idSf,
-          produce((n: ScenegraphNode) => {
-            const node = n as ScenegraphNode & { type: "node" };
-            if (node.transform.translate.y === undefined) {
-              node.transform.translate.y = 0;
-              node.transformOwners.translate.y = id;
-            }
-          })
-        );
-
-        accumulatedTransform.translate.y -= (
-          scenegraph[idSf] as ScenegraphNode & { type: "node" }
-        ).transform.translate.y!;
-      }
-
-      for (const refIdSf of refIdSuffix) {
-        setScenegraph(
-          refIdSf,
-          produce((n: ScenegraphNode) => {
-            const node = n as ScenegraphNode & { type: "node" };
-            if (node.transform.translate.y === undefined) {
-              node.transform.translate.y = 0;
-              node.transformOwners.translate.y = id;
-            }
-          })
-        );
-
-        accumulatedTransform.translate.y += (
-          scenegraph[refIdSf] as ScenegraphNode & { type: "node" }
-        ).transform.translate.y!;
-      }
-    }
-    return resolveRef(node.refId, mode, accumulatedTransform);
+      return resolveRef(node.refId, mode, accumulatedTransform);
+    });
   };
 
   const getBBox = (id: string): BBox => {
@@ -471,303 +501,265 @@ the align node.
     bbox: BBox,
     transform: Transform
   ) => {
-    const error = useError();
-    // TODO: should I untrack this?
-    // const { id: resolvedId, transform: accumulatedTransform } = resolveRef(id);
+    untrack(() => {
+      const error = useError();
+      // TODO: should I untrack this?
+      // const { id: resolvedId, transform: accumulatedTransform } = resolveRef(id);
 
-    // if any of the bbox values are NaN (undefined is ok), error and skip
-    for (const key of Object.keys(bbox) as Array<Dim>) {
-      if (bbox[key] !== undefined && isNaN(bbox[key]!)) {
-        error(dimNaNError({ source: owner, name: id, dim: key }));
-        return;
+      // if any of the bbox values are NaN (undefined is ok), error and skip
+      for (const key of Object.keys(bbox) as Array<Dim>) {
+        if (bbox[key] !== undefined && isNaN(bbox[key]!)) {
+          error(dimNaNError({ source: owner, name: id, dim: key }));
+          return;
+        }
       }
-    }
 
-    setScenegraph(
-      id,
-      produce((n: ScenegraphNode) => {
-        const node = n as ScenegraphNode & { type: "node" }; // guaranteed by resolveRef
+      const node = scenegraph[id] as ScenegraphNode & { type: "node" }; // guaranteed by resolveRef
 
-        // check bbox ownership
-        for (const key of Object.keys(bbox) as Array<Dim>) {
-          if (
-            bbox[key] !== undefined &&
-            node.bboxOwners[key] !== undefined &&
-            node.bboxOwners[key] !== owner
-          ) {
-            error(
-              dimAlreadyOwnedError({
-                source: owner,
-                name: id,
-                owner: node.bboxOwners[key]!,
-                dim: key,
-                value: bbox[key]!,
-              })
-            );
-            return node;
-          }
+      // check bbox ownership
+      for (const key of Object.keys(bbox) as Array<Dim>) {
+        if (
+          bbox[key] !== undefined &&
+          node.bboxOwners[key] !== undefined &&
+          node.bboxOwners[key] !== owner
+        ) {
+          error(
+            dimAlreadyOwnedError({
+              source: owner,
+              name: id,
+              owner: node.bboxOwners[key]!,
+              dim: key,
+              value: bbox[key]!,
+            })
+          );
+          return;
         }
+      }
 
-        // check transform ownership
-        for (const key of Object.keys(transform?.translate ?? {}) as Array<
-          keyof Transform["translate"]
-        >) {
-          if (
-            transform?.translate[key] !== undefined &&
-            node.transformOwners.translate[key] !== undefined &&
-            node.transformOwners.translate[key] !== owner
-          ) {
-            error(
-              translateAlreadyOwnedError({
-                source: owner,
-                name: id,
-                owner: node.transformOwners.translate[key]!,
-                axis: key,
-                value: transform.translate[key]!,
-              })
-            );
-            return node;
-          }
+      // check transform ownership
+      for (const key of Object.keys(transform?.translate ?? {}) as Array<
+        keyof Transform["translate"]
+      >) {
+        if (
+          transform?.translate[key] !== undefined &&
+          node.transformOwners.translate[key] !== undefined &&
+          node.transformOwners.translate[key] !== owner
+        ) {
+          error(
+            translateAlreadyOwnedError({
+              source: owner,
+              name: id,
+              owner: node.transformOwners.translate[key]!,
+              axis: key,
+              value: transform.translate[key]!,
+            })
+          );
+          return node;
         }
+      }
 
-        const newBBoxOwners: BBoxOwners = {
-          ...(bbox.left !== undefined ? { left: owner } : {}),
-          ...(bbox.centerX !== undefined ? { centerX: owner } : {}),
-          ...(bbox.right !== undefined ? { right: owner } : {}),
-          ...(bbox.top !== undefined ? { top: owner } : {}),
-          ...(bbox.centerY !== undefined ? { centerY: owner } : {}),
-          ...(bbox.bottom !== undefined ? { bottom: owner } : {}),
-          ...(bbox.width !== undefined ? { width: owner } : {}),
-          ...(bbox.height !== undefined ? { height: owner } : {}),
-        };
+      const newBBoxOwners: BBoxOwners = {
+        ...(bbox.left !== undefined ? { left: owner } : {}),
+        ...(bbox.centerX !== undefined ? { centerX: owner } : {}),
+        ...(bbox.right !== undefined ? { right: owner } : {}),
+        ...(bbox.top !== undefined ? { top: owner } : {}),
+        ...(bbox.centerY !== undefined ? { centerY: owner } : {}),
+        ...(bbox.bottom !== undefined ? { bottom: owner } : {}),
+        ...(bbox.width !== undefined ? { width: owner } : {}),
+        ...(bbox.height !== undefined ? { height: owner } : {}),
+      };
 
-        const newTransformOwners: TransformOwners = {
-          translate: {
-            x: transform?.translate.x !== undefined ? owner : undefined,
-            y: transform?.translate.y !== undefined ? owner : undefined,
-          },
-        };
+      const newTransformOwners: TransformOwners = {
+        translate: {
+          x: transform?.translate.x !== undefined ? owner : undefined,
+          y: transform?.translate.y !== undefined ? owner : undefined,
+        },
+      };
 
-        const newTransform = {
-          translate: transform?.translate ?? {},
-        };
+      const newTransform = {
+        translate: transform?.translate ?? {},
+      };
 
-        for (const key of Object.keys(bbox) as Array<Dim>) {
-          if (bbox[key] !== undefined) {
-            node.bbox[key] = bbox[key];
-          }
+      for (const key of Object.keys(bbox) as Array<Dim>) {
+        if (bbox[key] !== undefined) {
+          node.bbox[key] = bbox[key];
         }
+      }
 
-        for (const key of Object.keys(newBBoxOwners) as Array<Dim>) {
-          if (newBBoxOwners[key] !== undefined) {
-            node.bboxOwners[key] = newBBoxOwners[key];
-          }
+      for (const key of Object.keys(newBBoxOwners) as Array<Dim>) {
+        if (newBBoxOwners[key] !== undefined) {
+          node.bboxOwners[key] = newBBoxOwners[key];
         }
+      }
 
-        if (newTransform.translate.x !== undefined) {
-          node.transform.translate.x = newTransform.translate.x;
-        }
+      if (newTransform.translate.x !== undefined) {
+        node.transform.translate.x = newTransform.translate.x;
+      }
 
-        if (newTransform.translate.y !== undefined) {
-          node.transform.translate.y = newTransform.translate.y;
-        }
+      if (newTransform.translate.y !== undefined) {
+        node.transform.translate.y = newTransform.translate.y;
+      }
 
-        if (newTransformOwners.translate.x !== undefined) {
-          node.transformOwners.translate.x = newTransformOwners.translate.x;
-        }
+      if (newTransformOwners.translate.x !== undefined) {
+        node.transformOwners.translate.x = newTransformOwners.translate.x;
+      }
 
-        if (newTransformOwners.translate.y !== undefined) {
-          node.transformOwners.translate.y = newTransformOwners.translate.y;
-        }
-      })
-    );
+      if (newTransformOwners.translate.y !== undefined) {
+        node.transformOwners.translate.y = newTransformOwners.translate.y;
+      }
+    });
   };
 
   const setCustomData = (id: Id, customData: any) => {
-    setScenegraph(
-      id,
-      produce((n: ScenegraphNode) => {
-        const node = n as ScenegraphNode & { type: "node" }; // guaranteed by resolveRef
+    // setScenegraph(
+    //   id,
+    //   produce((n: ScenegraphNode) => {
+    //     const node = n as ScenegraphNode & { type: "node" }; // guaranteed by resolveRef
 
-        if (customData !== undefined) {
-          node.customData = customData;
-        }
-      })
-    );
+    //     if (customData !== undefined) {
+    //       node.customData = customData;
+    //     }
+    //   })
+    // );
+    scenegraph[id].customData = customData;
   };
 
   const setLayout = (id: Id, layout: LayoutFn) => {
-    const layoutMemo = createMemo(() => {
+    const layout2 = () => {
       for (const childId of scenegraph[id]?.children ?? []) {
         if ("layout" in scenegraph[childId]) {
           scenegraph[childId].layout();
         }
       }
 
-      // scan children of layout and clear all of id's ownership
-      // TODO: this does not support lazy materialization...
-      // for (const childId of scenegraph[id]?.children ?? []) {
-      //   // inspect ownership bbox
-      //   const childNode = scenegraph[childId];
-      //   if (childNode.type === "node") {
-      //     for (const dim of Object.keys(childNode.bboxOwners) as Array<Dim>) {
-      //       if (childNode.bboxOwners[dim] === id) {
-      //         childNode.bboxOwners[dim] = undefined;
-      //       }
-      //     }
-      //   }
-      // }
-
-      // // scan our own ownership and clear anything that's owned by our parent
-      // // let clearId = id;
-      // let node = scenegraph[id];
-      // // while (node.parent !== null) {
-      // setScenegraph(
-      //   clearId,
-      //   "bboxOwners",
-      //   produce((bboxOwners: BBoxOwners) => {
-      //     for (const dim of Object.keys(bboxOwners) as Array<Dim>) {
-      //       console.log(bboxOwners[dim], node.parent);
-      //       if (bboxOwners[dim] === node.parent) {
-      //         console.log("clearing", clearId, dim);
-      //         bboxOwners[dim] = undefined;
-      //       }
-      //     }
-      //   })
-      // );
-
+      // const { bbox, transform, customData } = layoutMemo2();
       const { bbox, transform, customData } = layout(
         (scenegraph[id]?.children ?? []).map((childId: Id) =>
           createChildRepr(id, childId)
         )
       );
 
-      // setBBox(props.id, bbox, props.id, transform);
       mergeBBoxAndTransform(id, id, bbox, transform);
       setCustomData(id, customData);
-    });
+    };
 
-    setScenegraph(
-      id,
-      produce((n: ScenegraphNode) => {
-        const node = n as ScenegraphNode & { type: "node" }; // guaranteed by resolveRef
-        node.layout = layoutMemo;
-      })
-    );
+    scenegraph[id].layout = layout2;
   };
 
   const setBBox = (owner: Id, id: Id, bbox: BBox) => {
-    const error = useError();
+    untrack(() => {
+      const error = useError();
 
-    const { id: resolvedId, transform: accumulatedTransform } = resolveRef(
-      id,
-      "write"
-    );
+      const { id: resolvedId, transform: accumulatedTransform } = resolveRef(
+        id,
+        "write"
+      );
 
-    // if any of the bbox values are NaN (undefined is ok), error and skip
-    for (const key of Object.keys(bbox) as Array<Dim>) {
-      if (bbox[key] !== undefined && isNaN(bbox[key]!)) {
-        error(dimNaNError({ source: owner, name: id, dim: key }));
-        return;
-      }
-    }
-
-    const node = scenegraph[resolvedId] as ScenegraphNode & { type: "node" }; // guaranteed by resolveRef
-
-    const proposedBBox: BBox = {};
-    const proposedTransform: Transform = {
-      translate: {},
-    };
-
-    for (const dim of [
-      "left",
-      "centerX",
-      "right",
-      "top",
-      "centerY",
-      "bottom",
-    ] as const) {
-      if (bbox[dim] === undefined) continue;
-
-      const axis = axisMap[dim];
-      if (accumulatedTransform.translate[axis] === undefined) {
-        error(
-          accumulatedTransformUndefinedError({
-            source: owner,
-            name: resolvedId,
-            dim,
-            axis,
-            value: bbox[dim]!,
-          })
-        );
-        continue;
+      // if any of the bbox values are NaN (undefined is ok), error and skip
+      for (const key of Object.keys(bbox) as Array<Dim>) {
+        if (bbox[key] !== undefined && isNaN(bbox[key]!)) {
+          error(dimNaNError({ source: owner, name: id, dim: key }));
+          return;
+        }
       }
 
-      if (
-        node.bboxOwners[dim] === owner ||
-        node.bboxOwners[dim] === undefined
-      ) {
-        if (node.transformOwners.translate[axis] === undefined) {
-          // need to set the translate[axis] so that the dim doesn't move
-          // NOTE: this case doesn't always happen. e.g. `right` could be set before `left` in which
-          // case `right` has already set the translate.x
-          proposedTransform.translate[axis] = 0;
+      const node = scenegraph[resolvedId] as ScenegraphNode & { type: "node" }; // guaranteed by resolveRef
+
+      const proposedBBox: BBox = {};
+      const proposedTransform: Transform = {
+        translate: {},
+      };
+
+      for (const dim of [
+        "left",
+        "centerX",
+        "right",
+        "top",
+        "centerY",
+        "bottom",
+      ] as const) {
+        if (bbox[dim] === undefined) continue;
+
+        const axis = axisMap[dim];
+        if (accumulatedTransform.translate[axis] === undefined) {
+          error(
+            accumulatedTransformUndefinedError({
+              source: owner,
+              name: resolvedId,
+              dim,
+              axis,
+              value: bbox[dim]!,
+            })
+          );
+          continue;
+        }
+
+        if (
+          node.bboxOwners[dim] === owner ||
+          node.bboxOwners[dim] === undefined
+        ) {
+          if (node.transformOwners.translate[axis] === undefined) {
+            // need to set the translate[axis] so that the dim doesn't move
+            // NOTE: this case doesn't always happen. e.g. `right` could be set before `left` in which
+            // case `right` has already set the translate.x
+            proposedTransform.translate[axis] = 0;
+            proposedBBox[dim] = bbox[dim]!;
+          } else {
+            proposedBBox[dim] = bbox[dim]! - node.transform.translate[axis]!;
+          }
+        } else if (
+          node.transformOwners.translate[axis] === owner ||
+          node.transformOwners.translate[axis] === undefined
+        ) {
+          proposedTransform.translate[axis] = bbox[dim]! - node.bbox[dim]!;
+        } else {
+          error(
+            dimAlreadyOwnedError({
+              source: owner,
+              name: resolvedId,
+              owner: node.bboxOwners[dim]!,
+              dim,
+              value: bbox[dim]!,
+            })
+          );
+          return;
+        }
+      }
+
+      for (const dim of ["width", "height"] as const) {
+        if (bbox[dim] === undefined) continue;
+
+        if (
+          node.bboxOwners[dim] === owner ||
+          node.bboxOwners[dim] === undefined
+        ) {
           proposedBBox[dim] = bbox[dim]!;
         } else {
-          proposedBBox[dim] = bbox[dim]! - node.transform.translate[axis]!;
+          error(
+            dimAlreadyOwnedError({
+              source: owner,
+              name: resolvedId,
+              owner: node.bboxOwners[dim]!,
+              dim,
+              value: bbox[dim]!,
+            })
+          );
+          return;
         }
-      } else if (
-        node.transformOwners.translate[axis] === owner ||
-        node.transformOwners.translate[axis] === undefined
-      ) {
-        proposedTransform.translate[axis] = bbox[dim]! - node.bbox[dim]!;
-      } else {
-        error(
-          dimAlreadyOwnedError({
-            source: owner,
-            name: resolvedId,
-            owner: node.bboxOwners[dim]!,
-            dim,
-            value: bbox[dim]!,
-          })
-        );
-        return;
       }
-    }
 
-    for (const dim of ["width", "height"] as const) {
-      if (bbox[dim] === undefined) continue;
+      proposedTransform.translate.x = maybeAdd(
+        proposedTransform.translate.x,
+        accumulatedTransform.translate.x
+      );
 
-      if (
-        node.bboxOwners[dim] === owner ||
-        node.bboxOwners[dim] === undefined
-      ) {
-        proposedBBox[dim] = bbox[dim]!;
-      } else {
-        error(
-          dimAlreadyOwnedError({
-            source: owner,
-            name: resolvedId,
-            owner: node.bboxOwners[dim]!,
-            dim,
-            value: bbox[dim]!,
-          })
-        );
-        return;
-      }
-    }
+      proposedTransform.translate.y = maybeAdd(
+        proposedTransform.translate.y,
+        accumulatedTransform.translate.y
+      );
 
-    proposedTransform.translate.x = maybeAdd(
-      proposedTransform.translate.x,
-      accumulatedTransform.translate.x
-    );
-
-    proposedTransform.translate.y = maybeAdd(
-      proposedTransform.translate.y,
-      accumulatedTransform.translate.y
-    );
-
-    mergeBBoxAndTransform(owner, resolvedId, proposedBBox, proposedTransform);
+      mergeBBoxAndTransform(owner, resolvedId, proposedBBox, proposedTransform);
+    });
   };
 
   const ownedByOther = (
