@@ -18,6 +18,8 @@ import {
   parentRefError,
   translateAlreadyOwnedError,
 } from "./errors";
+import { createToken, createTokenizer } from "@solid-primitives/jsx-tokenizer";
+import type { JSX } from "solid-js";
 
 export type Id = string;
 export type Inferred = { inferred: true };
@@ -76,6 +78,15 @@ export type ScenegraphNode =
 export type Scenegraph = {
   [key: Id]: ScenegraphNode;
 };
+
+export type ScenegraphToken = {
+  jsx: JSX.Element;
+  layout: (parentId: Id | null) => void;
+};
+
+export const ScenegraphTokenizer = createTokenizer<ScenegraphToken>({
+  name: "ScenegraphNode",
+});
 
 export const createScenegraph = (): ScenegraphContextType => {
   // const [scenegraph, setScenegraph] = createStore<Scenegraph>({});

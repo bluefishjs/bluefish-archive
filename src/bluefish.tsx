@@ -10,9 +10,11 @@ import {
   BBox,
   ChildNode,
   Scenegraph,
+  ScenegraphTokenizer,
 } from "./scenegraph";
 import {
   Accessor,
+  For,
   JSX,
   ParentProps,
   Show,
@@ -25,12 +27,13 @@ import {
   untrack,
 } from "solid-js";
 import { ParentScopeIdContext, Scope, ScopeContext } from "./createName";
-import { createStore } from "solid-js/store";
+import { createStore, produce } from "solid-js/store";
 import { ErrorContext, createErrorContext } from "./errorContext";
 import { BluefishError } from "./errors";
 import { getAncestorChain } from "./util/lca";
 import toast, { Toaster } from "solid-toast";
 import { createLinSysBBox } from "./util/bbox";
+import { resolveTokens } from "@solid-primitives/jsx-tokenizer";
 
 export type BluefishProps = ParentProps<{
   width?: number;
@@ -99,6 +102,8 @@ export function Bluefish(props: BluefishProps) {
   const autoGenScopeId = `Bluefish(${createUniqueId()})`;
   const id = autoGenId;
   const scopeId = props.id ?? autoGenScopeId;
+
+  const [fullLayoutFunction, setFullLayoutFunction] = createSignal(() => {});
 
   const [layoutIsDirty, setLayoutIsDirty] = createSignal(true);
   const [layoutUID, setLayoutUID] = createSignal(createUniqueId());
@@ -185,13 +190,23 @@ export function Bluefish(props: BluefishProps) {
         <ErrorContext.Provider value={errorContext}>
           <ScenegraphContext.Provider value={scenegraphContext}>
             <ScopeContext.Provider value={[scope, setScope]}>
-              <Layout name={id} layout={layout} paint={paint}>
-                <ParentScopeIdContext.Provider value={() => scopeId}>
-                  <ParentIDContext.Provider value={id}>
+              {untrack(() => {
+                const tokens = resolveTokens(ScenegraphTokenizer, () => (
+                  <Layout name={id} layout={layout} paint={paint}>
+                    {/* <ParentScopeIdContext.Provider value={() => scopeId}>
+                      <ParentIDContext.Provider value={id}> */}
                     {props.children}
-                  </ParentIDContext.Provider>
-                </ParentScopeIdContext.Provider>
-              </Layout>
+                    {/* </ParentIDContext.Provider>
+                    </ParentScopeIdContext.Provider> */}
+                  </Layout>
+                ));
+
+                setFullLayoutFunction(() => {
+                  return () => tokens()[0].data.layout(null);
+                });
+
+                return <For each={tokens()}>{(token) => token.data.jsx}</For>;
+              })}
             </ScopeContext.Provider>
           </ScenegraphContext.Provider>
         </ErrorContext.Provider>
@@ -208,19 +223,29 @@ export function Bluefish(props: BluefishProps) {
     // }
     // reset all scenegraph layout information to their default values
     // if (layoutIsDirty()) {
-    untrack(() => {
-      for (const id in scenegraph) {
-        if (scenegraph[id].type === "node") {
-          const { bbox, owners: bboxOwners } = createLinSysBBox();
-          scenegraph[id].bbox = bbox;
-          scenegraph[id].bboxOwners = bboxOwners;
-          scenegraph[id].transform = { translate: {} };
-          scenegraph[id].transformOwners = { translate: {} };
-          scenegraph[id].customData = { customData: {} };
-        }
-      }
-    });
-    scenegraph[id]?.layout();
+    // untrack(() => {
+    //   for (const id in scenegraph) {
+    //     if (scenegraph[id].type === "node") {
+    //       const { bbox, owners: bboxOwners } = createLinSysBBox();
+    //       scenegraph[id].bbox = bbox;
+    //       scenegraph[id].bboxOwners = bboxOwners;
+    //       scenegraph[id].transform = { translate: {} };
+    //       scenegraph[id].transformOwners = { translate: {} };
+    //       scenegraph[id].customData = { customData: {} };
+    //     }
+    //   }
+    // });
+
+    // clear scenegraph
+    for (const id in scenegraph) {
+      delete scenegraph[id];
+    }
+
+    // TODO: need to figure out how to clear scopes
+
+    // scenegraph[id]?.layout();
+    fullLayoutFunction()();
+    // token()[0].data.layout();
     // untrack(() => {
     //   console.log(
     //     "scenegraph after layout",

@@ -3,12 +3,20 @@ import {
   createEffect,
   createRenderEffect,
   onCleanup,
+  untrack,
   useContext,
 } from "solid-js";
-import { Id, UNSAFE_useScenegraph, ParentIDContext } from "./scenegraph";
+import {
+  Id,
+  UNSAFE_useScenegraph,
+  ParentIDContext,
+  ScenegraphTokenizer,
+} from "./scenegraph";
 import withBluefish from "./withBluefish";
 import { Name, Scope, ScopeContext } from "./createName";
 import { useError } from "./errorContext";
+import { createToken } from "@solid-primitives/jsx-tokenizer";
+import { produce } from "solid-js/store";
 
 // The properties we want:
 // every time the refId's bbox is updated, it should be propagated to the id
@@ -80,33 +88,54 @@ export const resolveSelection = (
 };
 
 export const Ref = withBluefish(
-  (props: RefProps) => {
+  createToken(ScenegraphTokenizer, (props: RefProps) => {
     const error = useError();
-    const parentId = useContext(ParentIDContext);
+    // const parentId = useContext(ParentIDContext);
     const [scope, setScope] = useContext(ScopeContext);
-    const { createRef, deleteRef } = UNSAFE_useScenegraph();
+    const { createRef, deleteRef, scenegraph } = UNSAFE_useScenegraph();
 
-    if (parentId === null) {
-      throw new Error("Ref must be a child of a Layout");
-    }
+    // if (parentId === null) {
+    //   throw new Error("Ref must be a child of a Layout");
+    // }
+
+    const normalizedSelection = () => normalizeSelection(props.select);
 
     // TODO: what do we do if the layout node isn't defined?
-    createRenderEffect(() => {
-      const normalizedSelection = normalizeSelection(props.select);
+    // createRenderEffect(() => {
+    //   onCleanup(() => {
+    //     deleteRef(error, props.name, setScope);
+    //   });
+    // });
 
-      createRef(
-        props.name,
-        resolveSelection(scope, normalizedSelection),
-        parentId
+    onCleanup(() => {
+      // filter out scopes that have this id as their layoutNode
+      setScope(
+        produce((scope) => {
+          for (const key of Object.keys(scope) as Array<Id>) {
+            if (scope[key].layoutNode === props.name) {
+              delete scope[key];
+            }
+          }
+        })
       );
-
-      onCleanup(() => {
-        deleteRef(error, props.name, setScope);
-      });
     });
 
-    return <></>;
-  },
+    // return <></>;
+    return {
+      jsx: <></>,
+      layout: (parentId: Id | null) => {
+        if (parentId === null) {
+          throw new Error("Ref must be a child of a Layout");
+        }
+
+        createRef(
+          props.name,
+          resolveSelection(scope, normalizedSelection()),
+          parentId
+        );
+      },
+    };
+  }),
   { displayName: "Ref" }
 );
 
