@@ -29,6 +29,14 @@ export const axisMap: { [key in Dim]: "x" | "y" } = {
 export type BBox = { [key in Dim]?: number };
 
 export const from = (bboxes: BBox[]): BBox => {
+  if (bboxes.length === 0)
+    return {
+      centerX: 0,
+      centerY: 0,
+      width: 0,
+      height: 0,
+    };
+
   const bboxesStructOfArray = {
     left: bboxes.map((bbox) => bbox.left),
     top: bboxes.map((bbox) => bbox.top),

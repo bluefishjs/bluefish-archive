@@ -105,7 +105,6 @@ export const Align = withBluefish(
     const layout = (childNodes: ChildNode[]) => {
       childNodes = Array.from(childNodes);
 
-      debugger;
       if (props.name.endsWith("DEBUG")) {
         debugger;
       }

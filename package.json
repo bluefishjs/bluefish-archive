@@ -56,6 +56,7 @@
     "vite-plugin-solid": "^2.7.0"
   },
   "dependencies": {
+    "@solid-primitives/jsx-tokenizer": "^1.0.10",
     "@types/d3-scale": "^4.0.5",
     "@types/lodash": "^4.14.195",
     "d3-scale": "^4.0.2",
