@@ -11,6 +11,8 @@ import {
   ChildNode,
   Scenegraph,
   ScenegraphTokenizer,
+  ScenegraphToken,
+  resolveScenegraphTokens,
 } from "./scenegraph";
 import {
   Accessor,
@@ -33,7 +35,6 @@ import { BluefishError } from "./errors";
 import { getAncestorChain } from "./util/lca";
 import toast, { Toaster } from "solid-toast";
 import { createLinSysBBox } from "./util/bbox";
-import { resolveTokens } from "@solid-primitives/jsx-tokenizer";
 
 export type BluefishProps = ParentProps<{
   width?: number;
@@ -191,7 +192,8 @@ export function Bluefish(props: BluefishProps) {
           <ScenegraphContext.Provider value={scenegraphContext}>
             <ScopeContext.Provider value={[scope, setScope]}>
               {untrack(() => {
-                const tokens = resolveTokens(ScenegraphTokenizer, () => (
+                /* const tokens = resolveTokens(ScenegraphTokenizer, () => ( */
+                const layoutNode = resolveScenegraphTokens(
                   <Layout name={id} layout={layout} paint={paint}>
                     {/* <ParentScopeIdContext.Provider value={() => scopeId}>
                       <ParentIDContext.Provider value={id}> */}
@@ -199,13 +201,14 @@ export function Bluefish(props: BluefishProps) {
                     {/* </ParentIDContext.Provider>
                     </ParentScopeIdContext.Provider> */}
                   </Layout>
-                ));
+                );
+                /* )); */
 
                 setFullLayoutFunction(() => {
-                  return () => tokens()[0].data.layout(null);
+                  return () => layoutNode[0].layout(null);
                 });
 
-                return <For each={tokens()}>{(token) => token.data.jsx}</For>;
+                return layoutNode[0].jsx;
               })}
             </ScopeContext.Provider>
           </ScenegraphContext.Provider>

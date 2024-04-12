@@ -6,16 +6,16 @@ import {
   untrack,
   useContext,
 } from "solid-js";
+import type { JSX } from "solid-js";
 import {
   Id,
   UNSAFE_useScenegraph,
   ParentIDContext,
-  ScenegraphTokenizer,
+  ScenegraphToken,
 } from "./scenegraph";
 import withBluefish from "./withBluefish";
 import { Name, Scope, ScopeContext } from "./createName";
 import { useError } from "./errorContext";
-import { createToken } from "@solid-primitives/jsx-tokenizer";
 import { produce } from "solid-js/store";
 
 // The properties we want:
@@ -88,7 +88,7 @@ export const resolveSelection = (
 };
 
 export const Ref = withBluefish(
-  createToken(ScenegraphTokenizer, (props: RefProps) => {
+  /* createToken(ScenegraphTokenizer,  */ (props: RefProps) => {
     const error = useError();
     // const parentId = useContext(ParentIDContext);
     const [scope, setScope] = useContext(ScopeContext);
@@ -134,8 +134,8 @@ export const Ref = withBluefish(
           parentId
         );
       },
-    };
-  }),
+    } satisfies ScenegraphToken as unknown as JSX.Element;
+  } /* ) */,
   { displayName: "Ref" }
 );
 

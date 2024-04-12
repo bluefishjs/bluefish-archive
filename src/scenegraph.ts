@@ -18,7 +18,6 @@ import {
   parentRefError,
   translateAlreadyOwnedError,
 } from "./errors";
-import { createToken, createTokenizer } from "@solid-primitives/jsx-tokenizer";
 import type { JSX } from "solid-js";
 
 export type Id = string;
@@ -84,9 +83,30 @@ export type ScenegraphToken = {
   layout: (parentId: Id | null) => void;
 };
 
-export const ScenegraphTokenizer = createTokenizer<ScenegraphToken>({
-  name: "ScenegraphNode",
-});
+export const resolveScenegraphTokens = (
+  unresolved: unknown
+): ScenegraphToken[] => {
+  // if undefined, return an empty array
+  if (unresolved === undefined || unresolved === null) {
+    return [];
+  } else if (typeof unresolved === "function" && !unresolved.length) {
+    return resolveScenegraphTokens(unresolved());
+  } else if (Array.isArray(unresolved)) {
+    return unresolved.flatMap((child) => resolveScenegraphTokens(child));
+  } else if (typeof unresolved === "object") {
+    return [unresolved as unknown as ScenegraphToken];
+  } else {
+    throw new Error(
+      `Could not resolve scenegraph tokens. Unresolved value: ${JSON.stringify(
+        unresolved
+      )}`
+    );
+  }
+};
+
+// export const ScenegraphTokenizer = createTokenizer<ScenegraphToken>({
+//   name: "ScenegraphNode",
+// });
 
 export const createScenegraph = (): ScenegraphContextType => {
   // const [scenegraph, setScenegraph] = createStore<Scenegraph>({});

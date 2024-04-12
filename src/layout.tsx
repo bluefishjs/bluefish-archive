@@ -20,14 +20,14 @@ import {
   ParentIDContext,
   LayoutFn,
   Id,
-  ScenegraphTokenizer,
+  ScenegraphToken,
+  resolveScenegraphTokens,
 } from "./scenegraph";
 import { IdContext } from "./withBluefish";
 import { ScopeContext } from "./createName";
 import { useError } from "./errorContext";
 import { LayoutIsDirtyContext, LayoutUIDContext } from "./bluefish";
 import { createStore, produce } from "solid-js/store";
-import { createToken, resolveTokens } from "@solid-primitives/jsx-tokenizer";
 
 export type LayoutProps = ParentProps<{
   name: Id;
@@ -41,7 +41,9 @@ export type LayoutProps = ParentProps<{
   }) => JSX.Element;
 }>;
 
-export const Layout = createToken(ScenegraphTokenizer, (props: LayoutProps) => {
+export const Layout = /* createToken(ScenegraphTokenizer,  */ (
+  props: LayoutProps
+) => {
   const parentId = useContext(ParentIDContext);
   const [_scope, setScope] = useContext(ScopeContext);
   const error = useError();
@@ -81,14 +83,15 @@ export const Layout = createToken(ScenegraphTokenizer, (props: LayoutProps) => {
     <ParentIDContext.Provider value={props.name}>
       <IdContext.Provider value={() => undefined}>
         {(() => {
-          const childTokens = resolveTokens(
-            ScenegraphTokenizer,
-            () => props.children
-          );
+          // const childTokens = resolveTokens(
+          //   ScenegraphTokenizer,
+          //   () => props.children
+          // );
+          const childNodes = resolveScenegraphTokens(props.children);
 
           setChildLayouts(() => {
-            return childTokens().map((child) => {
-              return child.data.layout;
+            return childNodes.map((child) => {
+              return child.layout;
             });
           });
 
@@ -105,7 +108,7 @@ export const Layout = createToken(ScenegraphTokenizer, (props: LayoutProps) => {
               // }}
               // customData={scenegraph[props.name]?.customData}
             >
-              <For each={childTokens()}>{(child) => child.data.jsx}</For>
+              <For each={childNodes}>{(child) => child.jsx}</For>
             </Dynamic>
           );
         })()}
@@ -189,8 +192,8 @@ export const Layout = createToken(ScenegraphTokenizer, (props: LayoutProps) => {
   return {
     jsx,
     layout,
-  };
-});
+  } satisfies ScenegraphToken as unknown as JSX.Element;
+}; /* ); */
 
 // export const Layout: Component<LayoutProps> = (props) => {
 //   const parentId = useContext(ParentIDContext);
