@@ -104,10 +104,6 @@ export const resolveScenegraphTokens = (
   }
 };
 
-// export const ScenegraphTokenizer = createTokenizer<ScenegraphToken>({
-//   name: "ScenegraphNode",
-// });
-
 export const createScenegraph = (): ScenegraphContextType => {
   // const [scenegraph, setScenegraph] = createStore<Scenegraph>({});
   const scenegraph: Scenegraph = {};
@@ -118,17 +114,6 @@ export const createScenegraph = (): ScenegraphContextType => {
 
     const { bbox, owners: bboxOwners } = createLinSysBBox();
 
-    // setScenegraph(id, {
-    //   type: "node",
-    //   bbox,
-    //   bboxOwners,
-    //   transform: { translate: {} },
-    //   transformOwners: { translate: {} },
-    //   children: [],
-    //   parent: parentId,
-    //   customData: { customData: {} },
-    //   layout: () => {},
-    // });
     scenegraph[id] = {
       type: "node",
       bbox,
@@ -142,23 +127,6 @@ export const createScenegraph = (): ScenegraphContextType => {
     };
 
     if (parentId !== null) {
-      // setScenegraph(parentId, (node: ScenegraphNode) => {
-      //   if (node.type === "ref") {
-      //     error(
-      //       parentRefError({
-      //         source: parentId,
-      //         caller: "createNode",
-      //         child: id,
-      //       })
-      //     );
-      //     return node;
-      //   }
-
-      //   return {
-      //     ...node,
-      //     children: [...node.children, id],
-      //   };
-      // });
       scenegraph[parentId].children.push(id);
     }
   };
@@ -182,23 +150,6 @@ export const createScenegraph = (): ScenegraphContextType => {
 
     if (node.parent !== null) {
       const nodeParent = node.parent;
-      // setScenegraph(node.parent, (node: ScenegraphNode) => {
-      //   if (node.type === "ref") {
-      //     error(
-      //       parentRefError({
-      //         source: nodeParent,
-      //         caller: "deleteNode",
-      //         child: id,
-      //       })
-      //     );
-      //     return node;
-      //   }
-
-      //   return {
-      //     ...node,
-      //     children: node.children.filter((c) => c !== id),
-      //   };
-      // });
       scenegraph[nodeParent].children = scenegraph[nodeParent].children.filter(
         (c) => c !== id
       );
@@ -220,7 +171,6 @@ export const createScenegraph = (): ScenegraphContextType => {
       })
     );
 
-    // setScenegraph({ ...scenegraph, [id]: undefined });
     delete scenegraph[id];
   };
 
@@ -245,23 +195,6 @@ export const createScenegraph = (): ScenegraphContextType => {
 
     if (node.parent !== null) {
       const nodeParent = node.parent;
-      // setScenegraph(node.parent, (node: ScenegraphNode) => {
-      //   if (node.type === "ref") {
-      //     error(
-      //       parentRefError({
-      //         source: nodeParent,
-      //         caller: "deleteRef",
-      //         child: id,
-      //       })
-      //     );
-      //     return node;
-      //   }
-
-      //   return {
-      //     ...node,
-      //     children: node.children.filter((c) => c !== id),
-      //   };
-      // });
       scenegraph[nodeParent].children = scenegraph[nodeParent].children.filter(
         (c) => c !== id
       );
@@ -278,18 +211,12 @@ export const createScenegraph = (): ScenegraphContextType => {
       })
     );
 
-    // setScenegraph({ ...scenegraph, [id]: undefined });
     delete scenegraph[id];
   };
 
   const createRef = (id: Id, refId: Id, parentId: Id) => {
     const error = useError();
 
-    // setScenegraph(id, {
-    //   type: "ref",
-    //   refId,
-    //   parent: parentId,
-    // });
     scenegraph[id] = {
       type: "ref",
       refId,
@@ -297,23 +224,6 @@ export const createScenegraph = (): ScenegraphContextType => {
     };
 
     if (parentId !== null) {
-      // setScenegraph(parentId, (node: ScenegraphNode) => {
-      //   if (node.type === "ref") {
-      //     error(
-      //       parentRefError({
-      //         source: parentId,
-      //         caller: "createRef",
-      //         child: id,
-      //       })
-      //     );
-      //     return node;
-      //   }
-
-      //   return {
-      //     ...node,
-      //     children: [...node.children, id],
-      //   };
-      // });
       scenegraph[parentId].children.push(id);
     }
   };
@@ -395,16 +305,6 @@ the align node.
       ) {
         // default all undefined transforms to 0 on the id side
         for (const idSf of idSuffix) {
-          // setScenegraph(
-          //   idSf,
-          //   produce((n: ScenegraphNode) => {
-          //     const node = n as ScenegraphNode & { type: "node" };
-          //     if (node.transform.translate.x === undefined) {
-          //       node.transform.translate.x = 0;
-          //       node.transformOwners.translate.x = id;
-          //     }
-          //   })
-          // );
           if (scenegraph[idSf].transform.translate.x === undefined) {
             scenegraph[idSf].transform.translate.x = 0;
             scenegraph[idSf].transformOwners.translate.x = id;
@@ -416,16 +316,6 @@ the align node.
         }
 
         for (const refIdSf of refIdSuffix) {
-          // setScenegraph(
-          //   refIdSf,
-          //   produce((n: ScenegraphNode) => {
-          //     const node = n as ScenegraphNode & { type: "node" };
-          //     if (node.transform.translate.x === undefined) {
-          //       node.transform.translate.x = 0;
-          //       node.transformOwners.translate.x = id;
-          //     }
-          //   })
-          // );
           if (scenegraph[refIdSf].transform.translate.x === undefined) {
             scenegraph[refIdSf].transform.translate.x = 0;
             scenegraph[refIdSf].transformOwners.translate.x = id;
@@ -447,16 +337,6 @@ the align node.
       ) {
         // default all undefined transforms to 0 on the id side
         for (const idSf of idSuffix) {
-          // setScenegraph(
-          //   idSf,
-          //   produce((n: ScenegraphNode) => {
-          //     const node = n as ScenegraphNode & { type: "node" };
-          //     if (node.transform.translate.y === undefined) {
-          //       node.transform.translate.y = 0;
-          //       node.transformOwners.translate.y = id;
-          //     }
-          //   })
-          // );
           if (scenegraph[idSf].transform.translate.y === undefined) {
             scenegraph[idSf].transform.translate.y = 0;
             scenegraph[idSf].transformOwners.translate.y = id;
@@ -468,16 +348,6 @@ the align node.
         }
 
         for (const refIdSf of refIdSuffix) {
-          // setScenegraph(
-          //   refIdSf,
-          //   produce((n: ScenegraphNode) => {
-          //     const node = n as ScenegraphNode & { type: "node" };
-          //     if (node.transform.translate.y === undefined) {
-          //       node.transform.translate.y = 0;
-          //       node.transformOwners.translate.y = id;
-          //     }
-          //   })
-          // );
           if (scenegraph[refIdSf].transform.translate.y === undefined) {
             scenegraph[refIdSf].transform.translate.y = 0;
             scenegraph[refIdSf].transformOwners.translate.y = id;
@@ -662,42 +532,6 @@ the align node.
         node.transformOwners.translate.y = newTransformOwners.translate.y;
       }
     });
-  };
-
-  const setCustomData = (id: Id, customData: any) => {
-    // setScenegraph(
-    //   id,
-    //   produce((n: ScenegraphNode) => {
-    //     const node = n as ScenegraphNode & { type: "node" }; // guaranteed by resolveRef
-
-    //     if (customData !== undefined) {
-    //       node.customData = customData;
-    //     }
-    //   })
-    // );
-    scenegraph[id].customData = customData;
-  };
-
-  const setLayout = (id: Id, layout: LayoutFn) => {
-    const layout2 = () => {
-      for (const childId of scenegraph[id]?.children ?? []) {
-        if ("layout" in scenegraph[childId]) {
-          scenegraph[childId].layout();
-        }
-      }
-
-      // const { bbox, transform, customData } = layoutMemo2();
-      const { bbox, transform, customData } = layout(
-        (scenegraph[id]?.children ?? []).map((childId: Id) =>
-          createChildRepr(id, childId)
-        )
-      );
-
-      mergeBBoxAndTransform(id, id, bbox, transform);
-      setCustomData(id, customData);
-    };
-
-    scenegraph[id].layout = layout2;
   };
 
   const setBBox = (owner: Id, id: Id, bbox: BBox) => {
@@ -1029,8 +863,6 @@ the align node.
     resolveRef,
     mergeBBoxAndTransform,
     // API
-    setCustomData,
-    setLayout,
     getBBox,
     setBBox,
     ownedByOther,
@@ -1062,8 +894,6 @@ export type ScenegraphContextType = {
     bbox: BBox,
     transform: Transform
   ) => void;
-  setCustomData: (id: Id, customData: any) => void;
-  setLayout: (id: Id, layout: LayoutFn) => void;
   getBBox: (id: Id) => BBox;
   setBBox: (owner: Id, id: Id, bbox: BBox) => void;
   ownedByOther: (id: Id, check: Id, dim: Dim) => boolean;

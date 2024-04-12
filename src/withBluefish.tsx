@@ -8,12 +8,7 @@ import {
   useContext,
 } from "solid-js";
 import type { JSX } from "solid-js";
-import {
-  Id,
-  ScenegraphToken,
-  ScenegraphTokenizer,
-  resolveScenegraphTokens,
-} from "./scenegraph";
+import { Id, ScenegraphToken, resolveScenegraphTokens } from "./scenegraph";
 import { ParentScopeIdContext, ScopeContext } from "./createName";
 import { Dynamic } from "solid-js/web";
 
@@ -59,33 +54,10 @@ export function withBluefish<ComponentProps>(
     }
     setScope(scopeId(), "layoutNode", id());
 
-    // return (
-    //   <ParentScopeIdContext.Provider value={scopeId}>
-    //     <IdContext.Provider value={id}>
-    //       {/* {untrack(() => {
-    //         const tokens = resolveTokens(ScenegraphTokenizer, () => (
-    //           <Dynamic
-    //             component={WrappedComponent}
-    //             {...(props as WithBluefishProps<ComponentProps>)}
-    //             name={id()}
-    //           />
-    //         ));
-
-    //         return tokens();
-    //       })} */}
-    //       <WrappedComponent
-    //         {...(props as WithBluefishProps<ComponentProps>)}
-    //         name={id()}
-    //       />
-    //     </IdContext.Provider>
-    //   </ParentScopeIdContext.Provider>
-    // );
-
     const jsx = (
       <ParentScopeIdContext.Provider value={scopeId}>
         <IdContext.Provider value={id}>
           {untrack(() => {
-            /* const tokens = resolveTokens(ScenegraphTokenizer, () => ( */
             const layoutNode = resolveScenegraphTokens(
               <Dynamic
                 component={WrappedComponent}
@@ -93,7 +65,6 @@ export function withBluefish<ComponentProps>(
                 name={id()}
               />
             );
-            /* )); */
 
             setLayout(() => layoutNode[0].layout);
 
@@ -107,29 +78,7 @@ export function withBluefish<ComponentProps>(
       jsx,
       layout: (parentId) => layout()(parentId),
     } satisfies ScenegraphToken as unknown as JSX.Element;
-    // (
-    //   <ParentScopeIdContext.Provider value={scopeId}>
-    //     <IdContext.Provider value={id}>
-    //       {/* {untrack(() => {
-    //       const tokens = resolveTokens(ScenegraphTokenizer, () => (
-    //         <Dynamic
-    //           component={WrappedComponent}
-    //           {...(props as WithBluefishProps<ComponentProps>)}
-    //           name={id()}
-    //         />
-    //       ));
-
-    //       return tokens();
-    //     })} */}
-    //       <WrappedComponent
-    //         {...(props as WithBluefishProps<ComponentProps>)}
-    //         name={id()}
-    //       />
-    //     </IdContext.Provider>
-    //   </ParentScopeIdContext.Provider>
-    // );
   };
-  /* ); */
 }
 
 export default withBluefish;

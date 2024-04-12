@@ -88,24 +88,13 @@ export const resolveSelection = (
 };
 
 export const Ref = withBluefish(
-  /* createToken(ScenegraphTokenizer,  */ (props: RefProps) => {
+  (props: RefProps) => {
     const error = useError();
     // const parentId = useContext(ParentIDContext);
     const [scope, setScope] = useContext(ScopeContext);
     const { createRef, deleteRef, scenegraph } = UNSAFE_useScenegraph();
 
-    // if (parentId === null) {
-    //   throw new Error("Ref must be a child of a Layout");
-    // }
-
     const normalizedSelection = () => normalizeSelection(props.select);
-
-    // TODO: what do we do if the layout node isn't defined?
-    // createRenderEffect(() => {
-    //   onCleanup(() => {
-    //     deleteRef(error, props.name, setScope);
-    //   });
-    // });
 
     onCleanup(() => {
       // filter out scopes that have this id as their layoutNode
@@ -135,7 +124,7 @@ export const Ref = withBluefish(
         );
       },
     } satisfies ScenegraphToken as unknown as JSX.Element;
-  } /* ) */,
+  },
   { displayName: "Ref" }
 );
 

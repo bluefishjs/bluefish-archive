@@ -77,10 +77,6 @@ Error path from root:
     // toast.error(errorMessage);
   };
 
-export const LayoutIsDirtyContext = createContext<
-  [Accessor<boolean>, (dirty: boolean) => void]
->([() => false, () => {}]);
-
 export const LayoutUIDContext = createContext<Accessor<string>>(() =>
   createUniqueId()
 );
@@ -106,7 +102,6 @@ export function Bluefish(props: BluefishProps) {
 
   const [fullLayoutFunction, setFullLayoutFunction] = createSignal(() => {});
 
-  const [layoutIsDirty, setLayoutIsDirty] = createSignal(true);
   const [layoutUID, setLayoutUID] = createSignal(createUniqueId());
   const [scenegraphSignal, setScenegraphSignal] = createSignal({
     scenegraph,
@@ -187,79 +182,43 @@ export function Bluefish(props: BluefishProps) {
 
   const jsx = (
     <LayoutUIDContext.Provider value={layoutUID}>
-      <LayoutIsDirtyContext.Provider value={[layoutIsDirty, setLayoutIsDirty]}>
-        <ErrorContext.Provider value={errorContext}>
-          <ScenegraphContext.Provider value={scenegraphContext}>
-            <ScopeContext.Provider value={[scope, setScope]}>
-              {untrack(() => {
-                /* const tokens = resolveTokens(ScenegraphTokenizer, () => ( */
-                const layoutNode = resolveScenegraphTokens(
-                  <Layout name={id} layout={layout} paint={paint}>
-                    {/* <ParentScopeIdContext.Provider value={() => scopeId}>
-                      <ParentIDContext.Provider value={id}> */}
-                    {props.children}
-                    {/* </ParentIDContext.Provider>
-                    </ParentScopeIdContext.Provider> */}
-                  </Layout>
-                );
-                /* )); */
+      <ErrorContext.Provider value={errorContext}>
+        <ScenegraphContext.Provider value={scenegraphContext}>
+          <ScopeContext.Provider value={[scope, setScope]}>
+            {untrack(() => {
+              const layoutNode = resolveScenegraphTokens(
+                <Layout name={id} layout={layout} paint={paint}>
+                  <ParentScopeIdContext.Provider value={() => scopeId}>
+                    <ParentIDContext.Provider value={id}>
+                      {props.children}
+                    </ParentIDContext.Provider>
+                  </ParentScopeIdContext.Provider>
+                </Layout>
+              );
 
-                setFullLayoutFunction(() => {
-                  return () => layoutNode[0].layout(null);
-                });
+              setFullLayoutFunction(() => {
+                return () => layoutNode[0].layout(null);
+              });
 
-                return layoutNode[0].jsx;
-              })}
-            </ScopeContext.Provider>
-          </ScenegraphContext.Provider>
-        </ErrorContext.Provider>
-      </LayoutIsDirtyContext.Provider>
+              return layoutNode[0].jsx;
+            })}
+          </ScopeContext.Provider>
+        </ScenegraphContext.Provider>
+      </ErrorContext.Provider>
     </LayoutUIDContext.Provider>
   );
 
   createRenderEffect(() => {
-    // debugger;
-    // console.log("running bluefish render effect");
-    // if (layoutIsDirty()) {
-    //   scenegraph[id]?.layout();
-    //   setLayoutIsDirty(false);
-    // }
-    // reset all scenegraph layout information to their default values
-    // if (layoutIsDirty()) {
-    // untrack(() => {
-    //   for (const id in scenegraph) {
-    //     if (scenegraph[id].type === "node") {
-    //       const { bbox, owners: bboxOwners } = createLinSysBBox();
-    //       scenegraph[id].bbox = bbox;
-    //       scenegraph[id].bboxOwners = bboxOwners;
-    //       scenegraph[id].transform = { translate: {} };
-    //       scenegraph[id].transformOwners = { translate: {} };
-    //       scenegraph[id].customData = { customData: {} };
-    //     }
-    //   }
-    // });
-
     // clear scenegraph
     for (const id in scenegraph) {
       delete scenegraph[id];
     }
 
-    // TODO: need to figure out how to clear scopes
-
-    // scenegraph[id]?.layout();
     fullLayoutFunction()();
-    // token()[0].data.layout();
-    // untrack(() => {
-    //   console.log(
-    //     "scenegraph after layout",
-    //     JSON.parse(JSON.stringify(scenegraph))
-    //   );
-    // });
-    setLayoutIsDirty(false);
+
     const uid = createUniqueId();
     setLayoutUID(uid);
     setScenegraphSignal({ scenegraph, uid });
-    // }
   });
 
   return (
