@@ -9,8 +9,6 @@ import { useError } from "./errorContext";
 import {
   BluefishError,
   accumulatedTransformUndefinedError,
-  deleteNodeRefError,
-  deleteRefNodeError,
   dimAlreadyOwnedError,
   dimNaNError,
   dimSetUndefinedError,
@@ -128,89 +126,6 @@ export const createScenegraph = (): ScenegraphContextType => {
     if (parentId !== null) {
       scenegraph[parentId].children.push(id);
     }
-  };
-
-  const deleteNode = (
-    error: (error: BluefishError) => void,
-    id: Id,
-    setScope: SetStoreFunction<Scope>
-  ) => {
-    const node = scenegraph[id];
-
-    if (node === undefined) {
-      error(idNotFoundError({ source: id, caller: "deleteNode" }));
-      return;
-    }
-
-    if (node.type === "ref") {
-      error(deleteNodeRefError(id));
-      return;
-    }
-
-    if (node.parent !== null) {
-      const nodeParent = node.parent;
-      scenegraph[nodeParent].children = scenegraph[nodeParent].children.filter(
-        (c) => c !== id
-      );
-    }
-
-    // COMBAK: it's not yet clear whether nodes should be recursively deleted
-    // for (const childId of node.children) {
-    //   deleteNode(childId);
-    // }
-
-    // filter out scopes that have this id as their layoutNode
-    setScope(
-      produce((scope) => {
-        for (const key of Object.keys(scope) as Array<Id>) {
-          if (scope[key].layoutNode === id) {
-            delete scope[key];
-          }
-        }
-      })
-    );
-
-    delete scenegraph[id];
-  };
-
-  // unlike the other functions, we have to pass `error` explicitly, because the error context is
-  // not accessible from `onCleanup`.
-  const deleteRef = (
-    error: (error: BluefishError) => void,
-    id: Id,
-    setScope: SetStoreFunction<Scope>
-  ) => {
-    const node = scenegraph[id];
-
-    if (node === undefined) {
-      error(idNotFoundError({ source: id, caller: "deleteRef" }));
-      return;
-    }
-
-    if (node.type === "node") {
-      error(deleteRefNodeError(id));
-      return;
-    }
-
-    if (node.parent !== null) {
-      const nodeParent = node.parent;
-      scenegraph[nodeParent].children = scenegraph[nodeParent].children.filter(
-        (c) => c !== id
-      );
-    }
-
-    // filter out scopes that have this id as their layoutNode
-    setScope(
-      produce((scope) => {
-        for (const key of Object.keys(scope) as Array<Id>) {
-          if (scope[key].layoutNode === id) {
-            delete scope[key];
-          }
-        }
-      })
-    );
-
-    delete scenegraph[id];
   };
 
   const createRef = (id: Id, refId: Id, parentId: Id) => {
@@ -847,9 +762,7 @@ the align node.
     scenegraph,
     // constructors
     createNode,
-    deleteNode,
     createRef,
-    deleteRef,
     // mid-level API
     resolveRef,
     mergeBBoxAndTransform,
@@ -864,17 +777,7 @@ the align node.
 export type ScenegraphContextType = {
   scenegraph: Scenegraph;
   createNode: (id: Id, parentId: Id | null) => void;
-  deleteNode: (
-    error: (error: BluefishError) => void,
-    id: Id,
-    setScope: SetStoreFunction<Scope>
-  ) => void;
   createRef: (id: Id, refId: Id, parentId: Id) => void;
-  deleteRef: (
-    error: (error: BluefishError) => void,
-    id: Id,
-    setScope: SetStoreFunction<Scope>
-  ) => void;
   resolveRef: (
     id: Id,
     mode: "read" | "write" | "check"

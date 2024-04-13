@@ -41,9 +41,7 @@ export type LayoutProps = ParentProps<{
   }) => JSX.Element;
 }>;
 
-export const Layout = /* createToken(ScenegraphTokenizer,  */ (
-  props: LayoutProps
-) => {
+export const Layout = (props: LayoutProps) => {
   const parentId = useContext(ParentIDContext);
   const [_scope, setScope] = useContext(ScopeContext);
   const error = useError();
@@ -58,13 +56,8 @@ export const Layout = /* createToken(ScenegraphTokenizer,  */ (
     customData: {},
   });
 
-  const {
-    scenegraph,
-    createNode,
-    deleteNode,
-    mergeBBoxAndTransform,
-    createChildRepr,
-  } = UNSAFE_useScenegraph();
+  const { scenegraph, createNode, mergeBBoxAndTransform, createChildRepr } =
+    UNSAFE_useScenegraph();
 
   // evaluate the child props before running the effect so that children's layout functions are
   // called before the parent's layout function

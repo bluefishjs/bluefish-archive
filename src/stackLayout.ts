@@ -10,7 +10,6 @@ import { maybe, maybeMax, maybeSub } from "./util/maybe";
 import * as BBox from "./util/bbox";
 import { useError } from "./errorContext";
 import { dimUnownedError } from "./errors";
-import { untrack } from "solid-js";
 
 export type StackArgs = {
   name: Id;

@@ -92,7 +92,7 @@ export const Ref = withBluefish(
     const error = useError();
     // const parentId = useContext(ParentIDContext);
     const [scope, setScope] = useContext(ScopeContext);
-    const { createRef, deleteRef, scenegraph } = UNSAFE_useScenegraph();
+    const { createRef } = UNSAFE_useScenegraph();
 
     const normalizedSelection = () => normalizeSelection(props.select);
 
