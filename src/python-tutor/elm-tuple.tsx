@@ -53,11 +53,7 @@ export const ElmTuple = withBluefish((props: ElmTupleProps) => {
           {""}
         </Text>
       )}
-      <Align alignment="centerX">
-        <Ref select={valName} />
-        <Ref select={boxName} />
-      </Align>
-      <Align alignment="centerY">
+      <Align alignment="center">
         <Ref select={valName} />
         <Ref select={boxName} />
       </Align>

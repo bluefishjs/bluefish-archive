@@ -28,7 +28,7 @@ type PythonTutorProps = WithBluefishProps<{
   heapArrangement: (Address | null)[][];
 }>;
 
-export const PythonTutor = withBluefish((props: PythonTutorProps) => {
+const PythonTutor = withBluefish((props: PythonTutorProps) => {
   const globalFrameName = createName("globalFrame");
   const heapName = createName("heap");
 
@@ -94,7 +94,7 @@ export const PythonTutor = withBluefish((props: PythonTutorProps) => {
   );
 });
 
-const PythonTutorExample: Story = {
+export const PythonTutorExample: Story = {
   args: {
     stack: [
       { variable: "c", value: pointer(0) },

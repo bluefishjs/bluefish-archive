@@ -59,6 +59,7 @@ export const Heap = withBluefish((props: HeapProps) => {
         {(heapObject, address) => (
           <For each={heapObject.values}>
             {(elmTupleValue, elmTupleIndex) => {
+              // TODO: probably should just box every value to make this simpler
               if (
                 typeof elmTupleValue === "object" &&
                 "type" in elmTupleValue &&
