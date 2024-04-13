@@ -1,4 +1,4 @@
-import { createMemo } from "solid-js";
+import { createMemo, untrack } from "solid-js";
 import { maybeAdd, maybeDiv, maybeMax, maybeMin, maybeSub } from "./maybe";
 import { createStore, produce } from "solid-js/store";
 import { BBoxOwners, Id, Inferred, inferred } from "../scenegraph";
@@ -192,13 +192,15 @@ export const createLinSysBBox = (): {
   return {
     bbox: {
       get left() {
-        if ("left" in equations.x) {
-          return equations.x.left![1];
-        } else if (centerXAndWidth() === undefined) {
-          return undefined;
-        } else {
-          return centerXAndWidth()![0] - centerXAndWidth()![1] / 2;
-        }
+        return untrack(() => {
+          if ("left" in equations.x) {
+            return equations.x.left![1];
+          } else if (centerXAndWidth() === undefined) {
+            return undefined;
+          } else {
+            return centerXAndWidth()![0] - centerXAndWidth()![1] / 2;
+          }
+        });
       },
       set left(left: number | undefined) {
         if (left === undefined) {
@@ -213,13 +215,15 @@ export const createLinSysBBox = (): {
         }
       },
       get centerX() {
-        if ("centerX" in equations.x) {
-          return equations.x.centerX![1];
-        } else if (centerXAndWidth() === undefined) {
-          return undefined;
-        } else {
-          return centerXAndWidth()![0];
-        }
+        return untrack(() => {
+          if ("centerX" in equations.x) {
+            return equations.x.centerX![1];
+          } else if (centerXAndWidth() === undefined) {
+            return undefined;
+          } else {
+            return centerXAndWidth()![0];
+          }
+        });
       },
       set centerX(centerX: number | undefined) {
         if (centerX === undefined) {
@@ -234,13 +238,15 @@ export const createLinSysBBox = (): {
         }
       },
       get right() {
-        if ("right" in equations.x) {
-          return equations.x.right![1];
-        } else if (centerXAndWidth() === undefined) {
-          return undefined;
-        } else {
-          return centerXAndWidth()![0] + centerXAndWidth()![1] / 2;
-        }
+        return untrack(() => {
+          if ("right" in equations.x) {
+            return equations.x.right![1];
+          } else if (centerXAndWidth() === undefined) {
+            return undefined;
+          } else {
+            return centerXAndWidth()![0] + centerXAndWidth()![1] / 2;
+          }
+        });
       },
       set right(right: number | undefined) {
         if (right === undefined) {
@@ -255,13 +261,15 @@ export const createLinSysBBox = (): {
         }
       },
       get width() {
-        if ("width" in equations.x) {
-          return equations.x.width![1];
-        } else if (centerXAndWidth() === undefined) {
-          return undefined;
-        } else {
-          return centerXAndWidth()![1];
-        }
+        return untrack(() => {
+          if ("width" in equations.x) {
+            return equations.x.width![1];
+          } else if (centerXAndWidth() === undefined) {
+            return undefined;
+          } else {
+            return centerXAndWidth()![1];
+          }
+        });
       },
       set width(width: number | undefined) {
         if (width === undefined) {
@@ -276,13 +284,15 @@ export const createLinSysBBox = (): {
         }
       },
       get top() {
-        if ("top" in equations.y) {
-          return equations.y.top![1];
-        } else if (centerYAndHeight() === undefined) {
-          return undefined;
-        } else {
-          return centerYAndHeight()![0] - centerYAndHeight()![1] / 2;
-        }
+        return untrack(() => {
+          if ("top" in equations.y) {
+            return equations.y.top![1];
+          } else if (centerYAndHeight() === undefined) {
+            return undefined;
+          } else {
+            return centerYAndHeight()![0] - centerYAndHeight()![1] / 2;
+          }
+        });
       },
       set top(top: number | undefined) {
         if (top === undefined) {
@@ -297,13 +307,15 @@ export const createLinSysBBox = (): {
         }
       },
       get centerY() {
-        if ("centerY" in equations.y) {
-          return equations.y.centerY![1];
-        } else if (centerYAndHeight() === undefined) {
-          return undefined;
-        } else {
-          return centerYAndHeight()![0];
-        }
+        return untrack(() => {
+          if ("centerY" in equations.y) {
+            return equations.y.centerY![1];
+          } else if (centerYAndHeight() === undefined) {
+            return undefined;
+          } else {
+            return centerYAndHeight()![0];
+          }
+        });
       },
       set centerY(centerY: number | undefined) {
         if (centerY === undefined) {
@@ -318,13 +330,15 @@ export const createLinSysBBox = (): {
         }
       },
       get bottom() {
-        if ("bottom" in equations.y) {
-          return equations.y.bottom![1];
-        } else if (centerYAndHeight() === undefined) {
-          return undefined;
-        } else {
-          return centerYAndHeight()![0] + centerYAndHeight()![1] / 2;
-        }
+        return untrack(() => {
+          if ("bottom" in equations.y) {
+            return equations.y.bottom![1];
+          } else if (centerYAndHeight() === undefined) {
+            return undefined;
+          } else {
+            return centerYAndHeight()![0] + centerYAndHeight()![1] / 2;
+          }
+        });
       },
       set bottom(bottom: number | undefined) {
         if (bottom === undefined) {
@@ -339,13 +353,15 @@ export const createLinSysBBox = (): {
         }
       },
       get height() {
-        if ("height" in equations.y) {
-          return equations.y.height![1];
-        } else if (centerYAndHeight() === undefined) {
-          return undefined;
-        } else {
-          return centerYAndHeight()![1];
-        }
+        return untrack(() => {
+          if ("height" in equations.y) {
+            return equations.y.height![1];
+          } else if (centerYAndHeight() === undefined) {
+            return undefined;
+          } else {
+            return centerYAndHeight()![1];
+          }
+        });
       },
       set height(height: number | undefined) {
         if (height === undefined) {
@@ -362,13 +378,15 @@ export const createLinSysBBox = (): {
     },
     owners: {
       get left() {
-        if ("left" in owners.x) {
-          return owners.x.left;
-        } else if (Object.keys(equations.x).length === 2) {
-          return inferred;
-        } else {
-          return undefined;
-        }
+        return untrack(() => {
+          if ("left" in owners.x) {
+            return owners.x.left;
+          } else if (Object.keys(equations.x).length === 2) {
+            return inferred;
+          } else {
+            return undefined;
+          }
+        });
       },
       set left(left: Id | undefined | Inferred) {
         if (left === undefined) {
@@ -383,13 +401,15 @@ export const createLinSysBBox = (): {
         }
       },
       get centerX() {
-        if ("centerX" in owners.x) {
-          return owners.x.centerX;
-        } else if (Object.keys(equations.x).length === 2) {
-          return inferred;
-        } else {
-          return undefined;
-        }
+        return untrack(() => {
+          if ("centerX" in owners.x) {
+            return owners.x.centerX;
+          } else if (Object.keys(equations.x).length === 2) {
+            return inferred;
+          } else {
+            return undefined;
+          }
+        });
       },
       set centerX(centerX: Id | undefined | Inferred) {
         if (centerX === undefined) {
@@ -404,13 +424,15 @@ export const createLinSysBBox = (): {
         }
       },
       get right() {
-        if ("right" in owners.x) {
-          return owners.x.right;
-        } else if (Object.keys(equations.x).length === 2) {
-          return inferred;
-        } else {
-          return undefined;
-        }
+        return untrack(() => {
+          if ("right" in owners.x) {
+            return owners.x.right;
+          } else if (Object.keys(equations.x).length === 2) {
+            return inferred;
+          } else {
+            return undefined;
+          }
+        });
       },
       set right(right: Id | undefined | Inferred) {
         if (right === undefined) {
@@ -425,13 +447,15 @@ export const createLinSysBBox = (): {
         }
       },
       get width() {
-        if ("width" in owners.x) {
-          return owners.x.width;
-        } else if (Object.keys(equations.x).length === 2) {
-          return inferred;
-        } else {
-          return undefined;
-        }
+        return untrack(() => {
+          if ("width" in owners.x) {
+            return owners.x.width;
+          } else if (Object.keys(equations.x).length === 2) {
+            return inferred;
+          } else {
+            return undefined;
+          }
+        });
       },
       set width(width: Id | undefined | Inferred) {
         if (width === undefined) {
@@ -446,13 +470,15 @@ export const createLinSysBBox = (): {
         }
       },
       get top() {
-        if ("top" in owners.y) {
-          return owners.y.top;
-        } else if (Object.keys(equations.y).length === 2) {
-          return inferred;
-        } else {
-          return undefined;
-        }
+        return untrack(() => {
+          if ("top" in owners.y) {
+            return owners.y.top;
+          } else if (Object.keys(equations.y).length === 2) {
+            return inferred;
+          } else {
+            return undefined;
+          }
+        });
       },
       set top(top: Id | undefined | Inferred) {
         if (top === undefined) {
@@ -467,13 +493,15 @@ export const createLinSysBBox = (): {
         }
       },
       get centerY() {
-        if ("centerY" in owners.y) {
-          return owners.y.centerY;
-        } else if (Object.keys(equations.y).length === 2) {
-          return inferred;
-        } else {
-          return undefined;
-        }
+        return untrack(() => {
+          if ("centerY" in owners.y) {
+            return owners.y.centerY;
+          } else if (Object.keys(equations.y).length === 2) {
+            return inferred;
+          } else {
+            return undefined;
+          }
+        });
       },
       set centerY(centerY: Id | undefined | Inferred) {
         if (centerY === undefined) {
@@ -488,13 +516,15 @@ export const createLinSysBBox = (): {
         }
       },
       get bottom() {
-        if ("bottom" in owners.y) {
-          return owners.y.bottom;
-        } else if (Object.keys(equations.y).length === 2) {
-          return inferred;
-        } else {
-          return undefined;
-        }
+        return untrack(() => {
+          if ("bottom" in owners.y) {
+            return owners.y.bottom;
+          } else if (Object.keys(equations.y).length === 2) {
+            return inferred;
+          } else {
+            return undefined;
+          }
+        });
       },
       set bottom(bottom: Id | undefined | Inferred) {
         if (bottom === undefined) {
@@ -509,13 +539,15 @@ export const createLinSysBBox = (): {
         }
       },
       get height() {
-        if ("height" in owners.y) {
-          return owners.y.height;
-        } else if (Object.keys(equations.y).length === 2) {
-          return inferred;
-        } else {
-          return undefined;
-        }
+        return untrack(() => {
+          if ("height" in owners.y) {
+            return owners.y.height;
+          } else if (Object.keys(equations.y).length === 2) {
+            return inferred;
+          } else {
+            return undefined;
+          }
+        });
       },
       set height(height: Id | undefined | Inferred) {
         if (height === undefined) {
