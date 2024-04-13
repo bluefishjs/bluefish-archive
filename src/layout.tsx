@@ -1,27 +1,22 @@
 import { Dynamic } from "solid-js/web";
 import {
-  Component,
   For,
   JSX,
   ParentProps,
-  children,
-  createReaction,
   createRenderEffect,
   createSignal,
   on,
   onCleanup,
-  untrack,
   useContext,
 } from "solid-js";
 import {
   BBox,
   Transform,
   UNSAFE_useScenegraph,
-  ParentIDContext,
   LayoutFn,
   Id,
-  ScenegraphToken,
-  resolveScenegraphTokens,
+  ScenegraphElement,
+  resolveScenegraphElements,
 } from "./scenegraph";
 import { IdContext } from "./withBluefish";
 import { ScopeContext } from "./createName";
@@ -42,7 +37,6 @@ export type LayoutProps = ParentProps<{
 }>;
 
 export const Layout = (props: LayoutProps) => {
-  const parentId = useContext(ParentIDContext);
   const [_scope, setScope] = useContext(ScopeContext);
   const error = useError();
   const layoutUID = useContext(LayoutUIDContext);
@@ -63,25 +57,23 @@ export const Layout = (props: LayoutProps) => {
   // called before the parent's layout function
   // h/t Erik Demaine
   const jsx = (
-    <ParentIDContext.Provider value={props.name}>
-      <IdContext.Provider value={() => undefined}>
-        {(() => {
-          const childNodes = resolveScenegraphTokens(props.children);
+    <IdContext.Provider value={() => undefined}>
+      {(() => {
+        const childNodes = resolveScenegraphElements(props.children);
 
-          setChildLayouts(() => {
-            return childNodes.map((child) => {
-              return child.layout;
-            });
+        setChildLayouts(() => {
+          return childNodes.map((child) => {
+            return child.layout;
           });
+        });
 
-          return (
-            <Dynamic component={props.paint} {...scenegraphInfo}>
-              <For each={childNodes}>{(child) => child.jsx}</For>
-            </Dynamic>
-          );
-        })()}
-      </IdContext.Provider>
-    </ParentIDContext.Provider>
+        return (
+          <Dynamic component={props.paint} {...scenegraphInfo}>
+            <For each={childNodes}>{(child) => child.jsx}</For>
+          </Dynamic>
+        );
+      })()}
+    </IdContext.Provider>
   );
 
   onCleanup(() => {
@@ -135,7 +127,7 @@ export const Layout = (props: LayoutProps) => {
   return {
     jsx,
     layout,
-  } satisfies ScenegraphToken as unknown as JSX.Element;
+  } satisfies ScenegraphElement as unknown as JSX.Element;
 };
 
 export default Layout;

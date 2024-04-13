@@ -8,7 +8,7 @@ import {
   useContext,
 } from "solid-js";
 import type { JSX } from "solid-js";
-import { Id, ScenegraphToken, resolveScenegraphTokens } from "./scenegraph";
+import { Id, ScenegraphElement, resolveScenegraphElements } from "./scenegraph";
 import { ParentScopeIdContext, ScopeContext } from "./createName";
 import { Dynamic } from "solid-js/web";
 
@@ -58,7 +58,7 @@ export function withBluefish<ComponentProps>(
       <ParentScopeIdContext.Provider value={scopeId}>
         <IdContext.Provider value={id}>
           {untrack(() => {
-            const layoutNode = resolveScenegraphTokens(
+            const layoutNode = resolveScenegraphElements(
               <Dynamic
                 component={WrappedComponent}
                 {...(props as WithBluefishProps<ComponentProps>)}
@@ -77,7 +77,7 @@ export function withBluefish<ComponentProps>(
     return {
       jsx,
       layout: (parentId) => layout()(parentId),
-    } satisfies ScenegraphToken as unknown as JSX.Element;
+    } satisfies ScenegraphElement as unknown as JSX.Element;
   };
 }
 

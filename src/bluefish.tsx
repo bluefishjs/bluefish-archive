@@ -5,14 +5,11 @@ import {
   ScenegraphNode,
   Transform,
   createScenegraph,
-  ParentIDContext,
   Id,
   BBox,
   ChildNode,
   Scenegraph,
-  ScenegraphTokenizer,
-  ScenegraphToken,
-  resolveScenegraphTokens,
+  resolveScenegraphElements,
 } from "./scenegraph";
 import {
   Accessor,
@@ -34,7 +31,6 @@ import { ErrorContext, createErrorContext } from "./errorContext";
 import { BluefishError } from "./errors";
 import { getAncestorChain } from "./util/lca";
 import toast, { Toaster } from "solid-toast";
-import { createLinSysBBox } from "./util/bbox";
 
 export type BluefishProps = ParentProps<{
   width?: number;
@@ -186,12 +182,10 @@ export function Bluefish(props: BluefishProps) {
         <ScenegraphContext.Provider value={scenegraphContext}>
           <ScopeContext.Provider value={[scope, setScope]}>
             {untrack(() => {
-              const layoutNode = resolveScenegraphTokens(
+              const layoutNode = resolveScenegraphElements(
                 <Layout name={id} layout={layout} paint={paint}>
                   <ParentScopeIdContext.Provider value={() => scopeId}>
-                    <ParentIDContext.Provider value={id}>
-                      {props.children}
-                    </ParentIDContext.Provider>
+                    {props.children}
                   </ParentScopeIdContext.Provider>
                 </Layout>
               );

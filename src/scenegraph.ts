@@ -76,23 +76,23 @@ export type Scenegraph = {
   [key: Id]: ScenegraphNode;
 };
 
-export type ScenegraphToken = {
+export type ScenegraphElement = {
   jsx: JSX.Element;
   layout: (parentId: Id | null) => void;
 };
 
-export const resolveScenegraphTokens = (
+export const resolveScenegraphElements = (
   unresolved: unknown
-): ScenegraphToken[] => {
+): ScenegraphElement[] => {
   // if undefined, return an empty array
   if (unresolved === undefined || unresolved === null) {
     return [];
   } else if (typeof unresolved === "function" && !unresolved.length) {
-    return resolveScenegraphTokens(unresolved());
+    return resolveScenegraphElements(unresolved());
   } else if (Array.isArray(unresolved)) {
-    return unresolved.flatMap((child) => resolveScenegraphTokens(child));
+    return unresolved.flatMap((child) => resolveScenegraphElements(child));
   } else if (typeof unresolved === "object") {
-    return [unresolved as unknown as ScenegraphToken];
+    return [unresolved as unknown as ScenegraphElement];
   } else {
     throw new Error(
       `Could not resolve scenegraph tokens. Unresolved value: ${JSON.stringify(
@@ -818,8 +818,6 @@ export const UNSAFE_useScenegraph = () => {
 
   return context;
 };
-
-export const ParentIDContext = createContext<Id | null>(null);
 
 export type LayoutFn = (childNodes: ChildNode[]) => {
   bbox: Partial<BBox>;

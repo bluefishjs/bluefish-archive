@@ -7,12 +7,7 @@ import {
   useContext,
 } from "solid-js";
 import type { JSX } from "solid-js";
-import {
-  Id,
-  UNSAFE_useScenegraph,
-  ParentIDContext,
-  ScenegraphToken,
-} from "./scenegraph";
+import { Id, UNSAFE_useScenegraph, ScenegraphElement } from "./scenegraph";
 import withBluefish from "./withBluefish";
 import { Name, Scope, ScopeContext } from "./createName";
 import { useError } from "./errorContext";
@@ -90,7 +85,6 @@ export const resolveSelection = (
 export const Ref = withBluefish(
   (props: RefProps) => {
     const error = useError();
-    // const parentId = useContext(ParentIDContext);
     const [scope, setScope] = useContext(ScopeContext);
     const { createRef } = UNSAFE_useScenegraph();
 
@@ -123,7 +117,7 @@ export const Ref = withBluefish(
           parentId
         );
       },
-    } satisfies ScenegraphToken as unknown as JSX.Element;
+    } satisfies ScenegraphElement as unknown as JSX.Element;
   },
   { displayName: "Ref" }
 );
