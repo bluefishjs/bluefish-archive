@@ -41,6 +41,6 @@ function getStringDims(str: string, style?: TextProps) {
 
 export default memoize(getStringDims, (str, style) => {
   if (!style) return `${str}_`;
-  const { children, ...rest } = style;
+  const { children, name, ...rest } = style;
   return `${str}_${JSON.stringify(rest)}`;
 });
