@@ -1,28 +1,10 @@
-import {
-  Component,
-  createEffect,
-  createRenderEffect,
-  onCleanup,
-  untrack,
-  useContext,
-} from "solid-js";
+import { onCleanup, useContext } from "solid-js";
 import type { JSX } from "solid-js";
 import { Id, UNSAFE_useScenegraph, ScenegraphElement } from "./scenegraph";
 import withBluefish from "./withBluefish";
 import { Name, Scope, ScopeContext } from "./createName";
 import { useError } from "./errorContext";
 import { produce } from "solid-js/store";
-
-// The properties we want:
-// every time the refId's bbox is updated, it should be propagated to the id
-//   (passing through worldTransforms)
-// every time the id's bbox is updated, it should be propagated to the refId
-//   (passing through worldTransforms)
-// I guess owners are the same for both?
-
-// TODO: actually the Ref's bbox should be completely derived from the refId's bbox that way we
-// avoid cycles. whenever the Ref's bbox is requested, we'll compute it. whenever the Ref's bbox is
-// "modified," we'll instead modify the refId's bbox.
 
 export type Selection = Id | [Id, ...Name[]];
 export type NormalizedSelection = [Id, ...Name[]];
@@ -91,9 +73,10 @@ export const Ref = withBluefish(
     const normalizedSelection = () => normalizeSelection(props.select);
 
     onCleanup(() => {
-      // filter out scopes that have this id as their layoutNode
+      // when the Ref node is destroyed, we need to clear any relevant scopes
       setScope(
         produce((scope) => {
+          // filter out scopes that have this id as their layoutNode
           for (const key of Object.keys(scope) as Array<Id>) {
             if (scope[key].layoutNode === props.name) {
               delete scope[key];

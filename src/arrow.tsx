@@ -1,15 +1,8 @@
-import {
-  JSX,
-  ParentProps,
-  Show,
-  createEffect,
-  mergeProps,
-  untrack,
-} from "solid-js";
+import { JSX, ParentProps, Show, mergeProps } from "solid-js";
 import { Layout } from "./layout";
 import _, { get, startsWith } from "lodash";
 import { maybe, maybeAdd, maybeMax, maybeMin, maybeSub } from "./util/maybe";
-import { BBox, Id, Transform, useScenegraph, ChildNode } from "./scenegraph";
+import { BBox, Id, Transform, ChildNode } from "./scenegraph";
 import withBluefish from "./withBluefish";
 import { ArrowOptions, getBoxToBoxArrow } from "perfect-arrows";
 

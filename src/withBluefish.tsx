@@ -4,7 +4,6 @@ import {
   createContext,
   createSignal,
   createUniqueId,
-  untrack,
   useContext,
 } from "solid-js";
 import type { JSX } from "solid-js";
@@ -57,7 +56,7 @@ export function withBluefish<ComponentProps>(
     const jsx = (
       <ParentScopeIdContext.Provider value={scopeId}>
         <IdContext.Provider value={id}>
-          {untrack(() => {
+          {(() => {
             const layoutNode = resolveScenegraphElements(
               <Dynamic
                 component={WrappedComponent}
@@ -69,7 +68,7 @@ export function withBluefish<ComponentProps>(
             setLayout(() => layoutNode[0].layout);
 
             return layoutNode[0].jsx;
-          })}
+          })()}
         </IdContext.Provider>
       </ParentScopeIdContext.Provider>
     );

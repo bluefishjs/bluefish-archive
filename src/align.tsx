@@ -1,8 +1,8 @@
-import { JSX, ParentProps, untrack } from "solid-js";
+import { JSX, ParentProps } from "solid-js";
 import { Layout } from "./layout";
 import _, { get, startsWith } from "lodash";
 import { maybe, maybeAdd, maybeMax, maybeMin, maybeSub } from "./util/maybe";
-import { ChildNode, Id, Transform, useScenegraph } from "./scenegraph";
+import { ChildNode, Id, Transform } from "./scenegraph";
 import withBluefish from "./withBluefish";
 import * as BBox from "./util/bbox";
 

@@ -81,10 +81,12 @@ export type ScenegraphElement = {
   layout: (parentId: Id | null) => void;
 };
 
+// We pass information up the JSX tree using ScenegraphElements
+// This function turns children of a component into an array of ScenegraphElements
+// Inspired by JSX tokenizer: https://github.com/solidjs-community/solid-primitives/blob/199ddd6bd7f0e996cd48915c6ff910f6b8220989/packages/jsx-tokenizer/src/index.ts#L135
 export const resolveScenegraphElements = (
   unresolved: unknown
 ): ScenegraphElement[] => {
-  // if undefined, return an empty array
   if (unresolved === undefined || unresolved === null) {
     return [];
   } else if (typeof unresolved === "function" && !unresolved.length) {

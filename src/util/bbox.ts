@@ -78,9 +78,10 @@ export const from = (bboxes: BBox[]): BBox => {
   };
 };
 
-export const dimensionVectors: {
-  [key in Axis]: { [key in string]: [number, number] };
-} = {
+// The coefficients for the linear equations that define the bounding box dimensions in terms of
+// center and size.
+// For example, left = 1 * centerX - 0.5 * width, so its entry is [1, -0.5].
+export const dimVecs = {
   x: {
     left: [1, -0.5],
     right: [1, 0.5],
@@ -93,12 +94,12 @@ export const dimensionVectors: {
     centerY: [1, 0],
     height: [0, 1],
   },
-};
+} as const;
 
 // solve 2x2 system given two equations e1 and e2
 export const solveSystem = (
-  e1: [[number, number], number],
-  e2: [[number, number], number]
+  e1: [readonly [number, number], number],
+  e2: [readonly [number, number], number]
 ): [number, number] => {
   const a = e1[0][0];
   const b = e1[0][1];
@@ -119,26 +120,43 @@ export const solveSystem = (
   return [center, size];
 };
 
+// If eq = [[a, b], c] and vec = [x, y], then this function checks: a * x + b * y = c
+export const checkLinearEq = (
+  eq: [readonly [number, number], number],
+  vec: readonly [number, number],
+  tolerance = 1e-6
+): boolean => {
+  const [a, b] = eq[0];
+  const c = eq[1];
+  return Math.abs(a * vec[0] + b * vec[1] - c) < tolerance;
+};
+
+// If eq = [a, b] and vec = [x, y], then this function computes: a * x + b * y
+export const computeLinearExpr = (
+  eq: readonly [number, number],
+  vec: readonly [number, number]
+) => eq[0] * vec[0] + eq[1] * vec[1];
+
 /* 
-Ok so the problem is that we always want a property to be readable if it has been set. At the very
-least the width should be readable if it has been set even if left and right are undefined. But also
-if right is defined and nothing else it should probably be readable as well I think?
+Creates a linear system of equations representing the bounding box dimensions.
 
-So if a field is read
-- first check if it is in the equations list
-  - if so we can return the value
-- otherwise check if the system has been solved (i.e. there are two equations)
-  - if so we can return the value
-- otherwise we can return undefined
-
-Only the fields in the equations list are owned. The rest are inferred.
+Dimensions along the x- and y-axes are defined using a 2x2 linear system for each axis. Two linear
+equations are sufficient to define all the dimensions along a single axis. For example, once left
+and right are specified, width and centerX can be inferred. The bounding box dimensions have three
+behaviors depending on the number of equations specified:
+- (<2): When fewer than two equations are specified, only the property set directly for that axis can be
+        read.
+- (=2): Once there are at least two equations, all the properties can be read. Properties that were
+  not set directly are marked as "inferred," because they are not directly owned.
+- (>2): If a user adds more equations, the system checks that the new equations are consistent with the
+        existing ones.
 */
 export const createLinSysBBox = (): {
   bbox: BBox;
   owners: BBoxOwners;
 } => {
   const [equations, setEquations] = createStore<{
-    [key in Axis]: { [key in Dim]?: [[number, number], number] };
+    [key in Axis]: { [key in Dim]?: [readonly [number, number], number] };
   }>({
     x: {},
     y: {},
@@ -159,14 +177,14 @@ export const createLinSysBBox = (): {
       if (xEqs.length > 2) {
         // check the other equations
         for (const eq of xEqs.slice(2)) {
-          if (Math.abs(eq[0][0] * centerX + eq[0][1] * width - eq[1]) > 1e-6) {
+          if (!checkLinearEq(eq, [centerX, width])) {
             throw new Error(
               `System is not solvable. Equations: ${JSON.stringify(xEqs)}`
             );
           }
         }
       }
-      return [centerX, width];
+      return [centerX, width] satisfies [number, number];
     }
   });
 
@@ -178,14 +196,14 @@ export const createLinSysBBox = (): {
       if (yEqs.length > 2) {
         // check the other equations
         for (const eq of yEqs.slice(2)) {
-          if (Math.abs(eq[0][0] * centerY + eq[0][1] * height - eq[1]) > 1e-6) {
+          if (!checkLinearEq(eq, [centerY, height])) {
             throw new Error(
               `System is not solvable. Equations: ${JSON.stringify(yEqs)}`
             );
           }
         }
       }
-      return [centerY, height];
+      return [centerY, height] satisfies [number, number];
     }
   });
 
@@ -195,11 +213,9 @@ export const createLinSysBBox = (): {
         return untrack(() => {
           if ("left" in equations.x) {
             return equations.x.left![1];
-          } else if (centerXAndWidth() === undefined) {
-            return undefined;
-          } else {
-            return centerXAndWidth()![0] - centerXAndWidth()![1] / 2;
           }
+          const cw = centerXAndWidth();
+          return cw ? computeLinearExpr(cw, dimVecs.x.left) : undefined;
         });
       },
       set left(left: number | undefined) {
@@ -211,18 +227,16 @@ export const createLinSysBBox = (): {
             })
           );
         } else {
-          setEquations("x", "left", [[1, -0.5], left]);
+          setEquations("x", "left", [dimVecs.x.left, left]);
         }
       },
       get centerX() {
         return untrack(() => {
           if ("centerX" in equations.x) {
             return equations.x.centerX![1];
-          } else if (centerXAndWidth() === undefined) {
-            return undefined;
-          } else {
-            return centerXAndWidth()![0];
           }
+          const cw = centerXAndWidth();
+          return cw ? computeLinearExpr(cw, dimVecs.x.centerX) : undefined;
         });
       },
       set centerX(centerX: number | undefined) {
@@ -234,18 +248,16 @@ export const createLinSysBBox = (): {
             })
           );
         } else {
-          setEquations("x", "centerX", [[1, 0], centerX]);
+          setEquations("x", "centerX", [dimVecs.x.centerX, centerX]);
         }
       },
       get right() {
         return untrack(() => {
           if ("right" in equations.x) {
             return equations.x.right![1];
-          } else if (centerXAndWidth() === undefined) {
-            return undefined;
-          } else {
-            return centerXAndWidth()![0] + centerXAndWidth()![1] / 2;
           }
+          const cw = centerXAndWidth();
+          return cw ? computeLinearExpr(cw, dimVecs.x.right) : undefined;
         });
       },
       set right(right: number | undefined) {
@@ -257,18 +269,16 @@ export const createLinSysBBox = (): {
             })
           );
         } else {
-          setEquations("x", "right", [[1, 0.5], right]);
+          setEquations("x", "right", [dimVecs.x.right, right]);
         }
       },
       get width() {
         return untrack(() => {
           if ("width" in equations.x) {
             return equations.x.width![1];
-          } else if (centerXAndWidth() === undefined) {
-            return undefined;
-          } else {
-            return centerXAndWidth()![1];
           }
+          const cw = centerXAndWidth();
+          return cw ? computeLinearExpr(cw, dimVecs.x.width) : undefined;
         });
       },
       set width(width: number | undefined) {
@@ -280,18 +290,16 @@ export const createLinSysBBox = (): {
             })
           );
         } else {
-          setEquations("x", "width", [[0, 1], width]);
+          setEquations("x", "width", [dimVecs.x.width, width]);
         }
       },
       get top() {
         return untrack(() => {
           if ("top" in equations.y) {
             return equations.y.top![1];
-          } else if (centerYAndHeight() === undefined) {
-            return undefined;
-          } else {
-            return centerYAndHeight()![0] - centerYAndHeight()![1] / 2;
           }
+          const ch = centerYAndHeight();
+          return ch ? computeLinearExpr(ch, dimVecs.y.top) : undefined;
         });
       },
       set top(top: number | undefined) {
@@ -303,18 +311,16 @@ export const createLinSysBBox = (): {
             })
           );
         } else {
-          setEquations("y", "top", [[1, -0.5], top]);
+          setEquations("y", "top", [dimVecs.y.top, top]);
         }
       },
       get centerY() {
         return untrack(() => {
           if ("centerY" in equations.y) {
             return equations.y.centerY![1];
-          } else if (centerYAndHeight() === undefined) {
-            return undefined;
-          } else {
-            return centerYAndHeight()![0];
           }
+          const ch = centerYAndHeight();
+          return ch ? computeLinearExpr(ch, dimVecs.y.centerY) : undefined;
         });
       },
       set centerY(centerY: number | undefined) {
@@ -326,18 +332,16 @@ export const createLinSysBBox = (): {
             })
           );
         } else {
-          setEquations("y", "centerY", [[1, 0], centerY]);
+          setEquations("y", "centerY", [dimVecs.y.centerY, centerY]);
         }
       },
       get bottom() {
         return untrack(() => {
           if ("bottom" in equations.y) {
             return equations.y.bottom![1];
-          } else if (centerYAndHeight() === undefined) {
-            return undefined;
-          } else {
-            return centerYAndHeight()![0] + centerYAndHeight()![1] / 2;
           }
+          const ch = centerYAndHeight();
+          return ch ? computeLinearExpr(ch, dimVecs.y.bottom) : undefined;
         });
       },
       set bottom(bottom: number | undefined) {
@@ -349,18 +353,16 @@ export const createLinSysBBox = (): {
             })
           );
         } else {
-          setEquations("y", "bottom", [[1, 0.5], bottom]);
+          setEquations("y", "bottom", [dimVecs.y.bottom, bottom]);
         }
       },
       get height() {
         return untrack(() => {
           if ("height" in equations.y) {
             return equations.y.height![1];
-          } else if (centerYAndHeight() === undefined) {
-            return undefined;
-          } else {
-            return centerYAndHeight()![1];
           }
+          const ch = centerYAndHeight();
+          return ch ? computeLinearExpr(ch, dimVecs.y.height) : undefined;
         });
       },
       set height(height: number | undefined) {
@@ -372,7 +374,7 @@ export const createLinSysBBox = (): {
             })
           );
         } else {
-          setEquations("y", "height", [[0, 1], height]);
+          setEquations("y", "height", [dimVecs.y.height, height]);
         }
       },
     },

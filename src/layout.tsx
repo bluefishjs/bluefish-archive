@@ -77,9 +77,10 @@ export const Layout = (props: LayoutProps) => {
   );
 
   onCleanup(() => {
-    // filter out scopes that have this id as their layoutNode
+    // when the Layout node is destroyed, we need to clear any relevant scopes
     setScope(
       produce((scope) => {
+        // filter out scopes that have this id as their layoutNode
         for (const key of Object.keys(scope) as Array<Id>) {
           if (scope[key].layoutNode === props.name) {
             delete scope[key];

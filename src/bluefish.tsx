@@ -13,12 +13,10 @@ import {
 } from "./scenegraph";
 import {
   Accessor,
-  For,
   JSX,
   ParentProps,
   Show,
   createContext,
-  createEffect,
   createRenderEffect,
   createSignal,
   createUniqueId,
@@ -26,7 +24,7 @@ import {
   untrack,
 } from "solid-js";
 import { ParentScopeIdContext, Scope, ScopeContext } from "./createName";
-import { createStore, produce } from "solid-js/store";
+import { createStore } from "solid-js/store";
 import { ErrorContext, createErrorContext } from "./errorContext";
 import { BluefishError } from "./errors";
 import { getAncestorChain } from "./util/lca";
@@ -87,7 +85,7 @@ export function Bluefish(props: BluefishProps) {
   );
 
   const scenegraphContext = createScenegraph();
-  const { scenegraph, createNode } = scenegraphContext;
+  const { scenegraph } = scenegraphContext;
   const [scope, setScope] = createStore<Scope>({});
   const errorContext = createErrorContext(createOnError(scenegraph, scope));
 
@@ -181,7 +179,7 @@ export function Bluefish(props: BluefishProps) {
       <ErrorContext.Provider value={errorContext}>
         <ScenegraphContext.Provider value={scenegraphContext}>
           <ScopeContext.Provider value={[scope, setScope]}>
-            {untrack(() => {
+            {(() => {
               const layoutNode = resolveScenegraphElements(
                 <Layout name={id} layout={layout} paint={paint}>
                   <ParentScopeIdContext.Provider value={() => scopeId}>
@@ -195,23 +193,27 @@ export function Bluefish(props: BluefishProps) {
               });
 
               return layoutNode[0].jsx;
-            })}
+            })()}
           </ScopeContext.Provider>
         </ScenegraphContext.Provider>
       </ErrorContext.Provider>
     </LayoutUIDContext.Provider>
   );
 
+  // whenever a layout changes, blast away the old scenegraph and rebuild it
   createRenderEffect(() => {
     // clear scenegraph
     for (const id in scenegraph) {
       delete scenegraph[id];
     }
 
+    // run layout
     fullLayoutFunction()();
 
     const uid = createUniqueId();
+    // we use this signal to notify Layout nodes to re-render
     setLayoutUID(uid);
+    // we use this signal for debugging since the scenegraph itself is not reactive
     setScenegraphSignal({ scenegraph, uid });
   });
 
