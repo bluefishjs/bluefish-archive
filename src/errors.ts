@@ -218,36 +218,6 @@ export const idNotFoundError = ({
   };
 };
 
-export type DeleteNodeRefError = {
-  type: "DeleteNodeRefError";
-} & BluefishError;
-
-export const deleteNodeRefError = (source: Id): DeleteNodeRefError => {
-  return {
-    type: "DeleteNodeRefError",
-    source,
-    display: (resolveScopeName) =>
-      `tried to delete ${resolveScopeName(
-        source
-      )} using deleteNode, but it is a ref and must be deleted by deleteRef`,
-  };
-};
-
-export type DeleteRefNodeError = {
-  type: "DeleteRefNodeError";
-} & BluefishError;
-
-export const deleteRefNodeError = (source: Id): DeleteRefNodeError => {
-  return {
-    type: "DeleteRefNodeError",
-    source,
-    display: (resolveScopeName) =>
-      `tried to delete ${resolveScopeName(
-        source
-      )} using deleteRef, but it is a node and must be deleted by deleteNode`,
-  };
-};
-
 export type ParentRefError = {
   type: "ParentRefError";
   caller: string;

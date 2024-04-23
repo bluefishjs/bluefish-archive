@@ -23,9 +23,12 @@ export const ErrorContext = createContext<ErrorContextType | null>(null);
 export const useError = () => {
   const context = useContext(ErrorContext);
 
-  if (context === null) {
-    throw new Error("useError must be used within an ErrorContext.Provider");
-  }
+  // if (context === null) {
+  //   throw new Error("useError must be used within an ErrorContext.Provider");
+  // }
 
-  return context.addError;
+  // return context.addError;
+  return (error: BluefishError) => {
+    console.warn(error);
+  };
 };

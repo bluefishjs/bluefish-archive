@@ -2,10 +2,12 @@ import {
   Accessor,
   Component,
   createContext,
+  createSignal,
   createUniqueId,
   useContext,
 } from "solid-js";
-import { Id } from "./scenegraph";
+import type { JSX } from "solid-js";
+import { Id, ScenegraphElement, resolveScenegraphElements } from "./scenegraph";
 import { ParentScopeIdContext, ScopeContext } from "./createName";
 import { Dynamic } from "solid-js/web";
 
@@ -21,7 +23,7 @@ export function withBluefish<ComponentProps>(
   WrappedComponent: Component<WithBluefishProps<ComponentProps>>,
   options?: { displayName?: string }
 ) {
-  return function (props: Omit<ComponentProps, "name"> & { name?: Id }) {
+  return (props: Omit<ComponentProps, "name"> & { name?: Id }) => {
     // scenegraph id
     const contextId = useContext(IdContext);
     const parentScopeId = useContext(ParentScopeIdContext);
@@ -36,6 +38,9 @@ export function withBluefish<ComponentProps>(
 
     // component scope id
     const [scope, setScope] = useContext(ScopeContext);
+    const [layout, setLayout] = createSignal<(parentId: Id | null) => void>(
+      () => {}
+    );
 
     // TODO: might have to initialize the scope in the store if the scope id was auto-generated
 
@@ -48,17 +53,30 @@ export function withBluefish<ComponentProps>(
     }
     setScope(scopeId(), "layoutNode", id());
 
-    return (
+    const jsx = (
       <ParentScopeIdContext.Provider value={scopeId}>
         <IdContext.Provider value={id}>
-          <Dynamic
-            component={WrappedComponent}
-            {...(props as WithBluefishProps<ComponentProps>)}
-            name={id()}
-          />
+          {(() => {
+            const layoutNode = resolveScenegraphElements(
+              <Dynamic
+                component={WrappedComponent}
+                {...(props as WithBluefishProps<ComponentProps>)}
+                name={id()}
+              />
+            );
+
+            setLayout(() => layoutNode[0].layout);
+
+            return layoutNode[0].jsx;
+          })()}
         </IdContext.Provider>
       </ParentScopeIdContext.Provider>
     );
+
+    return {
+      jsx,
+      layout: (parentId) => layout()(parentId),
+    } satisfies ScenegraphElement as unknown as JSX.Element;
   };
 }
 

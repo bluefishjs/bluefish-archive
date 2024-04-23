@@ -1,6 +1,6 @@
 import _ from "lodash";
 import Layout from "./layout";
-import { BBox, ChildNode, Id, Transform, useScenegraph } from "./scenegraph";
+import { BBox, ChildNode, Id, Transform } from "./scenegraph";
 import { JSX } from "solid-js/jsx-runtime";
 import { ParentProps, Show, mergeProps } from "solid-js";
 import { maybeAdd, maybeMax, maybeMin, maybeSub } from "./util/maybe";
