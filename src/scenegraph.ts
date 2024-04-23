@@ -82,20 +82,25 @@ export type Scenegraph = {
   [key: Id]: ScenegraphNode;
 };
 
+// Instead of returning a normal JSX.Element from our components, we return a ScenegraphElement.
+// This allows us to pass information up the JSX tree.
 export type ScenegraphElement = {
   jsx: JSX.Element;
   layout: (parentId: Id | null) => void;
 };
 
-// We pass information up the JSX tree using ScenegraphElements
-// This function turns children of a component into an array of ScenegraphElements
-// Inspired by JSX tokenizer: https://github.com/solidjs-community/solid-primitives/blob/199ddd6bd7f0e996cd48915c6ff910f6b8220989/packages/jsx-tokenizer/src/index.ts#L135
+// This function turns children of a component into an array of ScenegraphElements.
+// Inspired by JSX tokenizer:
+// https://github.com/solidjs-community/solid-primitives/blob/199ddd6bd7f0e996cd48915c6ff910f6b8220989/packages/jsx-tokenizer/src/index.ts#L135
 export const resolveScenegraphElements = (
   unresolved: unknown
 ): ScenegraphElement[] => {
+  // JSX children can be literals, functions, arrays, or objects. See the JSX.Element type for details.
   if (unresolved === undefined || unresolved === null) {
     return [];
   } else if (typeof unresolved === "function" && !unresolved.length) {
+    // This happens when a user passes information that gets wrapped by the Solid compiler.
+    // This wrapping preserves reactivity.
     return resolveScenegraphElements(unresolved());
   } else if (Array.isArray(unresolved)) {
     return unresolved.flatMap((child) => resolveScenegraphElements(child));
@@ -103,7 +108,7 @@ export const resolveScenegraphElements = (
     return [unresolved as unknown as ScenegraphElement];
   } else {
     throw new Error(
-      `Could not resolve scenegraph tokens. Unresolved value: ${JSON.stringify(
+      `Could not resolve scenegraph elements. Unresolved value: ${JSON.stringify(
         unresolved
       )}`
     );
