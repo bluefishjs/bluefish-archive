@@ -19,6 +19,12 @@ import {
 import type { JSX } from "solid-js";
 
 export type Id = string;
+
+// Inferred is used for ownership when a dimension is inferred from other dimensions (e.g. `left` is
+// inferred if `right` and `centerX` are set). An inferred dimension is owned (so it can't be
+// modified), but it's not set directly (so we can't assign a specific owner).
+// TODO: It's really owned by the two dimensions that it is inferred from, but we haven't
+// implemented this.
 export type Inferred = { inferred: true };
 export const inferred: Inferred = { inferred: true };
 
