@@ -16,7 +16,6 @@ export default defineConfig(({ command }) => ({
     open: "/public/index.html",
   },
   build: {
-    minify: false,
     lib: {
       entry: resolve(__dirname, "src/index.ts"),
       formats: ["es", "cjs", "umd"],
