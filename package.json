@@ -1,6 +1,6 @@
 {
   "name": "@bluefish-js/solid",
-  "version": "0.0.23",
+  "version": "0.0.24",
   "description": "A SolidJS diagramming library",
   "type": "module",
   "files": [
@@ -69,7 +69,5 @@
   },
   "peerDependencies": {
     "solid-js": "^1.7.7"
-  },
-  "readme": "ERROR: No README data found!",
-  "_id": "@bluefish-js/solid@0.0.9"
+  }
 }
