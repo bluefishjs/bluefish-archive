@@ -78,6 +78,30 @@ export type ScenegraphNode =
       parent: Id | null;
     };
 
+export const UNSAFE_asNode = (
+  node: ScenegraphNode
+): ScenegraphNode & { type: "node" } => {
+  return node as ScenegraphNode & { type: "node" };
+};
+
+export const UNSAFE_asRef = (
+  node: ScenegraphNode
+): ScenegraphNode & { type: "ref" } => {
+  return node as ScenegraphNode & { type: "ref" };
+};
+
+export const isNode = (
+  node: ScenegraphNode
+): node is ScenegraphNode & { type: "node" } => {
+  return node.type === "node";
+};
+
+export const isRef = (
+  node: ScenegraphNode
+): node is ScenegraphNode & { type: "ref" } => {
+  return node.type === "ref";
+};
+
 export type Scenegraph = {
   [key: Id]: ScenegraphNode;
 };
@@ -137,7 +161,7 @@ export const createScenegraph = (): ScenegraphContextType => {
     };
 
     if (parentId !== null) {
-      scenegraph[parentId].children.push(id);
+      UNSAFE_asNode(scenegraph[parentId]).children.push(id);
     }
   };
 
@@ -151,7 +175,11 @@ export const createScenegraph = (): ScenegraphContextType => {
     };
 
     if (parentId !== null) {
-      scenegraph[parentId].children.push(id);
+      const parentNode = scenegraph[parentId];
+      if (!isNode(parentNode)) {
+        throw new Error(`Parent id ${parentId} is not a node`);
+      }
+      parentNode.children.push(id);
     }
   };
 
@@ -224,64 +252,54 @@ the align node.
     if (
       // if mode is read and the ref node's left is undefined, then we don't want to materialize
       // transforms b/c we can't resolve the ref node's left anyway
-      !(
-        mode === "read" &&
-        (refNode as ScenegraphNode & { type: "node" }).bbox.left === undefined
-      )
+      !(mode === "read" && UNSAFE_asNode(refNode).bbox.left === undefined)
     ) {
       // default all undefined transforms to 0 on the id side
       for (const idSf of idSuffix) {
-        if (scenegraph[idSf].transform.translate.x === undefined) {
-          scenegraph[idSf].transform.translate.x = 0;
-          scenegraph[idSf].transformOwners.translate.x = id;
+        const node = UNSAFE_asNode(scenegraph[idSf]);
+        if (node.transform.translate.x === undefined) {
+          node.transform.translate.x = 0;
+          node.transformOwners.translate.x = id;
         }
 
-        accumulatedTransform.translate.x -= (
-          scenegraph[idSf] as ScenegraphNode & { type: "node" }
-        ).transform.translate.x!;
+        accumulatedTransform.translate.x -= node.transform.translate.x!;
       }
 
       for (const refIdSf of refIdSuffix) {
-        if (scenegraph[refIdSf].transform.translate.x === undefined) {
-          scenegraph[refIdSf].transform.translate.x = 0;
-          scenegraph[refIdSf].transformOwners.translate.x = id;
+        const node = UNSAFE_asNode(scenegraph[refIdSf]);
+        if (node.transform.translate.x === undefined) {
+          node.transform.translate.x = 0;
+          node.transformOwners.translate.x = id;
         }
 
-        accumulatedTransform.translate.x += (
-          scenegraph[refIdSf] as ScenegraphNode & { type: "node" }
-        ).transform.translate.x!;
+        accumulatedTransform.translate.x += node.transform.translate.x!;
       }
     }
 
     if (
       // if mode is read and the ref node's top is undefined, then we don't want to materialize
       // transforms b/c we can't resolve the ref node's top anyway
-      !(
-        mode === "read" &&
-        (refNode as ScenegraphNode & { type: "node" }).bbox.top === undefined
-      )
+      !(mode === "read" && UNSAFE_asNode(refNode).bbox.top === undefined)
     ) {
       // default all undefined transforms to 0 on the id side
       for (const idSf of idSuffix) {
-        if (scenegraph[idSf].transform.translate.y === undefined) {
-          scenegraph[idSf].transform.translate.y = 0;
-          scenegraph[idSf].transformOwners.translate.y = id;
+        const node = UNSAFE_asNode(scenegraph[idSf]);
+        if (node.transform.translate.y === undefined) {
+          node.transform.translate.y = 0;
+          node.transformOwners.translate.y = id;
         }
 
-        accumulatedTransform.translate.y -= (
-          scenegraph[idSf] as ScenegraphNode & { type: "node" }
-        ).transform.translate.y!;
+        accumulatedTransform.translate.y -= node.transform.translate.y!;
       }
 
       for (const refIdSf of refIdSuffix) {
-        if (scenegraph[refIdSf].transform.translate.y === undefined) {
-          scenegraph[refIdSf].transform.translate.y = 0;
-          scenegraph[refIdSf].transformOwners.translate.y = id;
+        const node = UNSAFE_asNode(scenegraph[refIdSf]);
+        if (node.transform.translate.y === undefined) {
+          node.transform.translate.y = 0;
+          node.transformOwners.translate.y = id;
         }
 
-        accumulatedTransform.translate.y += (
-          scenegraph[refIdSf] as ScenegraphNode & { type: "node" }
-        ).transform.translate.y!;
+        accumulatedTransform.translate.y += node.transform.translate.y!;
       }
     }
     return resolveRef(node.refId, mode, accumulatedTransform);
@@ -289,7 +307,7 @@ the align node.
 
   const getBBox = (id: string): BBox => {
     const { id: resolvedId, transform } = resolveRef(id, "read");
-    const node = scenegraph[resolvedId] as ScenegraphNode & { type: "node" }; // guaranteed by resolveRef
+    const node = UNSAFE_asNode(scenegraph[resolvedId]); // guaranteed by resolveRef
 
     return {
       get left() {
@@ -360,7 +378,7 @@ the align node.
       }
     }
 
-    const node = scenegraph[id] as ScenegraphNode & { type: "node" }; // guaranteed by resolveRef
+    const node = UNSAFE_asNode(scenegraph[id]); // guaranteed by resolveRef
 
     // check bbox ownership
     for (const key of Object.keys(bbox) as Array<Dim>) {
@@ -471,7 +489,7 @@ the align node.
       }
     }
 
-    const node = scenegraph[resolvedId] as ScenegraphNode & { type: "node" }; // guaranteed by resolveRef
+    const node = UNSAFE_asNode(scenegraph[resolvedId]); // guaranteed by resolveRef
 
     const proposedBBox: BBox = {};
     const proposedTransform: Transform = {
@@ -575,7 +593,7 @@ the align node.
     dim: Dim // on this `dim`?
   ): boolean => {
     const { id: resolvedId } = resolveRef(check, "check");
-    const node = scenegraph[resolvedId] as ScenegraphNode & { type: "node" }; // guaranteed by resolveRef
+    const node = UNSAFE_asNode(scenegraph[resolvedId]); // guaranteed by resolveRef
 
     if (dim === "left" || dim === "centerX" || dim === "right") {
       return !(

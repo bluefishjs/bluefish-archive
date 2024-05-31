@@ -17,6 +17,7 @@ import {
   Id,
   ScenegraphElement,
   resolveScenegraphElements,
+  UNSAFE_asNode,
 } from "./scenegraph";
 import { IdContext } from "./withBluefish";
 import { ScopeContext } from "./createName";
@@ -94,15 +95,16 @@ export const Layout = (props: LayoutProps) => {
     on(
       () => layoutUID(),
       () => {
+        const node = UNSAFE_asNode(scenegraph[props.name]);
         setScenegraphInfo({
-          bbox: scenegraph[props.name]?.bbox ?? {},
+          bbox: node.bbox ?? {},
           transform: {
             translate: {
-              x: scenegraph[props.name]?.transform?.translate?.x ?? 0,
-              y: scenegraph[props.name]?.transform?.translate?.y ?? 0,
+              x: node.transform?.translate?.x ?? 0,
+              y: node.transform?.translate?.y ?? 0,
             },
           },
-          customData: scenegraph[props.name]?.customData,
+          customData: node.customData,
         });
       }
     )
@@ -115,14 +117,16 @@ export const Layout = (props: LayoutProps) => {
       childLayout(props.name);
     }
 
+    const node = UNSAFE_asNode(scenegraph[props.name]);
+
     const { bbox, transform, customData } = props.layout(
-      (scenegraph[props.name]?.children ?? []).map((childId: Id) =>
+      (node.children ?? []).map((childId: Id) =>
         createChildRepr(props.name, childId)
       )
     );
 
     mergeBBoxAndTransform(props.name, props.name, bbox, transform);
-    scenegraph[props.name].customData = customData;
+    node.customData = customData;
   };
 
   return {
