@@ -95,7 +95,15 @@ export const Layout = (props: LayoutProps) => {
     on(
       () => layoutUID(),
       () => {
-        const node = UNSAFE_asNode(scenegraph[props.name]);
+        const node = UNSAFE_asNode(
+          scenegraph[props.name] ?? {
+            type: "node",
+            bbox: {},
+            transform: { translate: {} },
+            children: [],
+            customData: {},
+          }
+        );
         setScenegraphInfo({
           bbox: node.bbox ?? {},
           transform: {
