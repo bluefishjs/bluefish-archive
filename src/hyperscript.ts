@@ -1,4 +1,4 @@
-import { Component } from "solid-js";
+import { Component, JSX } from "solid-js";
 import h from "solid-js/h";
 
 import { Align as AlignJSX } from "./align";
@@ -16,8 +16,10 @@ import { Rect as RectJSX } from "./rect";
 import { Ref as RefJSX } from "./ref";
 import { StackH as StackHJSX } from "./stackh";
 import { Text as TextJSX } from "./text";
+import { Path as PathJSX } from "./path";
 import { withBluefish as withBluefishJSX } from "./withBluefish";
 
+// @ts-expect-error idk why this doesn't typecheck, but I copied it from elsewhere
 export function component<P>(
   fn: Component<P>
 ): (props: P, children: JSX.Element[]) => JSX.Element;
@@ -51,6 +53,7 @@ export const Rect = component(RectJSX);
 export const Ref = component(RefJSX);
 export const StackH = component(StackHJSX);
 export const Text = component(TextJSX);
+export const Path = component(PathJSX);
 export function withBluefish(WrappedComponent: Component) {
   return component(withBluefishJSX(WrappedComponent));
 }

@@ -70,7 +70,7 @@ export const Group = withBluefish(
             y: maybeSub(props.y, top),
           },
         },
-        bbox: { left, top, right, bottom, width, height },
+        bbox: { left, top, width, height },
       };
     };
 
