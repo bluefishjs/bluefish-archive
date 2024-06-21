@@ -156,11 +156,11 @@ export const Pulley = () => {
         <Weight width={30} height={30}>
           W1
         </Weight>
-        // hack to offset the centerX alignment of A and w1
+        {/* hack to offset the centerX alignment of A and w1 */}
         <Rect fill="transparent" width={r * 2 - 10} />
       </StackH>
       <StackH name="w2">
-        // hack to offset the centerX alignment of A and w2
+        {/* hack to offset the centerX alignment of A and w2 */}
         <Rect fill="transparent" width={r + (r / 2 - 10) - w2jut / 2} />
         <Weight width={r * 3 + w2jut} height={30}>
           W2

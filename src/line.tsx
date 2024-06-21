@@ -123,7 +123,7 @@ export const Line = withBluefish(
             y: maybeSub(props.y, top),
           },
         },
-        bbox: { left, top, right, bottom, width, height },
+        bbox: { left, top, width, height },
         customData: customData,
       };
     };
@@ -155,7 +155,7 @@ export const Line = withBluefish(
               stroke={props.stroke}
               stroke-width={props["stroke-width"]}
               stroke-dasharray={props["stroke-dasharray"]}
-            ></line>
+            />
             {paintProps.children}
           </g>
         </Show>
