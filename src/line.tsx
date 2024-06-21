@@ -1,4 +1,4 @@
-import { Show, mergeProps } from "solid-js";
+import { ParentProps, Show, mergeProps } from "solid-js";
 import Layout from "./layout";
 import withBluefish from "./withBluefish";
 import _ from "lodash";
@@ -21,15 +21,15 @@ const maybeMin = (a, b) =>
 const maybeMax = (a, b) =>
   a !== undefined && b !== undefined ? Math.max(a, b) : undefined;
 
-type LineProps = {
+type LineProps = ParentProps<{
   "stroke-width"?: number;
   "stroke-dasharray"?: string;
   stroke?: string;
   source?: number[];
   target?: number[];
-};
+}>;
 export const Line = withBluefish(
-  (props) => {
+  (props: LineProps) => {
     props = mergeProps(
       {
         "stroke-width": 3,
