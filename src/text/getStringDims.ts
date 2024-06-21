@@ -34,13 +34,13 @@ function getStringDims(str: string, style?: TextProps) {
       height: style !== undefined ? parseFloat(`${style["font-size"]}`) : 0,
     };
   } catch (e) {
-    // console.error(e);
+    console.error(e);
     return null;
   }
 }
 
 export default memoize(getStringDims, (str, style) => {
   if (!style) return `${str}_`;
-  const { children, ...rest } = style;
+  const { children, name, ...rest } = style;
   return `${str}_${JSON.stringify(rest)}`;
 });

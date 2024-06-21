@@ -1,10 +1,11 @@
 import { Dynamic } from "solid-js/web";
 import {
-  Component,
+  For,
   JSX,
   ParentProps,
-  children,
   createRenderEffect,
+  createSignal,
+  on,
   onCleanup,
   useContext,
 } from "solid-js";
@@ -12,13 +13,17 @@ import {
   BBox,
   Transform,
   UNSAFE_useScenegraph,
-  ParentIDContext,
   LayoutFn,
   Id,
+  ScenegraphElement,
+  resolveScenegraphElements,
+  UNSAFE_asNode,
 } from "./scenegraph";
 import { IdContext } from "./withBluefish";
 import { ScopeContext } from "./createName";
 import { useError } from "./errorContext";
+import { LayoutUIDContext } from "./bluefish";
+import { createStore, produce } from "solid-js/store";
 
 export type LayoutProps = ParentProps<{
   name: Id;
@@ -32,51 +37,110 @@ export type LayoutProps = ParentProps<{
   }) => JSX.Element;
 }>;
 
-export const Layout: Component<LayoutProps> = (props) => {
-  const parentId = useContext(ParentIDContext);
+export const Layout = (props: LayoutProps) => {
   const [_scope, setScope] = useContext(ScopeContext);
   const error = useError();
+  const layoutUID = useContext(LayoutUIDContext);
+  const [childLayouts, setChildLayouts] = createSignal<
+    ((parentId: Id | null) => void)[]
+  >([]);
 
-  const { scenegraph, createNode, deleteNode, setLayout } =
-    UNSAFE_useScenegraph();
-
-  createRenderEffect(() => {
-    createNode(props.name, parentId);
+  const [scenegraphInfo, setScenegraphInfo] = createStore({
+    bbox: {},
+    transform: { translate: {} },
+    customData: {},
   });
 
-  // onCleanup(() => {
-  //   deleteNode(error, props.name, setScope);
-  // });
+  const { scenegraph, createNode, mergeBBoxAndTransform, createChildRepr } =
+    UNSAFE_useScenegraph();
 
   // evaluate the child props before running the effect so that children's layout functions are
   // called before the parent's layout function
   // h/t Erik Demaine
   const jsx = (
-    <ParentIDContext.Provider value={props.name}>
-      <IdContext.Provider value={() => undefined}>
-        <Dynamic
-          component={props.paint}
-          bbox={scenegraph[props.name]?.bbox ?? {}}
-          transform={{
-            translate: {
-              x: scenegraph[props.name]?.transform?.translate?.x ?? 0,
-              y: scenegraph[props.name]?.transform?.translate?.y ?? 0,
-            },
-          }}
-          customData={scenegraph[props.name]?.customData}
-        >
-          {props.children}
-        </Dynamic>
-      </IdContext.Provider>
-    </ParentIDContext.Provider>
+    <IdContext.Provider value={() => undefined}>
+      {(() => {
+        const childNodes = resolveScenegraphElements(props.children);
+
+        setChildLayouts(() => {
+          return childNodes.map((child) => {
+            return child.layout;
+          });
+        });
+
+        return (
+          <Dynamic component={props.paint} {...scenegraphInfo}>
+            <For each={childNodes}>{(child) => child.jsx}</For>
+          </Dynamic>
+        );
+      })()}
+    </IdContext.Provider>
   );
 
-  createRenderEffect(() => {
-    // run this later so that the children's layout functions are called before the parent's layout function
-    setLayout(props.name, props.layout);
+  onCleanup(() => {
+    // when the Layout node is destroyed, we need to clear any relevant scopes
+    setScope(
+      produce((scope) => {
+        // filter out scopes that have this id as their layoutNode
+        for (const key of Object.keys(scope) as Array<Id>) {
+          if (scope[key].layoutNode === props.name) {
+            delete scope[key];
+          }
+        }
+      })
+    );
   });
 
-  return jsx;
+  createRenderEffect(
+    on(
+      () => layoutUID(),
+      () => {
+        const node = UNSAFE_asNode(
+          scenegraph[props.name] ?? {
+            type: "node",
+            bbox: {},
+            transform: { translate: {} },
+            children: [],
+            customData: {},
+          }
+        );
+        setScenegraphInfo({
+          bbox: node.bbox ?? {},
+          transform: {
+            translate: {
+              x: node.transform?.translate?.x ?? 0,
+              y: node.transform?.translate?.y ?? 0,
+            },
+          },
+          customData: node.customData,
+        });
+      }
+    )
+  );
+
+  const layout = (parentId: Id | null) => {
+    createNode(props.name, parentId);
+
+    for (const childLayout of childLayouts()) {
+      childLayout(props.name);
+    }
+
+    const node = UNSAFE_asNode(scenegraph[props.name]);
+
+    const { bbox, transform, customData } = props.layout(
+      (node.children ?? []).map((childId: Id) =>
+        createChildRepr(props.name, childId)
+      )
+    );
+
+    mergeBBoxAndTransform(props.name, props.name, bbox, transform);
+    node.customData = customData;
+  };
+
+  return {
+    jsx,
+    layout,
+  } satisfies ScenegraphElement as unknown as JSX.Element;
 };
 
 export default Layout;
