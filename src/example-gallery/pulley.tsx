@@ -101,6 +101,16 @@ export const Pulley = () => {
         <Ref select="C" />
       </Distribute>
 
+      <Group name="G">
+        <Ref select="A" />
+        <Ref select="B" />
+        <Ref select="C" />
+      </Group>
+      <Align alignment="centerX">
+        <Ref select="rect" />
+        <Ref select="G" />
+      </Align>
+
       <Align alignment="center">
         <Ref select="B" />
         <Text x={r} y={-r}>
@@ -212,16 +222,6 @@ export const Pulley = () => {
         <Ref select="t6" />
         <Ref select="t5" />
         <Ref select="t4" />
-      </Align>
-
-      <Group name="G">
-        <Ref select="A" />
-        <Ref select="B" />
-        <Ref select="C" />
-      </Group>
-      <Align alignment="centerX">
-        <Ref select="rect" />
-        <Ref select="G" />
       </Align>
 
       {/* Overdraws to make diagram pretty */}
