@@ -1,11 +1,10 @@
 import { Meta, StoryObj } from "storybook-solidjs";
 import Bluefish from "../../bluefish";
-import Group from "../../group";
-import Circle from "../../circle";
+import Ellipse from "../../ellipse";
 
-const meta: Meta<typeof Circle> = {
-  title: "Components/Circle",
-  component: Circle,
+const meta: Meta<typeof Ellipse> = {
+  title: "Components/Ellipse",
+  component: Ellipse,
   tags: ["autodocs"],
   argTypes: {
     fill: { control: "color" },
@@ -14,15 +13,16 @@ const meta: Meta<typeof Circle> = {
 };
 
 export default meta;
-type Story = StoryObj<typeof Circle>;
+type Story = StoryObj<typeof Ellipse>;
 
 /**
- * Creates a circle. Takes [SVG's Circle Element's Attributes](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/circle#attributes)
+ * Creates a Ellipse. Takes [SVG's Ellipse Element Attributes](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/ellipse#attributes)
  * as parameters.
  */
-export const CircleComponent: Story = {
+export const EllipseComponent: Story = {
   args: {
-    r: 15,
+    rx: 15,
+    ry:20,
     cx: 20,
     cy: 20,
     fill: "red",
@@ -32,7 +32,7 @@ export const CircleComponent: Story = {
   render: (props) => {
     return (
       <Bluefish width={600} height={100}>
-        <Circle {...props} />
+        <Ellipse {...props} />
       </Bluefish>
     );
   },
