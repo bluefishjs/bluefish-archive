@@ -17,6 +17,7 @@ import {
   ParentProps,
   Show,
   createContext,
+  createEffect,
   createRenderEffect,
   createSignal,
   createUniqueId,
@@ -29,6 +30,7 @@ import { ErrorContext, createErrorContext } from "./errorContext";
 import { BluefishError } from "./errors";
 import { getAncestorChain } from "./util/lca";
 import toast, { Toaster } from "solid-toast";
+import afterFrame from "afterframe";
 
 export type BluefishProps = ParentProps<{
   width?: number;
@@ -36,6 +38,7 @@ export type BluefishProps = ParentProps<{
   padding?: number;
   id?: string;
   debug?: boolean;
+  perf?: boolean;
   positioning?: "absolute" | "relative";
 }>;
 
@@ -202,6 +205,9 @@ export function Bluefish(props: BluefishProps) {
 
   // whenever a layout changes, blast away the old scenegraph and rebuild it
   createRenderEffect(() => {
+    // mark perf
+    performance.mark("start");
+
     // clear scenegraph
     for (const id in scenegraph) {
       delete scenegraph[id];
@@ -210,11 +216,36 @@ export function Bluefish(props: BluefishProps) {
     // run layout
     fullLayoutFunction()();
 
+    // mark perf
+    performance.mark("layout end");
+    const layoutDuration = performance.measure("layout", "start", "layout end");
+
     const uid = createUniqueId();
     // we use this signal to notify Layout nodes to re-render
     setLayoutUID(uid);
     // we use this signal for debugging since the scenegraph itself is not reactive
     setScenegraphSignal({ scenegraph, uid });
+
+    afterFrame(() => {
+      // mark perf
+      performance.mark("paint start");
+      const paintDuration = performance.measure(
+        "paint",
+        "layout end",
+        "paint start"
+      );
+
+      console.log(
+        JSON.stringify(
+          {
+            layout: `${layoutDuration.duration.toFixed(2)} ms`,
+            paint: `${paintDuration.duration.toFixed(2)} ms`,
+          },
+          null,
+          2
+        )
+      );
+    });
   });
 
   return (
@@ -236,6 +267,12 @@ export function Bluefish(props: BluefishProps) {
         <div style={{ float: "left" }}>
           <h1>Scope</h1>
           <pre>{JSON.stringify(scope, null, 2)}</pre>
+        </div>
+      </Show>
+      <Show when={props.perf === true}>
+        <div>
+          <h1>Scenegraph Size</h1>
+          <pre>{Object.keys(scenegraphSignal().scenegraph).length}</pre>
         </div>
       </Show>
     </>

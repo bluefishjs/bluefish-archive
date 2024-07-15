@@ -1,6 +1,6 @@
 // adapted from https://penrose.cs.cmu.edu/try/?examples=array-models/insertionSort
 
-import { For, Show } from "solid-js";
+import { For, Show, createMemo } from "solid-js";
 import Arrow from "../arrow";
 import Background from "../background";
 import Bluefish from "../bluefish";
@@ -167,40 +167,46 @@ const stageLabel = (stage, length) => {
   return "Stage " + stage;
 };
 
-const InsertionSortDiagram = withBluefish((props) => {
-  const insertionSortIterationData = [...insertionSort(props.unsortedArray)];
-  return (
-    <Group>
-      <StackV spacing={15}>
-        <For each={insertionSortIterationData}>
-          {(iterationData, i) => (
-            <InsertionSortStep
-              name={i()}
-              stage={i()}
-              iterationData={iterationData}
-            />
+export const InsertionSortDiagram = withBluefish(
+  (props: InsertionSortProps) => {
+    const insertionSortIterationData = createMemo(() => [
+      ...insertionSort(props.unsortedArray),
+    ]);
+    return (
+      <Group>
+        <StackV spacing={15}>
+          <For each={insertionSortIterationData()}>
+            {(iterationData, i) => (
+              <InsertionSortStep
+                name={i()}
+                stage={i()}
+                iterationData={iterationData}
+              />
+            )}
+          </For>
+        </StackV>
+        <For each={insertionSortIterationData()}>
+          {(_, i) => (
+            <StackH spacing={20}>
+              <LabelText>
+                {stageLabel(i(), props.unsortedArray.length)}
+              </LabelText>
+              <Ref select={i()} />
+            </StackH>
           )}
         </For>
-      </StackV>
-      <For each={insertionSortIterationData}>
-        {({}, i) => (
-          <StackH spacing={20}>
-            <LabelText>{stageLabel(i(), props.unsortedArray.length)}</LabelText>
-            <Ref select={i()} />
-          </StackH>
-        )}
-      </For>
-    </Group>
-  );
-});
+      </Group>
+    );
+  }
+);
 
 type InsertionSortProps = {
   unsortedArray: number[];
 };
-export const InsertionSort = ({ unsortedArray }: InsertionSortProps) => {
+export const InsertionSort = (props: InsertionSortProps) => {
   return (
     <Bluefish>
-      <InsertionSortDiagram unsortedArray={unsortedArray} />
+      <InsertionSortDiagram unsortedArray={props.unsortedArray} />
     </Bluefish>
   );
 };
