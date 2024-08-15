@@ -11,7 +11,7 @@ import { StackH } from "../stackh";
 import { Text } from "../text";
 import Circle from "../circle";
 import Arrow from "../arrow";
-import { within, userEvent } from "@storybook/testing-library";
+import { within, userEvent } from "@storybook/test";
 
 const meta: Meta = {
   title: "Regression/#50",

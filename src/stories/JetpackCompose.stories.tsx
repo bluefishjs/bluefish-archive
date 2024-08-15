@@ -58,7 +58,7 @@ const ComposeText = withBluefish((props: ComposeTextProps) => {
       letterSpacing: "1px",
       fill: "black",
     },
-    props
+    props,
   );
   return (
     <Text

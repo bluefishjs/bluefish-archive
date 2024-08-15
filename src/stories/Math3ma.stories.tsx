@@ -32,7 +32,7 @@ const dims = {
 };
 const myPath = new Path.Rectangle(
   new Point(dims.x, dims.y),
-  new Size(dims.width, dims.height)
+  new Size(dims.width, dims.height),
 );
 // const myPath = new Path();
 // myPath.add(new Point(50, 75));
@@ -43,8 +43,8 @@ myPath.insert(
   4,
   new Point(
     dims.x + dims.width / 2,
-    dims.y + dims.height - (dims.height * 5) / 50
-  )
+    dims.y + dims.height - (dims.height * 5) / 50,
+  ),
 );
 
 const dims2 = {
@@ -55,18 +55,18 @@ const dims2 = {
 };
 const myPath2 = new Path.Rectangle(
   new Point(dims2.x, dims2.y),
-  new Size(dims2.width, dims2.height)
+  new Size(dims2.width, dims2.height),
 );
 myPath2.insert(
   2,
-  new Point(dims2.x + dims2.width / 2, dims2.y + (dims2.height * 5) / 50)
+  new Point(dims2.x + dims2.width / 2, dims2.y + (dims2.height * 5) / 50),
 );
 myPath2.insert(
   5,
   new Point(
     dims2.x + dims2.width / 2,
-    dims2.y + dims2.height - (dims2.height * 5) / 50
-  )
+    dims2.y + dims2.height - (dims2.height * 5) / 50,
+  ),
 );
 
 export const Math3ma: Story = {

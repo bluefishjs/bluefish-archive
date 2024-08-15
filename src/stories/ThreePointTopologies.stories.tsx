@@ -25,7 +25,7 @@ const EllipseBackground = withBluefish(
   (
     props: ParentProps<{
       padding: number;
-    }>
+    }>,
   ) => (
     <Background
       padding={props.padding}
@@ -35,7 +35,7 @@ const EllipseBackground = withBluefish(
     >
       {props.children}
     </Background>
-  )
+  ),
 );
 
 const isAandCNeighbourhood = (neighbourhood: string[]) =>
@@ -65,7 +65,7 @@ const ThreePointTopology = withBluefish(
     props: WithBluefishProps<{
       topology: string[][];
       showLabels?: boolean;
-    }>
+    }>,
   ) => {
     const stack = createName("stack");
     const points: { [key: string]: string } = {
@@ -116,7 +116,7 @@ const ThreePointTopology = withBluefish(
         </EllipseBackground>
       </Group>
     );
-  }
+  },
 );
 
 // Diagram recreated in Bluefish based upon the original diagram in
