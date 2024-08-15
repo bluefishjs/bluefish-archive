@@ -1,25 +1,10 @@
-import {
-  Component,
-  createEffect,
-  createRenderEffect,
-  onCleanup,
-  useContext,
-} from "solid-js";
-import { Id, UNSAFE_useScenegraph, ParentIDContext } from "./scenegraph";
+import { onCleanup, useContext } from "solid-js";
+import type { JSX } from "solid-js";
+import { Id, UNSAFE_useScenegraph, ScenegraphElement } from "./scenegraph";
 import withBluefish from "./withBluefish";
 import { Name, Scope, ScopeContext } from "./createName";
 import { useError } from "./errorContext";
-
-// The properties we want:
-// every time the refId's bbox is updated, it should be propagated to the id
-//   (passing through worldTransforms)
-// every time the id's bbox is updated, it should be propagated to the refId
-//   (passing through worldTransforms)
-// I guess owners are the same for both?
-
-// TODO: actually the Ref's bbox should be completely derived from the refId's bbox that way we
-// avoid cycles. whenever the Ref's bbox is requested, we'll compute it. whenever the Ref's bbox is
-// "modified," we'll instead modify the refId's bbox.
+import { produce } from "solid-js/store";
 
 export type Selection = Id | [Id, ...Name[]];
 export type NormalizedSelection = [Id, ...Name[]];
@@ -82,30 +67,40 @@ export const resolveSelection = (
 export const Ref = withBluefish(
   (props: RefProps) => {
     const error = useError();
-    const parentId = useContext(ParentIDContext);
-    const [scope] = useContext(ScopeContext);
-    const { createRef, deleteRef } = UNSAFE_useScenegraph();
+    const [scope, setScope] = useContext(ScopeContext);
+    const { createRef } = UNSAFE_useScenegraph();
 
-    if (parentId === null) {
-      throw new Error("Ref must be a child of a Layout");
-    }
+    const normalizedSelection = () => normalizeSelection(props.select);
 
-    // TODO: what do we do if the layout node isn't defined?
-    createRenderEffect(() => {
-      const normalizedSelection = normalizeSelection(props.select);
-
-      createRef(
-        props.name,
-        resolveSelection(scope, normalizedSelection),
-        parentId
+    onCleanup(() => {
+      // when the Ref node is destroyed, we need to clear any relevant scopes
+      setScope(
+        produce((scope) => {
+          // filter out scopes that have this id as their layoutNode
+          for (const key of Object.keys(scope) as Array<Id>) {
+            if (scope[key].layoutNode === props.name) {
+              delete scope[key];
+            }
+          }
+        })
       );
-
-      onCleanup(() => {
-        deleteRef(error, props.name);
-      });
     });
 
-    return <></>;
+    // return <></>;
+    return {
+      jsx: <></>,
+      layout: (parentId: Id | null) => {
+        if (parentId === null) {
+          throw new Error("Ref must be a child of a Layout");
+        }
+
+        createRef(
+          props.name,
+          resolveSelection(scope, normalizedSelection()),
+          parentId
+        );
+      },
+    } satisfies ScenegraphElement as unknown as JSX.Element;
   },
   { displayName: "Ref" }
 );

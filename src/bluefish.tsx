@@ -5,19 +5,23 @@ import {
   ScenegraphNode,
   Transform,
   createScenegraph,
-  ParentIDContext,
   Id,
   BBox,
   ChildNode,
   Scenegraph,
+  resolveScenegraphElements,
 } from "./scenegraph";
 import {
+  Accessor,
   JSX,
   ParentProps,
   Show,
-  createEffect,
+  createContext,
+  createRenderEffect,
+  createSignal,
   createUniqueId,
   mergeProps,
+  untrack,
 } from "solid-js";
 import { ParentScopeIdContext, Scope, ScopeContext } from "./createName";
 import { createStore } from "solid-js/store";
@@ -67,6 +71,10 @@ Error path from root:
     // toast.error(errorMessage);
   };
 
+export const LayoutUIDContext = createContext<Accessor<string>>(() =>
+  createUniqueId()
+);
+
 export function Bluefish(props: BluefishProps) {
   props = mergeProps(
     {
@@ -77,7 +85,7 @@ export function Bluefish(props: BluefishProps) {
   );
 
   const scenegraphContext = createScenegraph();
-  const { scenegraph, createNode } = scenegraphContext;
+  const { scenegraph } = scenegraphContext;
   const [scope, setScope] = createStore<Scope>({});
   const errorContext = createErrorContext(createOnError(scenegraph, scope));
 
@@ -86,16 +94,25 @@ export function Bluefish(props: BluefishProps) {
   const id = autoGenId;
   const scopeId = props.id ?? autoGenScopeId;
 
-  const layout = (childNodes: ChildNode[]) => {
-    for (const childNode of childNodes) {
-      if (!childNode.owned.left) {
-        childNode.bbox.left = 0;
-      }
+  const [fullLayoutFunction, setFullLayoutFunction] = createSignal(() => {});
 
-      if (!childNode.owned.top) {
-        childNode.bbox.top = 0;
+  const [layoutUID, setLayoutUID] = createSignal(createUniqueId());
+  const [scenegraphSignal, setScenegraphSignal] = createSignal({
+    scenegraph,
+    uid: createUniqueId(),
+  });
+
+  const layout = (childNodes: ChildNode[]) => {
+    untrack(() => {
+      for (const childNode of childNodes) {
+        if (!childNode.owned.left) {
+          childNode.bbox.left = 0;
+        }
+        if (!childNode.owned.top) {
+          childNode.bbox.top = 0;
+        }
       }
-    }
+    });
 
     const bboxes = {
       left: childNodes.map((childNode) => childNode.bbox.left),
@@ -136,9 +153,9 @@ export function Bluefish(props: BluefishProps) {
     children: JSX.Element;
   }) => {
     const width = () =>
-      props.width ?? paintProps.bbox.width! + props.padding! * 2;
+      props.width ?? (paintProps.bbox.width ?? 0) + props.padding! * 2;
     const height = () =>
-      props.height ?? paintProps.bbox.height! + props.padding! * 2;
+      props.height ?? (paintProps.bbox.height ?? 0) + props.padding! * 2;
 
     return (
       <svg
@@ -157,21 +174,52 @@ export function Bluefish(props: BluefishProps) {
     );
   };
 
-  return (
-    <>
+  const jsx = (
+    <LayoutUIDContext.Provider value={layoutUID}>
       <ErrorContext.Provider value={errorContext}>
         <ScenegraphContext.Provider value={scenegraphContext}>
           <ScopeContext.Provider value={[scope, setScope]}>
-            <Layout name={id} layout={layout} paint={paint}>
-              <ParentScopeIdContext.Provider value={() => scopeId}>
-                <ParentIDContext.Provider value={id}>
-                  {props.children}
-                </ParentIDContext.Provider>
-              </ParentScopeIdContext.Provider>
-            </Layout>
+            {(() => {
+              const layoutNode = resolveScenegraphElements(
+                <Layout name={id} layout={layout} paint={paint}>
+                  <ParentScopeIdContext.Provider value={() => scopeId}>
+                    {props.children}
+                  </ParentScopeIdContext.Provider>
+                </Layout>
+              );
+
+              setFullLayoutFunction(() => {
+                return () => layoutNode[0].layout(null);
+              });
+
+              return layoutNode[0].jsx;
+            })()}
           </ScopeContext.Provider>
         </ScenegraphContext.Provider>
       </ErrorContext.Provider>
+    </LayoutUIDContext.Provider>
+  );
+
+  // whenever a layout changes, blast away the old scenegraph and rebuild it
+  createRenderEffect(() => {
+    // clear scenegraph
+    for (const id in scenegraph) {
+      delete scenegraph[id];
+    }
+
+    // run layout
+    fullLayoutFunction()();
+
+    const uid = createUniqueId();
+    // we use this signal to notify Layout nodes to re-render
+    setLayoutUID(uid);
+    // we use this signal for debugging since the scenegraph itself is not reactive
+    setScenegraphSignal({ scenegraph, uid });
+  });
+
+  return (
+    <>
+      {jsx}
       <Toaster
         position="top-left"
         containerStyle={{
@@ -183,7 +231,7 @@ export function Bluefish(props: BluefishProps) {
         <br />
         <div style={{ float: "left", "margin-right": "40px" }}>
           <h1>Scenegraph</h1>
-          <pre>{JSON.stringify(scenegraph, null, 2)}</pre>
+          <pre>{JSON.stringify(scenegraphSignal().scenegraph, null, 2)}</pre>
         </div>
         <div style={{ float: "left" }}>
           <h1>Scope</h1>

@@ -248,7 +248,7 @@ export const InsertionSortDiagram: Story = {
   render: (args) => {
     try {
       const convertedArray = JSON.parse(args.unsortedArrayString).map(
-        (val: string) => +val,
+        (val: string) => +val
       );
       if (convertedArray.filter((val) => isNaN(val)).length > 0) {
         throw new Error("Non-numeric value in array");

@@ -5,9 +5,17 @@
   <h3>Create beautiful, customizable visualizations in SolidJS.</h3>
 </div>
 
+## Installation Guide
+
+To start, make sure you have `pnpm` installed. Installation instructions can be found at `https://pnpm.io/installation`.
+
+After you have installed `pnpm`, open a new terminal window and navigate to project directory. Run the following command to install all necessary packages and dependencies:
+
+`pnpm install`
+
 ## Available Scripts
 
-In the project directory, you can run:
+You can run the following commands inside the project directory:
 
 ### `pnpm start`
 
@@ -16,20 +24,10 @@ Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
 The page will reload if you make edits.<br>
 
-### `pnpm build`
-
-Builds the app for production to the `dist` folder.<br>
-It correctly bundles Solid in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.<br>
-Your app is ready to be deployed!
-
 ### `pnpm storybook`
 
 Runs storybook
 
-## Deployment
+## Making an `App.tsx` File
 
-1. Bump the version number
-2. Commit changes.
-3. Run `pnpm build && pnpm publish`.
+When you run `pnpm start`, it builds and renders the contents of `App.tsx`. You should create an `App.tsx` file in `/public`. This can be done by duplicating the `App.template.tsx` file in the `/public` folder and renaming it to `App.tsx`.

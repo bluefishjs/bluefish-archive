@@ -1,10 +1,8 @@
 import { ParentProps, JSX, mergeProps, children, For } from "solid-js";
-import { StackArgs, stackLayout } from "./stackLayout";
 import withBluefish, { WithBluefishProps } from "./withBluefish";
 import Layout from "./layout";
 import { Transform, ChildNode, Id, BBox } from "./scenegraph";
 import * as BBoxUtil from "./util/bbox";
-import { AlignmentVertical } from "./align";
 import dagre from "dagre";
 import { maybeSub } from "./util/maybe";
 
@@ -31,7 +29,7 @@ export type NodeProps = WithBluefishProps<
   ParentProps<{ id: string; type?: "node" }>
 >;
 
-export const Node = withBluefish((props: NodeProps) => {
+export const Node = (props: NodeProps) => {
   props = mergeProps(
     {
       type: "node" as const,
@@ -40,7 +38,7 @@ export const Node = withBluefish((props: NodeProps) => {
   );
 
   return props as unknown as JSX.Element;
-});
+};
 
 export type EdgeProps = WithBluefishProps<{
   source: string;
@@ -48,7 +46,7 @@ export type EdgeProps = WithBluefishProps<{
   type?: "edge";
 }>;
 
-export const Edge = withBluefish((props: EdgeProps) => {
+export const Edge = (props: EdgeProps) => {
   props = mergeProps(
     {
       type: "edge" as const,
@@ -57,7 +55,7 @@ export const Edge = withBluefish((props: EdgeProps) => {
   );
 
   return props as unknown as JSX.Element;
-});
+};
 
 export const GraphLayered = withBluefish(
   (props: GraphLayeredProps) => {

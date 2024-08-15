@@ -60,7 +60,6 @@ export {
   createScenegraph,
   useScenegraph,
   UNSAFE_useScenegraph,
-  ParentIDContext,
   ScenegraphContext,
 } from "./scenegraph";
 export type {

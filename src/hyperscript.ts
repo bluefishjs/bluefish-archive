@@ -1,4 +1,4 @@
-import { Component } from "solid-js";
+import { Component, JSX } from "solid-js";
 import h from "solid-js/h";
 
 import { Align as AlignJSX } from "./align";
@@ -19,6 +19,7 @@ import { Text as TextJSX } from "./text";
 import { Path as PathJSX } from "./path";
 import { withBluefish as withBluefishJSX } from "./withBluefish";
 
+// @ts-expect-error idk why this doesn't typecheck, but I copied it from elsewhere
 export function component<P>(
   fn: Component<P>
 ): (props: P, children: JSX.Element[]) => JSX.Element;

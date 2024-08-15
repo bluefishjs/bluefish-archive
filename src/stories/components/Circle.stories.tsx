@@ -17,7 +17,7 @@ export default meta;
 type Story = StoryObj<typeof Circle>;
 
 /**
- * Creates a circle. Takes [SVGCircleElement Attributes](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/circle#attributes)
+ * Creates a circle. Takes [SVG's Circle Element's Attributes](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/circle#attributes)
  * as parameters.
  */
 export const CircleComponent: Story = {

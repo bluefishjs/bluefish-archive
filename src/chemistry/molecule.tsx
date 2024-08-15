@@ -3,8 +3,11 @@ import Atom from "./atom";
 import Bond from "./bond";
 import Ref from "../ref";
 import Group from "../group";
+// @ts-expect-error untyped file
 import SmilesDrawer from "smiles-drawer/app.js";
+// @ts-expect-error untyped file
 import SvgDrawer from "smiles-drawer/src/SvgDrawer";
+// @ts-expect-error untyped file
 import ThemeManager from "smiles-drawer/src/ThemeManager";
 import { For } from "solid-js";
 import Circle from "../circle";
