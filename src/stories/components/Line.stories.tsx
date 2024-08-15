@@ -13,20 +13,21 @@ const meta: Meta<typeof Line> = {
   tags: ["autodocs"],
   argTypes: {
     "stroke-dasharray": {
-        description: "The specification of dashes and gaps for the line. See [here](https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-dasharray) for more details."
+      description:
+        "The specification of dashes and gaps for the line. See [here](https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-dasharray) for more details.",
     },
     "stroke-width": {
-        description: "The width of the line.",
-        control: {
-            type: "number", 
-            step: 1
-        }
+      description: "The width of the line.",
+      control: {
+        type: "number",
+        step: 1,
+      },
     },
     stroke: {
-        description: "The color of the line.",
-        control: {
-            type: "text"
-        }
+      description: "The color of the line.",
+      control: {
+        type: "text",
+      },
     },
 
     source: {
@@ -41,7 +42,8 @@ const meta: Meta<typeof Line> = {
       },
     },
     target: {
-        description:  "Either an array of two numbers, `[a, b]`, between 0 and 1, or `undefined`. If an array is specified, the end point of the line's x-coordinate \
+      description:
+        "Either an array of two numbers, `[a, b]`, between 0 and 1, or `undefined`. If an array is specified, the end point of the line's x-coordinate \
         is a linear interpolation between the left and right edges of the source box. For example, if `a` is 0.25, then the \
         x-coordinate is a quarter of the way from the left edge. Similarly, its y-coordinate is a linear interpolation between \
         the top and bottom edges of the source box. For example, if `b` is 0.25, then the y-coordinate is a quarter of the way from the top edge.\

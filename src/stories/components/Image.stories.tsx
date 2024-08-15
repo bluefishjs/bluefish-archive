@@ -21,7 +21,7 @@ export const FirstStory: Story = {
   args: {
     width: 100,
     height: 100,
-    href: "https://bluefishjs.org/img/bluefish%20logo%20transparent%20-%20no%20bubbles.svg",
+    href: "https://bluefishjs.org/bluefish-logo.png",
   },
   render: (props) => (
     <Bluefish>

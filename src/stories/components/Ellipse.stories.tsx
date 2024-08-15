@@ -22,7 +22,7 @@ type Story = StoryObj<typeof Ellipse>;
 export const EllipseComponent: Story = {
   args: {
     rx: 15,
-    ry:20,
+    ry: 20,
     cx: 20,
     cy: 20,
     fill: "red",

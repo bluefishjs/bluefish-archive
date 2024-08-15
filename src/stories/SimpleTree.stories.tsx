@@ -71,7 +71,7 @@ const Tree = withBluefish((props: TreeProps) => {
       nodeId: createUniqueId(),
       value: "?",
     },
-    props
+    props,
   );
 
   // merge props with default
@@ -81,7 +81,7 @@ const Tree = withBluefish((props: TreeProps) => {
 
   // TODO: could probably get even fancier with this by turning objects into nested names somehow
   const subtreeNames = (props.subtrees ?? []).map((_, i) =>
-    createName(`subtree${i}`)
+    createName(`subtree${i}`),
   );
 
   return (

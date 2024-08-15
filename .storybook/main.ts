@@ -6,14 +6,13 @@ const config: StorybookConfig = {
     "@storybook/addon-links",
     "@storybook/addon-essentials",
     "@storybook/addon-interactions",
-    "@storybook/addon-docs"
+    "@storybook/addon-docs",
+    "@chromatic-com/storybook"
   ],
   framework: {
     name: "storybook-solidjs-vite",
     options: {},
   },
-  docs: {
-    autodocs: "tag",
-  },
+  docs: {},
 };
 export default config;

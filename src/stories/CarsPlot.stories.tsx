@@ -21,13 +21,13 @@ export const Cars: Story = {
           x={(dims: any) =>
             scaleLinear(
               [0, Math.max(...nonNullData.map((d) => +d.Horsepower))!],
-              [0, 1000]
+              [0, 1000],
             )
           }
           y={(dims: any) =>
             scaleLinear(
               [0, Math.max(...nonNullData.map((d) => +d.Miles_per_Gallon))!],
-              [500, 0]
+              [500, 0],
             )
           }
           color={() => () => "cornflowerblue"}
